@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="GB2312"?>
+<project default="CI" basedir=".">
+	 <!--		timestamp set		-->
+	 <tstamp><format property="today" pattern="yyyyMMdd"/></tstamp>
+	 
+     <!--		property set		-->
+	 <property name="project.name" value="VODM" />
+     <property name="project.path" value="/compiler/compiler/VODM"/>
+	 <property name="svn.checkout.dir" value="${project.path}/checkout"/>
+	 <property name="jar.name" value="${project.name}.jar" />	 
+	 <property name="build.name" value="VODM" />
+	 <property name="build.dir" value="${svn.checkout.dir}"/>
+	 <property name="backup.dir" value="${project.path}/dist/${today}" />
+	 <property name="tar.name" value="${build.name}.tar.gz" />
+	 <property name="project.bin.dir" value="${build.name}/bin" />
+	 <property name="project.resource.dir" value="${build.name}/resource" />
+	 <property name="project.conf.dir" value="${build.name}/conf" />
+	 <property name="project.libs.dir" value="${build.name}/libs" />
+	 <property name="deploy.path" value="/compiler/deploy/${project.name}" />
+
+	 <!--		compile temp dir		 -->
+	 <property name="classes.dir" value="${svn.checkout.dir}/classes" />
+	 <property name="resource.dir" value="${svn.checkout.dir}/resource" />
+     <property name="package.dir" value="${svn.checkout.dir}/resource" />
+	 <property name="lib.dir" value ="${svn.checkout.dir}/libs"/>
+	 <property name="ant.home" value="/compiler/cruisecontrol/apache-ant-1.7.0" />
+	
+	 <!--		compile property set		-->
+	 <property name="app.src.dir" value="${svn.checkout.dir}/src" />
+	 <property name="app.libs.dir" value="${svn.checkout.dir}/libs" />
+	 <property name="app.resource.dir" value="${svn.checkout.dir}/resource" />
+	 <property name="app.run.dir" value="${svn.checkout.dir}/run" />		
+	 <!--		FTP property set,must be modify		-->
+     <property name="ftp.remotedir" value="/home/biluocun/test/VODM"/>
+     <property name="ftp.server" value="10.0.138.19"/>
+     <property name="ftp.userid" value="biluocun"/>
+     <property name="ftp.password" value="blc123"/>
+	 <!--		SVN property set		-->
+	 <path id="svnant.lib">      
+           <pathelement location="${ant.home}/lib/svnant.jar"/>
+           <pathelement location="${ant.home}/lib/svnClientAdapter.jar"/>
+           <pathelement location="${ant.home}/lib/svnjavahl.jar"/>   
+     </path>
+     <!--		other property set		-->           
+	 <property name="svn.user" value="compiler"/>
+     <property name="svn.passwd" value="123456"/>
+     <property name="svn.server" value="http://10.0.138.20/svn/svn/"/>
+     <property name="svn.path" value="CODE/01.product/04.VODM/02.AAA/"/>
+     <property name="urlRepos" value="${svn.server}/${svn.path}"/>
+	 <property name="test.file" value="${lib.dir}/junit.jar" />
+	 <property name="report.dir" value="${svn.checkout.dir}"/>
+	 <property name="report.name" value="junit-ccp-tv.html"/>
+	 <property name="mail.server" value="mail.wasu.com.cn"/>
+     <property name="send.user" value="ljzhang@wasu.com.cn"/>
+     <property name="send.passwd" value="151016"/>
+     <property name="accpet.user" value="ljzhang@wasu.com.cn,joan4591@163.com,zxg@wasu.com.cn"/>
+     <property name="send.addr" value="ljzhang@wasu.com.cn"/>
+
+     <!--		clean old dist dir		-->
+	 <target name="clean">
+		<!-- dir="${svn.checkout.dir}" /-->
+		<delete file="${backup.dir}/${tar.name}" />
+		<delete dir="${report.dir}" />
+		<delete dir="${build.name}" />
+	 </target>
+
+	 <target name="init" depends="clean">
+		<mkdir dir="${build.name}" />
+		<mkdir dir="${project.bin.dir}" />
+		<mkdir dir="${project.resource.dir}" />
+		<mkdir dir="${project.libs.dir}" />
+		<mkdir dir="${project.conf.dir}" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${backup.dir}" />
+		<mkdir dir="${deploy.path}" />
+	</target>
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" 
+          classpathref="svnant.lib" />
+     
+    <target name="checkout" depends="init">
+ 		<echo message="*******************************************************" />
+		<echo message="*                                                     *" />
+		<echo message="*        checkout code                                *" />
+		<echo message="*                                                     *" />
+		<echo message="*******************************************************" />
+            <svn username="compiler" password="123456" javahl="false"> 
+            	<!-- <svn refid="svn.settings"> --> 
+                 <checkout url="${urlRepos}" destPath="${svn.checkout.dir}" />
+            </svn>
+     </target>
+
+	 <!--================================-->
+	 <!--		compile java		     -->
+	 <!--================================-->
+	 <target name="fullCompile" depends="">
+		<echo message="*******************************************************" />
+		<echo message="*                                                     *" />
+		<echo message="*        start compile                		         *" />
+		<echo message="*                                                     *" />
+		<echo message="*******************************************************" />
+	    <javac destdir="${classes.dir}" encoding="GBK">
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		    <src path="${app.src.dir}"/>
+	    </javac>		
+		<jar destfile="${project.resource.dir}/${jar.name}" basedir="${classes.dir}">
+		</jar>
+		<copy todir="${project.resource.dir}">
+			<fileset dir="${app.resource.dir}">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<copy todir="${project.libs.dir}">
+			<fileset dir="${app.libs.dir}">
+				<include name="*" />
+			</fileset>
+		</copy>
+		<copy todir="${project.bin.dir}">
+			<fileset dir="${app.run.dir}">
+				<include name="*" />
+			</fileset>
+		</copy>
+		<move todir="${project.conf.dir}">
+			<fileset dir="${app.resource.dir}">
+				<include name="config.properties" />
+				<include name="log4j.properties" />
+			</fileset>
+		</move>	 	 
+	</target>
+	 
+	 <!--================================-->
+	 <!-- configure properties   		 -->
+	 <!--================================-->
+	
+	 <target name="configure">
+		<echo message="*******************************************************" />
+		<echo message="*                                                     *" />
+		<echo message="*        start configure              		         *" />
+		<echo message="*                                                     *" />
+		<echo message="*******************************************************" />		
+		<replace dir="${project.resource.dir}" includes="log4j.properties">
+			<replacefilter token="log4j.appender.R.File=logs/server.log" value="log4j.appender.R.File=../bin/logs/server.log" />
+		</replace>
+		<replace dir="${project.conf.dir}" includes="log4j.properties">
+			<replacefilter token="log4j.appender.R.File=logs/server.log" value="log4j.appender.R.File=../bin/logs/server.log" />
+		</replace>
+     </target>
+     
+	 <target name="build-tar" >
+		<echo message="*******************************************************" />
+		<echo message="*                                                     *" />
+		<echo message="*       start build tar                 				 *" />
+		<echo message="*                                                     *" />
+		<echo message="*******************************************************" />
+		<echo message="${build.dir}"/>
+			<tar destfile="${backup.dir}/${tar.name}" compression="gzip" >		
+              <tarfileset dir="${project.path}/${build.name}">
+              <include name="resource/**" />
+			  <include name="bin/**" />
+			  <include name="libs/**" />
+			  <include name="conf/**" />
+              </tarfileset>
+			 </tar>
+	</target>
+     <!--=====================================================-->
+     <!--copy war to local apache tomcat					  -->
+     <!--=====================================================-->	
+     <target name="copy-tar" description="copy tar to local server">
+		<echo message="****************************************" />
+		<echo message="*                                      *" />
+		<echo message="*       copy tar to local server       *" />
+		<echo message="*                                      *" />
+		<echo message="****************************************" />
+		<untar src="${backup.dir}/${tar.name}" dest="${deploy.path}" overwrite="yes" compression="gzip" />
+	 </target>	
+     <target name="ftp-app" description="ftp app jar to remote">
+          <echo message="****************************************"/>
+          <echo message="*                                      *"/>
+          <echo message="*       ftp upload to server           *"/>
+          <echo message="*                                      *"/>
+          <echo message="****************************************"/>
+          <ftp server="${ftp.server}" remotedir="${ftp.remotedir}" userid="${ftp.userid}" password="${ftp.password}" preservelastmodified="yes" verbose="yes">
+                  <fileset dir="${backup.dir}">
+                          <include name="VODM*"/>
+                  </fileset>
+          </ftp>
+     </target>
+    
+     <target name="CI" depends="checkout,fullCompile,build-tar">
+		<echo message="**********************************************************"/>
+		<echo message="*                                                      	*"/>
+		<echo message="* compile successful and sended it to server successful  *"/>
+		<echo message="*                                                      	*"/>
+		<echo message="**********************************************************"/>	
+	 </target>
+
+ </project>

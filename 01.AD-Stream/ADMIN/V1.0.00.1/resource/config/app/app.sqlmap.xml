@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<!-- 业务系统的SQL映射文件装载 -->
+<sqlMapConfig>
+	<settings useStatementNamespaces="true" />
+	<sqlMap resource="org/eredlab/g4/arm/sqlmap/dgwMonitor.xml" />
+	<sqlMap resource="org/eredlab/g4/arm/sqlmap/RsmConfBusi.xml" />
+	<sqlMap resource="org/eredlab/g4/crsm/sqlmap/CrsmServerMonitor.xml"/>
+	<sqlMap resource="org/eredlab/g4/cabs/sqlmap/ServerMonitor.xml"/>
+	<sqlMap resource="org/eredlab/g4/cabs/sqlmap/PackageVersion.xml"/>
+	<sqlMap resource="org/eredlab/g4/cabs/sqlmap/AppGroupManager.xml"/>
+	<sqlMap resource="org/eredlab/g4/cabs/sqlmap/UpdateStrategy.xml"/>
+	<sqlMap resource="org/eredlab/g4/cabs/sqlmap/BatchUpdate.xml"/>
+	<sqlMap resource="org/eredlab/g4/cabs/sqlmap/DeviceManage.xml"/>
+</sqlMapConfig>

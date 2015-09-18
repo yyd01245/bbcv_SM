@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:context="http://www.springframework.org/schema/context" xmlns:jee="http://www.springframework.org/schema/jee"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+			
+	<bean id="propertyConfigurer" class="prod.nebula.vgw4sida.util.PropertyPlaceholderConfigurer">
+		<constructor-arg index="0" ref="core"></constructor-arg>
+	</bean>		
+			
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+	   <property name="driverClass"><value>${vgw.mysqlserver.drivename}</value></property>
+	   <property name="jdbcUrl"><value>${vgw.mysqlserver.url}</value></property>
+	   <property name="user"><value>${vgw.mysqlserver.username}</value></property>
+	   <property name="password"><value>${vgw.mysqlserver.password}</value></property>
+	  <!--连接池中保留的最小连接数。-->            
+	    <property name="minPoolSize" value="${vgw.mysqlconn.minpoolsize}" />        
+	    <!--连接池中保留的最大连接数。Default: 15 -->         
+	    <property name="maxPoolSize" value="${vgw.mysqlconn.maxpoolsize}" />        
+	    <!--最大空闲时间,1800秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 -->               
+	    <property name="maxIdleTime" value="${vgw.mysqlconn.maxidletime}" />        
+	    <!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->               
+	    <property name="acquireIncrement" value="${vgw.mysqlconn.acquireincrement}" />         
+	    <property name="maxStatements" value="${vgw.mysqlconn.maxstatements}" />          
+	    <property name="initialPoolSize" value="${vgw.mysqlconn.minpoolsize}" />          
+	    <!--每60秒检查所有连接池中的空闲连接。Default: 0 -->       
+	    <property name="idleConnectionTestPeriod" value="60" />          
+	    <!--定义在从数据库获取新连接失败后重复尝试的次数。Default: 30 -->       
+	    <property name="acquireRetryAttempts" value="30" />          
+	    <property name="breakAfterAcquireFailure" value="true" />              
+	    <property name="testConnectionOnCheckout" value="false" /> 
+	</bean>
+
+</beans>

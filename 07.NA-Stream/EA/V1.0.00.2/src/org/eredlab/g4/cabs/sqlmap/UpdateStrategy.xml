@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 升级策略管理手工映射SQL语句 -->
+<sqlMap namespace="UpdateStrategy">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	<!-- 获取关联表主键值 -->
+	<select id="queryRelMaxIndex" parameterClass="map" resultClass="java.lang.Integer">
+		select MAX(gv_id) from dgw_group_version_info
+	</select>
+	<!-- 根据组查询组对应的承载ID -->
+	<select id="queryVncwList" parameterClass="map" resultClass="dto">
+		SELECT vncm_id as vnc_id,vncm_type as type FROM dgw_vncm_info WHERE group_id = #group_id#
+	</select>
+	<!-- 保存操作事件 -->
+	<insert id="saveEvent" parameterClass="map">
+		insert into dgw_event_update (event_id,vnc_id,oper_status,type,create_time)
+		value (#event_id#,#vncm_id#,#oper_status#,#vncm_type#,#create_time#);
+	</insert>
+	
+	<!-- 获取事件主键值 -->
+	<select id="queryEventMaxIndex" parameterClass="map" resultClass="java.lang.Integer">
+		select MAX(event_id) from dgw_event_update
+	</select>
+	<!-- 根据组队列 -->
+	<select id="queryGroupList" parameterClass="map" resultClass="dto">
+		SELECT group_id,group_name FROM dgw_group_info where 1=1 
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="encodeType">
+				encodeType=#encodeType#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 根据设备队列 -->
+	<select id="queryDeviceList" parameterClass="map" resultClass="dto">
+		SELECT dev_name,dev_type FROM dgw_dev_info
+	</select>
+	
+	<!-- 查看关联表是否已存在对应关系 -->
+	<select id="queryPackageGroupRel" parameterClass="map" resultClass="java.lang.Integer">
+	select count(gv_id) from dgw_group_version_info where group_id = #group_id# and version_id = #version_id#
+	</select>
+	<!-- 根据group_id获取jar_record_id -->
+	<select id="getJarRecordIdByGroupId" parameterClass="map" resultClass="dto">
+		SELECT a.gv_id,a.group_id,a.version_id,a.status,a.create_time,a.update_time,b.tarname,b.tarsh,b.update_version FROM dgw_group_version_info a ,dgw_version_info b WHERE a.version_id =b.version_id and a.group_id = #group_id#
+	</select>
+	
+	<!-- 根据group_version_id获取jar_record_id -->
+	<select id="getJarRecordIdByGroupVersionId" parameterClass="map" resultClass="dto">
+		SELECT jar_record_id
+		FROM yynm_group_version_rel
+		WHERE group_version_id = #group_version_id#
+	</select>	
+	
+	<!-- 获取升级策略列表-->
+	<select id="getUpdateStrategyListForPage" parameterClass="map" resultClass="dto">
+		SELECT version_id, group_id, update_version,targetaddr,jar_type,jar_size,status,tarname,tarsh
+		    FROM dgw_version_info 
+		   WHERE version_id = version_id
+	</select>
+	
+	<!-- 获取升级策略总数-->
+	<select id="getUpdateStrategyListForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_version_info WHERE version_id = version_id
+	</select>
+	
+	<!-- 插入升级策略管理表一条记录 -->
+	<insert id="saveUpdateStrategyItem" parameterClass="map" >
+		INSERT INTO dgw_group_version_info (gv_id, group_id, version_id,status,create_time) 
+		VALUES (#gv_id#, #group_id#, #version_id#,1,#create_time#)
+	</insert>
+	
+	<insert id="saveItems" parameterClass="dto">
+		INSERT INTO yynm_term_version_rel (version_record_id,term_record_id,jar_record_id,current_version,status) 
+		VALUES (#version_record_id#, #term_record_id#,#jar_record_id#,#current_version#,#status#)
+	</insert>
+	
+	<!-- 删除策略包 -->
+	<delete id="deleteUpdateStrategyItems" parameterClass="map" >
+		DELETE FROM dgw_group_version_info
+		      WHERE gv_id = #gv_id#
+	</delete>
+	
+	<!-- 删除关联策略包 -->
+	<delete id="deleteUpdateStrategy" parameterClass="map">
+		DELETE FROM dgw_group_version_info WHERE group_id = #group_id#
+	</delete>
+	<!-- 程序包更新，更改承载状态为升级 -->
+	<update id="updateVncwStutas" parameterClass="map">
+		update dgw_vncm_info set status=4 where group_id = #group_id#
+	</update>
+</sqlMap>

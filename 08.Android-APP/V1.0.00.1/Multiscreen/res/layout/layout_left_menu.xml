@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="240dip"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/ll"
+        android:layout_width="200dip"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginTop="100dp" >
+
+        <TextView
+            android:id="@+id/tv_user"
+            style="@style/menu_tab_style"
+            android:drawableLeft="@drawable/menu_user"
+            android:text="用户" />
+
+        <TextView
+            android:id="@+id/tv_about"
+            style="@style/menu_tab_style"
+            android:drawableLeft="@drawable/menu_about"
+            android:text="关于" />
+
+        <TextView
+            android:id="@+id/tv_help"
+            android:visibility="visible"
+            style="@style/menu_tab_style"
+            android:drawableLeft="@drawable/menu_help"
+            android:text="帮助" />
+
+        <TextView
+            android:id="@+id/tv_alipay"
+            android:visibility="gone"
+            style="@style/menu_tab_style"
+            android:drawableLeft="@drawable/menu_help"
+            android:text="alipayTest" />
+
+    </LinearLayout>
+
+</ScrollView>

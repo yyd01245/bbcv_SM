@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+	<!-- 配置ActionFormBean -->
+	<form-beans>
+		<!-- 公共Form -->
+		<form-bean name="commonActionForm" type="org.eredlab.g4.rif.web.CommonActionForm" />
+	</form-beans>
+
+	<!-- Action映射 -->
+	<action-mappings type="org.apache.struts.action.ActionMapping">
+		<!-- 服务器监控导入-->
+		<action name="commonActionForm" path="/serverMonitor" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.cabs.web.ServerMonitorAction">
+			<forward name="initView" path="/serverMonitor.jsp" />
+		</action>
+			<!-- 升级包导入-->
+		<action name="commonActionForm" path="/packageVersion" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.cabs.web.PackageVersionAction">
+			<forward name="initView" path="/packageVersionManager.jsp" />
+	    </action>
+	    <!-- 应用组管理导入 -->
+	    <action name="commonActionForm" path="/appGroupManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.cabs.web.AppGroupManagerAction">
+			<forward name="initView" path="/appGroupManager.jsp" />
+			<forward name="toAim" path="/AimShutdown.jsp" />
+			<forward name="toAimSession" path="/strategySession.jsp" />
+			<forward name="toRsmConf" path="/RsmConf.jsp" />
+			<forward name="toTvManage" path="/TVServerManage.jsp" />
+	    </action>
+	    <!-- 升级策略管理 -->
+	    <action name="commonActionForm" path="/updateStrategy" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.cabs.web.UpdateStrategyAction">
+			<forward name="initView" path="/updateStrategy.jsp" />
+	    </action>
+	    <!-- 批量升级管理 -->
+	    <action name="commonActionForm" path="/batchUpdate" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.cabs.web.BatchUpdateAction">
+			<forward name="initView" path="/batchUpdate.jsp" />
+	    </action>
+	     <!-- 设备管理 -->
+	    <action name="commonActionForm" path="/deviceManage" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.cabs.web.DeviceManage">
+			<forward name="initView" path="/devManage.jsp" />
+	    </action>
+	</action-mappings>
+</struts-config>

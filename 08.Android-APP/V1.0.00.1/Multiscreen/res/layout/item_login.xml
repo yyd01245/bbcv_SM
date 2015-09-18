@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dip" >
+
+    <TextView
+        android:id="@+id/tv_desc"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dip"
+        android:gravity="center"
+        android:text="文    本  ："
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/et_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/tv_desc"
+        android:background="@drawable/login_tv"
+        android:textColor="#FFFFFF"
+        android:paddingLeft="15dp"
+        android:text="输入用户名"
+        android:textSize="15sp" 
+        android:lines="1"
+        android:maxLength="11" />
+
+</RelativeLayout>

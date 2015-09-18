@@ -1,0 +1,157 @@
+
+.btn {
+	BACKGROUND-IMAGE: url(image/bg1.gif); COLOR: #003399; BACKGROUND-COLOR: #ffffff; TEXT-DECORATION: none
+}
+.btn {
+	FONT-WEIGHT: normal;
+	MARGIN: 1px;
+	LINE-HEIGHT: 15px;
+	HEIGHT: 18px;
+	TEXT-DECORATION: none;
+	border: 1px outset #99CCFF;
+	padding: 1px;
+
+}
+
+.menu a:link { color: #000000;  text-decoration : none;  }
+.menu a:visited { color: #000000; text-decoration : none; }
+.menu a:hover { color: #FFCC00; text-decoration : none; }
+
+
+.T{
+color: #006699;
+font-size:9pt;
+}
+
+table#tt th {
+text-align:left;
+color:#006699;
+font-size:12px;
+}
+table#tt td {
+text-align:right;
+color:#006699;
+font-size:12px;
+}
+table#ff th {
+text-align:left;
+color:#006699;
+font-size:12px;
+}
+table#ff td {
+text-align:center;
+color:#006699;
+font-size:12px;
+}
+.pages{
+text-align:right;
+color:#006699;
+font-size:12px;
+}
+
+input{
+height:20px;
+border:1px solid #006699;
+}
+
+table#dd {
+background-color: #C1DEFE;
+}
+table#dd thead th {
+background-color: #E9F3FF;
+font-size:12px;
+color:#006699;
+height:30px;
+}
+table#dd thead td {
+font-size:12px;
+color:#006699;
+background-color: #E9F3FF;
+height:30px;
+font-weight:bold;
+text-align:left;
+height:30px;
+}
+
+table#dd tbody.tb1 td {
+background-color: #FBFBFB;
+text-align:center;
+height:30px;
+}
+table#dd tbody.tb1 th {
+background-color: #FBFBFB;
+font-size:12px;
+color:#006699;
+text-align:left;
+padding: 6px;
+font-weight: normal;
+height:30px;
+}
+table#dd tbody.tb2 td {
+background-color: #FBFBFB;
+text-align:left;
+height:30px;
+padding-left:6px;
+}
+table#dd tbody.tb2 th {
+background-color: #E9F3FF;
+font-size:12px;
+color:#006699;
+text-align:center;
+height:30px;
+}
+
+table#dd tbody td:hover {
+background-color: #BFEDF9;
+}
+table#dd colgroup col.name {
+background-color: #E6E6E6;
+width: 100px;
+font-weight: normal;
+}
+
+A{
+	font-size:9pt;
+	color: #009900;
+	TEXT-DECORATION:underline; 
+}
+A:hover{
+TEXT-DECORATION:underline; 
+color: #FF0000;
+}
+.STYLE2{
+color: #006699;
+font-size:9pt;
+}
+TD{
+color:#006699;
+font-size:9pt;
+}
+
+TABLE{
+border-color:#006699;
+border:1px;
+padding:0px;
+}
+
+.input_button{
+background-color="#E6F7FF";
+height:20px;
+font-size:12px;
+color:#666666;
+border:1px solid #006699;
+}
+
+INPUT{
+height:20px;
+border:1px solid #006699;
+}
+.input_checkbox{
+border:0;
+width:20px;
+}
+
+select
+{
+	color: #006699; 
+}

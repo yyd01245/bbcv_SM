@@ -1,0 +1,11 @@
+{
+   "content_scripts": [ {
+      "js": [ "target.js" ],
+      "matches": [ "http://*/*" ]
+   } ],
+   "description": "Open all link in self window",
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7bCKtCMXWNygdMoBxHsFiRUHlt6ebi4XrzVxw5hBVzy4q+L/U2qR9mWXkW4uVW470KzBIXja//C2xt910IOCCFyl2+NQ9WDW+Y5ybIikVfCeAzRxS7fdOALXs1vYIveKf/D5twqkyNb7rzXOo3QX8m0d4XE8HQgFiqMATYnu4eQIDAQAB",
+   "name": "Links target=_self",
+   "update_url": "http://clients2.google.com/service/update2/crx",
+   "version": "0.0.2"
+}

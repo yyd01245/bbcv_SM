@@ -1,0 +1,118 @@
+/*
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	margin: 0;
+	font-size: 80%;
+	font-weight: bold;
+	background: #FFF;
+	}
+*/
+h2 {
+	font: bold 14px Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+	margin: 0px;
+	padding: 0px 0px 0px 15px;
+}
+	
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	}
+
+img {
+    border: none;
+} 
+
+/*- Menu 10--------------------------- */
+	
+#menu10 {
+	width: 160px;
+	margin: 10px;
+	}
+	
+#menu10 li a {
+	height: 32px;
+  	voice-family: "\"}\""; 
+  	voice-family: inherit;
+  	height: 24px;
+	text-decoration: none;
+	}	
+	
+#menu10 li a:link, #menu10 li a:visited {
+	color: #4D4D4D;
+	display: block;
+	background:  url(../images/tabImge/menu10.gif);
+	padding: 8px 0 0 10px;
+	}
+	
+#menu10 li a:hover, #menu10 li #current { 
+	color: #FF9834;
+	background:  url(../images/tabImge/menu10.gif) 0 -32px;
+	padding: 8px 0 0 10px;
+	}
+#tabs1 {
+      float:left;
+      width:100%;
+	  background:#F4F7FB;
+      font-size:93%;
+      line-height:normal;
+	  border-bottom:1px solid #BCD2E6;
+      }
+    #tabs1 ul {
+	  margin:0;
+	  padding:1px 10px 0 10px;
+	  list-style:none;
+      }
+    #tabs1 li {
+      display:inline;
+      margin:0;
+      padding:0;
+      }
+    #tabs1 a {
+      float:left;
+      background:url("../images/tabImge/tableft1.gif") no-repeat left top;
+      margin:0;
+      padding:0 0 0 4px;
+      text-decoration:none;
+      }
+    #tabs1 a span {
+      float:left;
+      display:block;
+      background:url("../images/tabImge/tabright1.gif") no-repeat right top;
+      padding:5px 5px 4px 6px;
+      color:#627EB7;
+      }
+    /* Commented Backslash Hack hides rule from IE5-Mac \*/
+    #tabs1 a span {float:none;}
+    /* End IE5-Mac hack */
+    #tabs a:hover span {
+      color:#627EB7;
+      }
+    #tabs1 a:hover {
+      background-position:0% -42px;
+      }
+    #tabs1 a:hover span {
+      background-position:100% -42px;
+      }
+
+      #tabs1 #current a {
+      	background-position:0% -42px;
+      }
+      #tabs1 #current a span {
+      	background-position:100% -42px;
+}	
+.hy10 {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: dotted;
+	border-left-style: solid;
+	border-top-color: #666666;
+	border-right-color: #666666;
+	border-bottom-color: #666666;
+	border-left-color: #666666;
+}		

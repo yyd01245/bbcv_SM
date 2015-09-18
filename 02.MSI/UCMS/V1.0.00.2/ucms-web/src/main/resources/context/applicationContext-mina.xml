@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+		<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer"> 
+		<property name="customEditors"> 
+			<map> 
+				<entry key="java.net.SocketAddress"> 
+					<bean class="org.apache.mina.integration.beans.InetSocketAddressEditor" /> 
+				</entry> 
+			</map> 
+		</property> 
+	</bean> 
+	<!-- The IoHandler implementation --> 
+	<bean id="ucmsMinaHandler" class="prod.nebula.msi.web.handle.TcpPersistentHandler"/> 
+	<bean id="ucmsThreadPool" class="org.apache.mina.integration.spring.ThreadPoolExecutorFactoryBean">
+		<property name="corePoolSize" value="300"/>
+		<property name="maxPoolSize" value="2000"/>
+		<property name="keepAliveSeconds" value="10"/>
+	</bean>
+	<bean id="ucmsExecutorFilter" class="org.apache.mina.filter.executor.ExecutorFilter" >
+		<constructor-arg ref="ucmsThreadPool"/>
+	</bean> 
+	<bean id="ucmsMdcInjectionFilter" class="org.apache.mina.filter.logging.MdcInjectionFilter"> 
+		<constructor-arg value="remoteAddress" /> 
+	</bean> 
+	<bean id="ucmsCodecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter"> 
+		<constructor-arg> 
+			<bean class="prod.nebula.msi.web.handle.MinaTextLineCodecFactory">
+				<constructor-arg index="0" value="UTF-8" />
+				<constructor-arg index="1" value="XXEE" />
+				<constructor-arg index="2" value="XXEE" />
+				<constructor-arg index="3" value="4096" />
+				<constructor-arg index="4" value="4096" />
+			</bean> 
+		</constructor-arg> 
+	</bean> 
+	<!-- <bean id="cumsLoggingFilter" class="org.apache.mina.filter.logging.LoggingFilter" /> -->  
+	<!-- The non-SSL filter chain. --> 
+	<bean id="ucmsFilterChainBuilder" class="org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder"> 
+		<property name="filters"> 
+			<map> 
+				<entry key="executor" value-ref="ucmsExecutorFilter" /> 
+				<entry key="mdcInjectionFilter" value-ref="ucmsMdcInjectionFilter" /> 
+				<entry key="codecFilter" value-ref="ucmsCodecFilter" /> 
+			</map> 
+		</property> 
+	</bean> 
+	<bean id="ucmsMinaAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor" init-method="bind" destroy-method="unbind"> 
+		<property name="defaultLocalAddress" value=":${local.tcpserver.port}" /> 
+		<property name="handler" ref="ucmsMinaHandler" /> 
+		<property name="reuseAddress" value="true" /> 
+		<property name="backlog" value="4000" /> 
+		<property name="filterChainBuilder" ref="ucmsFilterChainBuilder" />
+	</bean>   
+</beans>

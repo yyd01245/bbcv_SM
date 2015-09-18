@@ -1,0 +1,2958 @@
+#include "SM_Manager.h"
+#include "VGW_VodStream.h"
+#include "MSI_SMStream.h"
+#include "Advertisement.h"
+#include "Navigation.h"
+#include "initadvstream.h"
+#include <string.h>
+
+#include "DBInterface.h"
+
+//#define TEST_DATA
+#define NEWFINDWAY
+#define MAPREGION
+
+SM_Manager::SM_Manager()
+{
+   	m_Navigation = NULL;
+   	m_Advertiser = NULL;
+   	m_VGWVodPlayer = NULL;
+   	m_Msi_SMInter = NULL;
+	
+	hdisfull = 0;
+	sdisfull = 0;
+	printf("---create Manager\n");
+	fflush(stdout);
+	
+	pthread_mutex_init(&m_BindStatuslocker, NULL);
+	pthread_mutex_init(&m_VecNewNavlocker, NULL);
+	pthread_mutex_init(&m_lockerRegion, NULL);
+
+	char *strRegion1 = (char*)malloc(64);
+	strcpy(strRegion1,"0x0601");
+	char *strRegion2 = (char*)malloc(64);
+	strcpy(strRegion2,"0x0603");
+	char *strRegion3 = (char*)malloc(64);
+	strcpy(strRegion3,"0x0602");
+
+	for(int i=0;i<sizeof(CIRegionID);++i)
+	{
+		char strregionid[64] ={0};
+	//	printf("---region %s \n",CstrRegion[i].c_str());
+	//	strcpy(strregionid,CstrRegion[i].c_str());
+		int iport = CIRegionID[i];
+		if(i==0)
+			m_mapRegionID.insert(MapRegionID::value_type(iport,strRegion1));
+		else if (i==1)
+			m_mapRegionID.insert(MapRegionID::value_type(iport,strRegion2));
+		else if (i==2)
+			m_mapRegionID.insert(MapRegionID::value_type(iport,strRegion3));
+	}
+	MapRegionID::iterator it = m_mapRegionID.begin();
+	while(it != m_mapRegionID.end())
+	{
+		printf("--region %s , port %d \n",it->second,it->first);
+		fflush(stdout);
+		++it;
+	}
+	//清理完会话需要将对应数据状体修改
+}
+SM_Manager::~SM_Manager()
+{
+
+	if(m_Navigation)
+		delete m_Navigation;
+
+	//释放map set中的资源
+	pthread_mutex_destroy(&m_BindStatuslocker);
+	pthread_mutex_destroy(&m_VecNewNavlocker);
+}
+
+
+bool SM_Manager::CleanAllStream() //char * strSeesionId,char * strSerialno
+{
+	MapStreamStatus::iterator it = m_mapStreamStatus.begin();
+	while(it != m_mapStreamStatus.end())
+	{
+		//清理导航流
+		char strSID[128] = "1001";
+		char strReSID[128] = "1001";
+		char strAuthiName[128] = "cscs";
+		char strAuthcode[128] = "123456";
+		char strMsg[128] = "";
+		int iTaskID = 111;
+
+
+		StreamStatus* pTmp = it->second;
+		char strSeesionID[64] ={0};
+		sprintf(strSeesionID,"%d",pTmp->istreamID);
+
+		//先清理移动网关
+		//if(strcmp(pTmp->strBind_userID, "") != 0)
+			m_Msi_SMInter->CleanMSIStream(pTmp->strBind_userID,strSeesionID); //seesionID作为serialno
+			usleep(1000*200);
+		
+		//根据数据类型进行不同模块的清理
+		//if (strcmp(pTmp->strStreamType, Status_Adver) == 0)
+				//char strTaskID[64]={0};
+			//	sprintf(strTaskID,"%d",pTmp->iTaskID);
+			m_Advertiser->CleanAdverStream(strSeesionID,pTmp->strSwitch_task_id,strSeesionID);
+			usleep(1000*100);
+				
+			m_Navigation->CleanNavStream(strSeesionID,strSID,pTmp->strSwitch_task_id,strAuthiName,strAuthcode,strSeesionID,strMsg);
+			//Cleanonenav(strSeesionID);
+			usleep(1000*200);
+	//	else if (strcmp(pTmp->strStreamType, Status_Vod) == 0 )
+		
+			m_VGWVodPlayer->CleanVODStream(strSeesionID,pTmp->strSwitch_task_id,strSeesionID);
+			//Cleanonevod(strSeesionID);
+			usleep(1000*200);
+		
+		it++;
+	}
+
+	return true;
+}
+bool SM_Manager::Cleanonenav(char *strSeesionID)
+{
+	char strSID[128] = "1001";
+	char strReSID[128] = "1001";
+	char strAuthiName[128] = "cscs";
+	char strAuthcode[128] = "123456";
+	char strMsg[128] = "";
+		
+	StreamStatus pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strSeesionID,&pTmpResource);
+	if(iret)
+	{
+		StreamStatus* pTmp = &pTmpResource;
+		m_Advertiser->CleanAdverStream(strSeesionID,pTmp->strSwitch_task_id,pTmp->strSerialNo);
+		usleep(1000*100);
+			
+		m_Navigation->CleanNavStream(strSeesionID,strSID,pTmp->strSwitch_task_id,strAuthiName,strAuthcode,pTmp->strSerialNo,strMsg);
+		//Cleanonenav(strSeesionID);
+		usleep(1000*100);	
+	}
+	return true;
+}
+bool SM_Manager::Cleanonevod(char *strSeesionID)
+{
+	StreamStatus pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strSeesionID,&pTmpResource);
+	if(iret)
+	{
+		StreamStatus* pTmp = &pTmpResource;
+		m_Advertiser->CleanAdverStream(strSeesionID,pTmp->strSwitch_task_id,pTmp->strSerialNo);
+		usleep(1000*100);
+		m_VGWVodPlayer->CleanVODStream(strSeesionID,pTmp->strSwitch_task_id,pTmp->strSerialNo);
+		usleep(1000*100);
+	}
+	return true;
+}
+bool SM_Manager::CleanStream(int iStreamID,ModuleType emodelType)
+{
+//只清理广告导航vod
+	bool bNeedWait = false;
+
+#ifndef USEMAP
+	char strkey_value[64] = {0};
+	sprintf(strkey_value,"%d",iStreamID);
+	StreamStatus pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value,&pTmpResource);
+	if(iret)
+	{
+		StreamStatus* pTmp = &pTmpResource;
+#else
+	MapStreamStatus::iterator it = m_mapStreamStatus.find(iStreamID);
+	if(it != m_mapStreamStatus.end())	
+	{
+		StreamStatus* pTmp = it->second;
+#endif			
+		//首先清理掉上一路
+				//清理导航流
+		char strSID[128] = "1001";
+		char strReSID[128] = "1001";
+		char strAuthiName[128] = "cscs";
+		char strAuthcode[128] = "123456";
+		char strMsg[128] = "";
+		int iTaskID = 111;
+		
+		 if (strcmp(pTmp->strStreamType, Status_Vod) == 0 )
+		 {
+				//vod重复点播
+				bNeedWait = true;
+		 }
+		if(emodelType == Other)
+		{
+			char strSeesionID[64] ={0};
+			sprintf(strSeesionID,"%d",pTmp->istreamID);
+
+			m_Advertiser->CleanAdverStream(strSeesionID,pTmp->strSwitch_task_id,pTmp->strSerialNo);
+			usleep(1000*100);
+			
+			m_Navigation->CleanNavStream(strSeesionID,strSID,pTmp->strSwitch_task_id,strAuthiName,strAuthcode,pTmp->strSerialNo,strMsg);
+			//Cleanonenav(strSeesionID);
+			usleep(1000*100);	
+			
+			//else if (strcmp(pTmp->strStreamType, Status_Vod) == 0 )
+			
+				//重复点播不跳转广告流
+	/*			MapVodPlay::iterator itfind= m_VGWVodPlayer->m_mapVod_player.find(atoi(strSeesionID));
+				if(itfind != m_VGWVodPlayer->m_mapVod_player.end())
+				{
+					Stream *ptmp = itfind->second;
+					m_VGWVodPlayer->m_mapVod_player.erase(itfind);
+					delete ptmp;
+				}
+	*/
+			m_VGWVodPlayer->CleanVODStream(strSeesionID,pTmp->strSwitch_task_id,strSeesionID);
+			//Cleanonevod(strSeesionID);
+			usleep(1000*100);
+			
+		}
+		else
+		{
+			char strSeesionID[64] ={0};
+			sprintf(strSeesionID,"%d",pTmp->istreamID);
+
+				//根据数据类型进行不同模块的清理
+			if (strcmp(pTmp->strStreamType, Status_Adver) == 0)
+			{
+					//char strTaskID[64]={0};
+				//	sprintf(strTaskID,"%d",pTmp->iTaskID);
+					m_Advertiser->CleanAdverStream(strSeesionID,pTmp->strSwitch_task_id,pTmp->strSerialNo);
+					usleep(1000*100);
+			}
+			else if (strcmp(pTmp->strStreamType, Status_Nav) == 0 || strcmp(pTmp->strStreamType, Status_Nav_Home) == 0)
+			{
+				//m_Navigation->CleanNavStream(strSeesionID,strSID,pTmp->strSwitch_task_id,strAuthiName,strAuthcode,pTmp->strSerialNo,strMsg);
+				Cleanonenav(strSeesionID);
+				usleep(1000*100);
+			}
+			else if (strcmp(pTmp->strStreamType, Status_Vod) == 0 )
+			{
+				//重复点播不跳转广告流
+	/*			MapVodPlay::iterator itfind= m_VGWVodPlayer->m_mapVod_player.find(atoi(strSeesionID));
+				if(itfind != m_VGWVodPlayer->m_mapVod_player.end())
+				{
+					Stream *ptmp = itfind->second;
+					m_VGWVodPlayer->m_mapVod_player.erase(itfind);
+					delete ptmp;
+				}
+	*/
+				//m_VGWVodPlayer->CleanVODStream(strSeesionID,pTmp->strSwitch_task_id,strSeesionID);
+				Cleanonevod(strSeesionID);
+				usleep(1000*100);
+			}
+		}
+	}
+	return bNeedWait;
+}
+
+
+bool SM_Manager::ClearoneStream(int iStreamID,int type)
+{
+	printf("begin to clean stream %d\n",iStreamID);
+	fflush(stdout);
+	char streamid[64] = {0};
+	char status[32] = {0};
+	sprintf(streamid,"%d",iStreamID);
+	StreamStatus pTmpResource;
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",streamid,&pTmpResource);
+	if(iret)
+	{
+		StreamStatus* pTmp = &pTmpResource;	
+		memcpy(status,pTmp->strStreamType,strlen(pTmp->strStreamType)+1);
+		m_Msi_SMInter->CleanMSIStream(pTmp->strBind_userID,streamid);		
+	}
+	CleanStream(iStreamID);
+	usleep(1000*1800);
+	if(strcmp(status,Status_Idle)!=0)
+	{
+		if(strcmp(status,Status_Nav)==0)
+		{
+			printf("---after clean to add a Nav stream\n");
+			fflush(stdout);
+			AddOneNavStream(iStreamID);
+		}
+		else
+		{
+			printf("---after clean to add a  Adver stream\n");
+			fflush(stdout);
+			AddOneAdvStream(iStreamID);
+		}
+	}	
+	return true;
+}
+
+//下发导航路数及广告流路数
+bool SM_Manager::InAdvanceStream(int iNavNum,int iAdverNum)
+{
+
+	return true;
+
+}
+
+bool SM_Manager::CheckStreamStatus(ModuleType emodelType)
+{
+	return true;
+
+}
+bool SM_Manager::ResouceRecovery(ModuleType emodelType)
+{
+	return true;
+
+}
+/*	bool CheckVodStream();
+bool CheckNavgationStream();
+bool VODResouceRecovery();
+bool NavResouceRecovery();
+*/
+//装载流通道分组
+bool SM_Manager::LoadStreamResource()
+{
+	m_mapStreamResource.clear();
+#ifndef TEST_DATA
+	DBInterfacer::GetInstance()->LoadAllStreamResource(m_mapStreamResource);
+#else
+		int i =0;
+		while(i++<11)
+			{
+				StreamResource *pTmpStream = new StreamResource;
+				pTmpStream->iStreamID = i;
+				pTmpStream->iOutPutPort = 50438+i*2;
+				pTmpStream->iPidMaping = 123;
+				pTmpStream->iProgramNum = 321;
+				pTmpStream->iBitRate = 30;
+				pTmpStream->iIPQAMNum = i/4+1;
+				char strRegNum[32]={0};
+				sprintf(strRegNum,"%d",(i-1)/2 + 1);
+				memcpy(pTmpStream->strNetRegionNum,strRegNum,2);
+				pTmpStream->iFreqPoint = 1234;
+				memcpy(pTmpStream->strComment,"222",4);
+				char testurl[64] = "www.baidu.com";
+				memcpy(pTmpStream->strNav_url,testurl,strlen(testurl)+1);
+				pTmpStream->iIs_Need_Key = 1;
+				memcpy(pTmpStream->strMobile_url,testurl,strlen(testurl)+1);
+				//memcpy(pTmpStream->strSessionID,sqlrow[12],strlen(sqlrow[12]));
+				//printf("\n");			
+				m_mapStreamResource.insert(MapStreamResource::value_type(pTmpStream->iStreamID, pTmpStream));
+			}
+#endif
+	
+	return true;
+}
+
+//载入网络分组数据
+bool SM_Manager::LoadNetWorkGroup()
+{
+#ifndef TEST_DATA
+	DBInterfacer::GetInstance()->LoadNetWorkGroup(m_mapNetworkGroup);
+
+	//根据分组信息载入分组数据
+	MapNetWorkGroup::iterator iter = m_mapNetworkGroup.begin();
+
+	while(iter != m_mapNetworkGroup.end())
+	{
+			//查找每一个分组的数据，导出vector
+			ListStreamResource tmplistGroupStream;
+
+			//tmplistGroupStream.clear();
+			printf("get group info %s \n",iter->first);
+			fflush(stdout);
+			DBInterfacer::GetInstance()->LoadOneGroupStreamResource(iter->first,tmplistGroupStream);
+			if(tmplistGroupStream.size() > 0)
+			{
+				m_mapStreamGroup.insert(MapStreamGroup::value_type(iter->first,tmplistGroupStream));
+				printf("group %s  no data \n",iter->first);
+				fflush(stdout);
+			}
+			++iter;
+			//需要关联分组编号与流通道
+	}
+#else
+		int i=0;
+	//	while(i++<3)
+			{
+					i++;
+					NetworkGroup *pTmpStream = new NetworkGroup;
+
+					char txt[32]={0};
+					sprintf(txt,"%d",i);
+				//	memcpy(pTmpStream->strNetRegionNum,txt,strlen(txt));
+					strcpy(pTmpStream->strNetRegionNum,txt);
+					//memcpy(pTmpStream->strNetRegionName,"aa",2);
+					strcpy(pTmpStream->strNetRegionName,"aa");
+					pTmpStream->iNavgationStreamNum = 1;
+					pTmpStream->iAdvertisementStreamNum = 1;
+					//memcpy(pTmpStream->strNetworkComment,"qqq",3);
+					strcpy(pTmpStream->strNetworkComment,"qqq");
+					m_mapNetworkGroup.insert(MapNetWorkGroup::value_type(pTmpStream->strNetRegionNum, pTmpStream));
+
+					int iStreamID = i*2;
+					ListStreamResource tmplistGroupStream;
+					tmplistGroupStream.push_back( iStreamID);
+					tmplistGroupStream.push_back( iStreamID-1);
+					m_mapStreamGroup.insert(MapStreamGroup::value_type(pTmpStream->strNetRegionNum, tmplistGroupStream));
+			}
+					
+#endif
+	
+	return true;
+}
+
+
+bool SM_Manager::LoadStreamStatus()
+{
+	m_mapStreamStatus.clear();
+#ifndef TEST_DATA
+	DBInterfacer::GetInstance()->LoadAllStreamStatus(m_mapStreamStatus);
+#else
+	{
+/*		StreamStatus *pTmpStream = new StreamStatus;
+		memset(pTmpStream,0,sizeof(StreamStatus));
+		pTmpStream->istreamID = 1;
+		memcpy(pTmpStream->strStreamType,Status_Adver,strlen(Status_Adver)+1);
+		memcpy(pTmpStream->strBind_userID,"123098",7);
+		char tmp[64]="2014-9-7";
+		memcpy(pTmpStream->strBind_date,tmp,strlen(tmp)+1);
+		memcpy(pTmpStream->strSwitch_task_id,"333221",7);		
+		m_mapStreamStatus.insert(MapStreamStatus::value_type(pTmpStream->istreamID, pTmpStream));
+
+		StreamStatus *pTmpStream1 = new StreamStatus;
+		memset(pTmpStream1,0,sizeof(StreamStatus));
+		pTmpStream1->istreamID = 2;
+		memcpy(pTmpStream1->strStreamType,Status_Nav,strlen(Status_Nav)+1);
+		memcpy(pTmpStream1->strBind_userID,"123098",7);
+		char tmp1[64]="2014-9-7";
+		memcpy(pTmpStream1->strBind_date,tmp1,strlen(tmp1)+1);
+		memcpy(pTmpStream1->strSwitch_task_id,"3332211",8);		
+		m_mapStreamStatus.insert(MapStreamStatus::value_type(pTmpStream1->istreamID, pTmpStream1));
+
+
+		
+		StreamStatus *pTmpStream2 = new StreamStatus;
+		memset(pTmpStream2,0,sizeof(StreamStatus));
+		pTmpStream2->istreamID = 3;
+		memcpy(pTmpStream2->strStreamType,Status_Vod,strlen(Status_Vod)+1);
+		memcpy(pTmpStream2->strBind_userID,"123098",7);
+		char tmp2[64]="2014-9-7";
+		memcpy(pTmpStream2->strBind_date,tmp2,strlen(tmp2)+1);
+		memcpy(pTmpStream2->strSwitch_task_id,"33322111",9);		
+		m_mapStreamStatus.insert(MapStreamStatus::value_type(pTmpStream2->istreamID, pTmpStream2));
+*/	}
+
+#endif
+	printf("---map size =%d \n",m_mapStreamStatus.size());
+	fflush(stdout);
+		//echo data;
+#ifdef TEST_DATA		
+	MapStreamStatus::iterator it = m_mapStreamStatus.begin();
+	while(it != m_mapStreamStatus.end())
+	{
+		StreamStatus *ptmp = it->second;
+		/*
+		int istreamID;
+		char strStreamType[32];
+		char strStatus_date[128];
+		char strBind_userID[128];
+		char strBind_date[128];
+		char strSwitch_task_id[128];
+		char strSessionID[512];
+		char strSerialNo[512];
+		*/
+		
+		printf("%d, %s,%s,%s,%s,%s,%s,%s, \n ",ptmp->istreamID,ptmp->strStreamType,
+				ptmp->strStatus_date,ptmp->strBind_userID,ptmp->strBind_date,
+				ptmp->strSwitch_task_id,ptmp->strSessionID,ptmp->strSerialNo);
+		fflush(stdout);
+		++it;
+	}
+#endif	
+	return true;
+}
+
+bool SM_Manager::LoadIPQAMInfo()
+{
+	m_mapIpqamInfo.clear();
+#ifndef TEST_DATA
+	DBInterfacer::GetInstance()->LoadALLIPQAMInfo(m_mapIpqamInfo);
+#else
+	IPQAMInfo *pTmpStream = new IPQAMInfo;
+	memset(pTmpStream,0,sizeof(IPQAMInfo));
+
+	char strIP[64] ="192.168.100.106";
+	pTmpStream->iIPQAMNum = 1;
+	memcpy(pTmpStream->strIpqamName,"name1",6);
+	memcpy(pTmpStream->strIpqamIP,strIP,strlen(strIP)+1);
+	pTmpStream->iIpqamManagerPort = 10000;
+	memcpy(pTmpStream->strIpqamType,"211",3+1);
+	memcpy(pTmpStream->strIpqamModel,"A",1+1);
+	memcpy(pTmpStream->strIpqamManufacturers,"eqw",3+1);
+	memcpy(pTmpStream->strIpqamComment,"442",3+1);
+	pTmpStream->iIsSupportR6 = 0;
+	m_mapIpqamInfo.insert(MapIPQAMInfo::value_type(pTmpStream->iIPQAMNum, pTmpStream));
+
+	pTmpStream = new IPQAMInfo;
+	memset(pTmpStream,0,sizeof(IPQAMInfo));
+	//char strIP[64] ="192.168.1.1";
+	pTmpStream->iIPQAMNum = 2;
+	memcpy(pTmpStream->strIpqamName,"name1",5+1);
+	memcpy(pTmpStream->strIpqamIP,strIP,strlen(strIP)+1);
+	pTmpStream->iIpqamManagerPort = 11000;
+	memcpy(pTmpStream->strIpqamType,"211",3+1);
+	memcpy(pTmpStream->strIpqamModel,"A",1+1);
+	memcpy(pTmpStream->strIpqamManufacturers,"eqw",3+1);
+	memcpy(pTmpStream->strIpqamComment,"442",3+1);
+	pTmpStream->iIsSupportR6 = 0;
+	m_mapIpqamInfo.insert(MapIPQAMInfo::value_type(pTmpStream->iIPQAMNum, pTmpStream));
+
+
+#endif
+
+	
+	return true;
+}
+
+bool SM_Manager::LoadAdvinfo()
+{
+	//m_mapadvinfo
+	m_mapadvinfo.clear();
+	DBInterfacer::GetInstance()->LoadAlladvinfo(m_mapadvinfo);
+}
+
+
+int SM_Manager::AddOneStream(ModuleType emodelType,int iOldStreamID,int *bAddNewStream)
+{
+
+	char strnetWork_Reg[128]={0};
+	int iNewStreamID = -1;
+	int iLastTimeStreamID = -1;
+
+	bool bInStatus = false;
+	char strStreamType[64]={0};
+	char TmpTime[64]={0};
+	bool bNewStream = false;
+	int whetherhd = 0;
+	strcpy(TmpTime,"9976-10-13-3:31:18");
+	//将新的绑定的导航流去掉
+	//将新的导航流加上
+	
+	if(iOldStreamID > 0)
+	{	//补发
+		printf("find other stream from stream %d \n",iOldStreamID);
+		fflush(stdout);
+#ifndef USEMAP
+		//MapStreamResource::iterator itfid = m_mapStreamResource.find(iOldStreamID);
+		//先找到资源信息
+		char strkey_value[64] = {0};
+		sprintf(strkey_value,"%d",iOldStreamID);
+		StreamResource pTmpResource;
+		memset(&pTmpResource,0,sizeof(pTmpResource));
+		int iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+		if(iret)
+		{
+			StreamResource* pTmp = &pTmpResource;
+			whetherhd = pTmp->iWherether_HD;
+			//select st *,
+			//从分组表中找到
+			//资源表netnum,相同的所有数据，
+			printf("hd or sd this is find in %d \n",whetherhd);
+			fflush(stdout);
+			
+			Navinfo::iterator itnav = m_navinfo.find(iOldStreamID);
+			if(itnav != m_navinfo.end())	
+			{
+				if(whetherhd == 0)
+				{
+					hdm_navnext.push_back(itnav->second);
+				}
+				else if(whetherhd == 1)
+				{
+					sdm_navnext.push_back(itnav->second);
+				}
+				itnav->second = 0;
+			}
+			
+#ifdef NEWFINDWAY
+			//统一向前查找
+			SetGroupStream listTmp;
+			listTmp.clear();
+			iret = DBInterfacer::GetInstance()->FindSameGroupStream(pTmp->strNetRegionNum,whetherhd,listTmp);
+
+			SetGroupStream::iterator iterList0 = listTmp.find(iOldStreamID);
+			SetGroupStream::iterator  iterflag = iterList0;
+			++iterList0;
+			bool bhasAdv = false;
+			while(iterList0 != listTmp.end())
+			{
+				int iStreamID = *iterList0;
+				StreamStatus pTmpstatus;
+				char strkey_value1[64] = {0};
+				sprintf(strkey_value1,"%d",iStreamID);
+				printf("-----stream id = %d\n",iStreamID);
+				fflush(stdout);
+				memset(&pTmpstatus,0,sizeof(pTmpstatus));
+				iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value1,&pTmpstatus);
+				if(iret)
+				{
+					StreamStatus *ptmpstat = &pTmpstatus;
+					if((strcmp(ptmpstat->strStreamType,Status_Idle)==0)&&(strcmp(ptmpstat->strBind_userID,"")==0))
+					{
+						iNewStreamID = iStreamID;
+						break;
+					}
+					else if(!bhasAdv && strcmp(ptmpstat->strStreamType,Status_Adver)==0&&strcmp(ptmpstat->strBind_userID,"")==0)
+					{
+						iNewStreamID = iStreamID;
+						bhasAdv = true;
+					}
+					else if(!(strcmp(ptmpstat->strStreamType,Status_Vod)==0 || 
+						strcmp(ptmpstat->strStreamType,Status_Nav_Home)==0||strcmp(ptmpstat->strStreamType,Status_Nav)==0))
+					{
+						//最远使用的流
+						printf("before time comper-----status date %s \n",ptmpstat->strStatus_date);
+						fflush(stdout);
+						if(strcmp(TmpTime,ptmpstat->strStatus_date) > 0)
+						{
+							printf("-----status date %s \n",ptmpstat->strStatus_date);
+							fflush(stdout);
+							strcpy(TmpTime,ptmpstat->strStatus_date);
+							iLastTimeStreamID = iStreamID;
+							strcpy(strStreamType,ptmpstat->strStreamType);
+						}		
+					}
+				}
+				else
+				{
+				//状态表中没有该流通道，说明空闲流
+					iNewStreamID = iStreamID;
+					printf("---stream %d is unuse \n",iNewStreamID);
+					fflush(stdout);
+					bNewStream = true;
+					break;
+				}
+				printf("++++++++++list data %d \n",*iterList0);
+				fflush(stdout);
+				++iterList0;
+			}
+			if(iterList0 == listTmp.end())
+			{
+				iterList0 = listTmp.begin();
+				while(iterList0 != iterflag)
+				{	
+					int iStreamID = *iterList0;
+					//
+					StreamStatus pTmpstatus;
+					char strkey_value1[64] = {0};
+					sprintf(strkey_value1,"%d",iStreamID);
+					printf("----this stream id = %d\n",iStreamID);
+					fflush(stdout);
+					memset(&pTmpstatus,0,sizeof(pTmpstatus));
+					iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value1,&pTmpstatus);
+					if(iret)
+					{
+						StreamStatus *ptmpstat = &pTmpstatus;
+						if((strcmp(ptmpstat->strStreamType,Status_Idle)==0)&&(strcmp(ptmpstat->strBind_userID,"")==0))
+						{
+							iNewStreamID = iStreamID;
+							break;
+						}
+						else if(!bhasAdv && strcmp(ptmpstat->strStreamType,Status_Adver)==0 && strcmp(ptmpstat->strBind_userID,"")==0)
+						{
+							iNewStreamID = iStreamID;
+							bhasAdv = true;
+							
+						}
+						else if(!(strcmp(ptmpstat->strStreamType,Status_Vod)==0 ||
+								strcmp(ptmpstat->strStreamType,Status_Nav_Home)==0||strcmp(ptmpstat->strStreamType,Status_Nav)==0))
+						{
+							//最远使用的流
+							printf("123before time comper-----status date %s \n",ptmpstat->strStatus_date);
+							fflush(stdout);
+							if(strcmp(TmpTime,ptmpstat->strStatus_date) > 0)
+							{
+								strcpy(TmpTime,ptmpstat->strStatus_date);
+								iLastTimeStreamID = iStreamID;
+								strcpy(strStreamType,ptmpstat->strStreamType);
+								printf("123time comper-----status date %s \n",ptmpstat->strStatus_date);
+								fflush(stdout);
+							}		
+						}
+					}
+					
+					else
+					{
+						//状态表中没有该流通道，说明空闲流
+						iNewStreamID = iStreamID;
+						printf("---stream %d is unuse \n",iNewStreamID);
+						fflush(stdout);
+						bNewStream = true;
+						break;
+			
+					}
+					
+					printf("++++++++++list data %d \n",*iterList0);	
+					fflush(stdout);
+					
+					++iterList0;
+				}
+			}
+			if(-1 == iNewStreamID && iLastTimeStreamID != -1)
+			{
+				//使用最远时间的流，包括
+				iNewStreamID = iLastTimeStreamID;
+				printf("----use last time stream \n");
+				fflush(stdout);
+			}
+
+#else
+			ListStreamResource listTmp;
+			iret = DBInterfacer::GetInstance()->LoadOneGroupStreamResource(pTmp->strNetRegionNum,listTmp);
+			ListStreamResource::iterator iterList = listTmp.begin();
+			char TmpTime[64]={0};
+			while(iterList != listTmp.end())
+			{
+				int iStreamID = *iterList;
+				printf("----find stream %d is can user ?\n",iStreamID);
+				fflush(stdout);
+				//MapStreamStatus::iterator itFind = m_mapStreamStatus.find(iStreamID);
+				StreamStatus pTmpstatus;
+				char strkey_value1[64] = {0};
+				sprintf(strkey_value1,"%d",iStreamID);
+				memset(&pTmpstatus,0,sizeof(pTmpstatus));
+				iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value1,&pTmpstatus);
+				if(iret)
+				{
+					StreamStatus *ptmpstat = &pTmpstatus;
+					//首先找到空闲流
+					if((strcmp(ptmpstat->strStreamType,Status_Idle)==0)&&(strcmp(ptmpstat->strBind_userID,"")==0))
+					{
+						
+					}
+					else if(strcmp(ptmpstat->strStreamType,Status_Adver)==0 && emodelType == Navigation)
+					{
+						//广告流可使用的流
+						
+						iNewStreamID = iStreamID;
+						printf("---find one stream adver %d \n",iNewStreamID);
+						fflush(stdout);
+						bInStatus = true;
+						strcpy(strStreamType,ptmpstat->strStreamType);
+						break;
+					}
+					else if(!bInStatus)//if((strcmp(ptmpstat->strBind_userID,"NULL")==0 ||
+						//	strcmp(ptmpstat->strBind_userID,"")==0 ))
+					{
+						//最远使用的流
+						printf("11111before time comper-----status date %s \n",ptmpstat->strStatus_date);
+						fflush(stdout);
+						if(strcmp(TmpTime,ptmpstat->strStatus_date) > 0)
+						{
+							strcpy(TmpTime,ptmpstat->strStatus_date);
+							iNewStreamID = iStreamID;
+							strcpy(strStreamType,ptmpstat->strStreamType);
+							printf("1111time comper-----status date %s \n",ptmpstat->strStatus_date);
+							fflush(stdout);
+						}		
+					}
+				}	
+
+				++iterList;
+			}
+#endif
+		}
+
+#else
+		MapStreamResource::iterator itfid = m_mapStreamResource.find(iOldStreamID);
+		if(itfid != m_mapStreamResource.end())
+		{
+			StreamResource *pTmp = itfid->second;
+
+			//从分组表中找到
+			printf("find group %s streamgroup size=%d\n",pTmp->strNetRegionNum,m_mapStreamGroup.size());
+			fflush(stdout);
+			//MapStreamGroup::iterator itstremfind  = m_mapStreamGroup.find(pTmp->strNetRegionNum);
+			MapStreamGroup::iterator itstremfind  = m_mapStreamGroup.begin();
+
+			while(itstremfind != m_mapStreamGroup.end())
+			{
+				if(strcmp(itstremfind->first,pTmp->strNetRegionNum) == 0)
+				{
+					printf("find same group \n");
+					fflush(stdout);
+					ListStreamResource listTmp = itstremfind->second;
+					ListStreamResource::iterator iterList = listTmp.begin();
+					char TmpTime[64]={0};
+					while(iterList != listTmp.end())
+					{
+						int iStreamID = *iterList;
+						MapStreamStatus::iterator itFind = m_mapStreamStatus.find(iStreamID);
+						if(itFind != m_mapStreamStatus.end())
+						{
+							StreamStatus *ptmpstat = itFind->second;
+							if(strcmp(ptmpstat->strStreamType,Status_Adver)==0 && emodelType == Navigation)
+							{
+								//广告流可使用的流
+								printf("---find one stream adver %d \n",iNewStreamID);
+								fflush(stdout);
+								iNewStreamID = iStreamID;
+								bInStatus = true;
+								strcpy(strStreamType,ptmpstat->strStreamType);
+								break;
+							}
+							else if(!bInStatus)  //((strcmp(ptmpstat->strBind_userID,"NULL")==0 ||
+									//strcmp(ptmpstat->strBind_userID,"")==0 ))
+							{
+								//最远使用的流
+								printf("1111before time comper-----status date %s \n",ptmpstat->strStatus_date);
+								fflush(stdout);
+								if(strcmp(TmpTime,ptmpstat->strStatus_date) > 0)
+								{
+									strcpy(TmpTime,ptmpstat->strStatus_date);
+									iNewStreamID = iStreamID;
+									strcpy(strStreamType,ptmpstat->strStreamType);
+									printf("1111time comper-----status date %s \n",TmpTime);
+									fflush(stdout);
+								}		
+
+							}
+						}	
+
+						++iterList;
+					}
+					
+				}
+				++itstremfind;
+			}
+
+		}
+#endif
+	}
+
+	if(iNewStreamID == -1)
+	{
+		printf("Add one stream failed emodelType=%d\n",emodelType);
+		fflush(stdout);
+		printf("----------before hdfull = %d\n",hdisfull);
+		printf("----------before sdfull = %d\n",sdisfull);
+		fflush(stdout);
+		if(!whetherhd)
+		{
+			hdisfull+=1;
+			printf("-------hdisfull = %d this is hd stream",hdisfull);
+			fflush(stdout);
+		}
+		else
+		{
+			sdisfull+=1;
+			printf("-------sdisfull = %d this is sd stream\n",sdisfull);
+			fflush(stdout);
+		}
+		return false;
+	}
+	printf("---the last status Time = %s find stream id=%d \n",TmpTime,iNewStreamID);
+	fflush(stdout);
+	if(bAddNewStream != NULL)
+	{	
+		*bAddNewStream = bNewStream;
+		printf("1234 --- hello\n");
+		fflush(stdout);
+	}
+	bNewStream = true;
+//	return iNewStreamID;
+
+	switch(emodelType)
+	{
+		case Advertisement:
+		{
+/*			if(bInStatus)
+			{
+				MapStreamStatus::iterator it = m_mapStreamStatus.find(iNewStreamID);
+				if(it != m_mapStreamStatus.end())
+				{
+					StreamStatus* ptmp = it->second;
+					
+								//下发
+					char strSeesionID[64] = {0};
+					sprintf(strSeesionID,"%d",ptmp->istreamID);
+					printf("Add one adv stream in status \n");
+					//m_Advertiser->StartOneStream("1","udp://239.1.1.1:12000","udp://192.168.100.106:50442","e123214");
+				
+					
+				}
+			}
+			else
+			{
+
+				//找到对应流信息
+				MapStreamResource::iterator iterStream = m_mapStreamResource.find(iNewStreamID);
+				if(iterStream != m_mapStreamResource.end())
+				{
+					StreamResource *pStream = iterStream->second;
+					//调用下发一路导航流
+					char strSeesionID[64] ={0};
+					sprintf(strSeesionID,"%d",pStream->iStreamID);
+					char strSID[64] ="1001";
+					char strReSID[64] ="2000"; //operid
+					char strSIP[64] ="192.168.30.160";
+					char strSPort[32]="12000";
+					char strAreaID[32] ="3301";
+					
+					int iIPQAMnum = pStream->iIPQAMNum;
+					printf("---ipqam info num=%d \n",iIPQAMnum);
+					MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+					if(itIpqam != m_mapIpqamInfo.end())
+					{
+						IPQAMInfo *pIpqam = itIpqam->second;
+				
+						char strOutPort[64]={0};
+						sprintf(strOutPort,"%d",pStream->iOutPutPort);
+						char strMsg[32]="";
+						//导航流的url是否需拼接
+						m_Navigation->StartOneStream(strSeesionID,strSID,strReSID,pStream->strNav_url,pIpqam->strIpqamIP,
+									strOutPort,strSIP,strSPort,strAreaID,strSeesionID,strMsg);
+						//listTmp.erase(iterList);
+						printf("---start one nav stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+								pStream->strNetRegionNum,pStream->iIPQAMNum);
+					}
+					
+						
+				}
+
+			}
+	*/
+		}
+		break;
+		case Navigation:
+		{
+			//if(bInStatus)
+			{
+
+#ifndef USEMAP
+				char strkey_value[64] = {0};
+				sprintf(strkey_value,"%d",iNewStreamID);
+				StreamStatus pTmpResource;
+				memset(&pTmpResource,0,sizeof(pTmpResource));
+				int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value,&pTmpResource);
+				printf("---==== iret =%d \n",iret);
+				fflush(stdout);
+				if(iret)
+				{
+					StreamStatus* pTmp = &pTmpResource;		
+#else
+				MapStreamStatus::iterator it = m_mapStreamStatus.find(iNewStreamID);
+				if(it != m_mapStreamStatus.end())
+				{
+					StreamStatus* pTmp = it->second;
+#endif					
+					//首先清理掉上一路
+							//清理导航流
+					char strSID[128] = "1001";
+					char strReSID[128] = "1001";
+					char strAuthiName[128] = "cscs";
+					char strAuthcode[128] = "123456";
+					char strMsg[128] = "";
+					int iTaskID = 111;
+
+					//将需要转发的导航流存在vector
+					printf("----find new streamid %d \n",iNewStreamID);
+					fflush(stdout);
+					pthread_mutex_lock(&m_VecNewNavlocker);								
+					m_vecNewNav.insert(iNewStreamID);
+					pthread_mutex_unlock(&m_VecNewNavlocker);	
+					printf("-----set size=%d \n",m_vecNewNav.size());
+					fflush(stdout);
+					
+					char strSeesionID[64] ={0};
+					sprintf(strSeesionID,"%d",pTmp->istreamID);
+
+
+					//先清理绑定关系
+					if(strcmp(pTmp->strBind_userID, "") != 0)
+					{
+						printf("----m_Msi_SMInter->CleanMSIStream\n");
+						m_Msi_SMInter->CleanMSIStream(pTmp->strBind_userID,strSeesionID); //seesionID作为serialno
+						usleep(1000*100);
+					}
+					
+					//根据数据类型进行不同模块的清理
+					//if (strcmp(pTmp->strStreamType, Status_Adver) == 0)
+					{
+							//char strTaskID[64]={0};
+						    //sprintf(strTaskID,"%d",pTmp->iTaskID);
+							m_Advertiser->CleanAdverStream(strSeesionID,pTmp->strSwitch_task_id,pTmp->strSerialNo);
+							printf("123454 m_Advertiser->CleanAdverStream\n");
+							fflush(stdout);
+							usleep(1000*100);
+					}
+					//else if (strcmp(pTmp->strStreamType, Status_Nav) == 0 || 	strcmp(pTmp->strStreamType, Status_Nav_Home) == 0)
+					{
+						m_Navigation->CleanNavStream(strSeesionID,strSID,pTmp->strSwitch_task_id,strAuthiName,strAuthcode,pTmp->strSerialNo,strMsg);
+						//Cleanonenav(strSeesionID);
+						printf("123454 m_Navigation->CleanNavStream\n");
+						fflush(stdout);
+						usleep(1000*500);
+					}
+					//else if (strcmp(pTmp->strStreamType, Status_Vod) == 0 )
+					{
+						
+						printf("1111---hell world\n");
+						m_VGWVodPlayer->CleanVODStream(strSeesionID,pTmp->strSwitch_task_id,strSeesionID);
+						//Cleanonevod(strSeesionID);
+						printf("1111----world\n");
+						fflush(stdout);
+						usleep(1000*500);
+					}
+				}
+				if(bNewStream)
+				{
+					printf("---new steam\n");
+					fflush(stdout);
+					AddOneNavStream(iNewStreamID);
+				}
+				//usleep(1000*2000);
+				printf("---bNewStream 11111\n");
+				fflush(stdout);
+					//创建一路导航流
+		
+			}	
+			break;
+		}
+		break;
+		default:
+		break;
+	}
+
+	return true;
+}
+
+int SM_Manager::AddOneVodStream(int iStreamID,char* strUrl,int iFd,char* username,char *vodname,char *posterurl,char* strSerilno)
+{
+	char strUserID[128] ={0};
+	char strkey_value1[64] = {0};
+ 	sprintf(strkey_value1,"%d",iStreamID);
+	StreamStatus pTmpResource1;
+	memset(&pTmpResource1,0,sizeof(pTmpResource1));
+	printf("-----this is addvod\n");
+	fflush(stdout);
+	int iret1 = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value1,&pTmpResource1);
+	if(iret1)
+	{
+	    StreamStatus* pTmp1 = &pTmpResource1;
+		memcpy(strUserID,pTmp1->strBind_userID,strlen(pTmp1->strBind_userID)+1);
+	}
+	printf("---5555555555555strUserID = %s,streamid = %d\n",strUserID,iStreamID);
+	fflush(stdout);
+	
+	//向均衡切流器申请ip和port
+	if((Istype == 2)&&(advflag == 1))
+	{
+		m_Advertiser->Getaddr(strkey_value1,strSerilno);
+		printf("to get the adv ip and port\n");
+		fflush(stdout);
+	}
+	
+	//先释放资源
+	bool bneedwait = CleanStream(iStreamID);
+	usleep(VOD_play_clean);
+		
+	printf("----get userid %s \n",strUserID);
+	fflush(stdout);
+
+#ifndef USEMAP
+		char strkey_value[64] = {0};
+		sprintf(strkey_value,"%d",iStreamID);
+		StreamResource pTmpResource;
+		memset(&pTmpResource,0,sizeof(pTmpResource));
+		int iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+		if(iret)
+		{
+			StreamResource* pTmp = &pTmpResource;
+#else
+		MapStreamResource::iterator it = m_mapStreamResource.find(iStreamID);
+		if(it != m_mapStreamResource.end())
+		{
+			StreamResource* pTmp = it->second;
+#endif
+			Stream *ptmpRequest = new Stream;
+	 
+			ptmpRequest->m_clientSocket = iFd;
+			printf("---AddOneVodStream m_clientSocket fd = %d\n",ptmpRequest->m_clientSocket);
+			fflush(stdout);
+			
+			//cJSON *pRet_root;
+			ptmpRequest->pRet_root = cJSON_CreateObject();
+			ptmpRequest->Requst_Json_str(2,"serialno",strSerilno);
+			m_VGWVodPlayer->m_mapVod_player.insert(MapVodPlay::value_type(iStreamID,ptmpRequest));
+		
+			char strRegion[128] = {0};
+			int iRegionPort = 0;
+			int idex  = 0;
+	      	if(Istype == 1)
+	        {
+#ifdef 	MAPREGION
+
+				MapRegionID::iterator it = m_mapRegionID.begin();
+				while(it != m_mapRegionID.end())
+				{
+					printf("--region %s , port %d \n",it->second,it->first);
+					fflush(stdout);
+					++it;
+				}
+
+				MapRegionID::iterator itfid = m_mapRegionID.begin();
+				while(itfid != m_mapRegionID.end())
+				{
+
+					if(itfid->first != m_idex)
+					{
+
+						//SetUsedRegionID::iterator itused = m_SetUsedRegionID.find(itfid->first);
+						pthread_mutex_lock(&m_lockerRegion);
+						SetUsedRegionID::iterator itused = m_SetUsedRegionID.begin();
+						while(itused != m_SetUsedRegionID.end())
+						{	
+							int iRegportUsed = itused->second;
+							int iRegioID = itfid->first;
+							if(iRegioID == iRegportUsed)
+							{
+								printf("---region id is port used %d \n",iRegioID);
+								fflush(stdout);
+								break;
+							}
+							++itused;
+						}
+						pthread_mutex_unlock(&m_lockerRegion);
+						if(itused == m_SetUsedRegionID.end() )
+						{
+							//没有在使用
+							strcpy(strRegion,itfid->second);
+							printf("*********region %s \n",itfid->second);
+							fflush(stdout);
+							iRegionPort = itfid->first;
+							printf("find can use region %s %d \n",strRegion,iRegionPort);
+							fflush(stdout);
+							break;
+						}
+					}
+					++itfid;
+				}	
+				if(0==iRegionPort)
+				{
+					//没有可用的region
+					//return -1；
+				
+					MapRegionID::iterator itfid = m_mapRegionID.begin();
+					strcpy(strRegion,itfid->second);
+					iRegionPort = itfid->first;
+					printf("----no find can used region\n");
+					fflush(stdout);
+				}
+
+#else
+				idex = m_icurrentidex;
+				m_icurrentidex = !m_icurrentidex;
+				
+				strcpy(strRegion,CstrRegion[idex]);
+#endif
+				
+				//将regionID加入到中
+				pthread_mutex_lock(&m_lockerRegion);
+				printf("---insert one stream %d  %d into used map \n",iStreamID,iRegionPort);
+				fflush(stdout);
+				
+				SetUsedRegionID::iterator itisused = m_SetUsedRegionID.find(iStreamID);
+				if(itisused!=m_SetUsedRegionID.end())
+				{
+					m_SetUsedRegionID.erase(itisused);
+				}
+				m_SetUsedRegionID.insert(SetUsedRegionID::value_type(iStreamID,iRegionPort));
+				pthread_mutex_unlock(&m_lockerRegion);
+				printf("----insert over \n");
+				fflush(stdout);
+				m_idex = iRegionPort;
+				printf("StartOneStream5555555555555%s\n",strUserID);
+				fflush(stdout);
+				//(int iStreamID,char *strUrl,char *strRegionid,char* strUserID,char *vodname,char *posterurl)、username
+				if(m_VGWVodPlayer->StartOneStream(iStreamID,strUrl,strRegion,username,vodname,posterurl,iFd))
+				{
+					printf("to start a vod stream success\n");
+					fflush(stdout);
+				}
+				else
+				{
+					printf("start a vod stream error\n");
+					fflush(stdout);
+					return -1;
+				}
+	        }	
+			char strSeesionID[64] ={0};
+			sprintf(strSeesionID,"%d",pTmp->iStreamID);
+
+			
+			int iIPQAMnum = pTmp->iIPQAMNum;
+#ifndef USEMAP
+			char strkey_value1[64] = {0};
+			sprintf(strkey_value1,"%d",iIPQAMnum);
+			IPQAMInfo pTmpResource1;
+			memset(&pTmpResource1,0,sizeof(pTmpResource1));
+			int iret = DBInterfacer::GetInstance()->FindOneStream(5,"iIPQAMNum",strkey_value1,&pTmpResource1);
+			if(iret)
+			{
+				IPQAMInfo* pIpqam = &pTmpResource1;
+#else		
+			MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+			if(itIpqam != m_mapIpqamInfo.end())
+			{
+				IPQAMInfo *pIpqam = itIpqam->second;
+#endif
+				char strOutputUrl[128]={0};
+				sprintf(strOutputUrl,"udp://%s:%d",pIpqam->strIpqamIP,pTmp->iOutPutPort);
+
+				char strInputUrl[128] ={0};
+				if((Istype == 2) && (advflag == 0))
+				{
+					m_VGWVodPlayer->StartOneStream(iStreamID,strUrl,strRegion,username,vodname,posterurl,iFd);
+					usleep(1000*300);
+					sprintf(strInputUrl,"udp://%s:%d",strAdverIP,65000+iStreamID);
+					printf("strInputUrl = %s\n",strInputUrl);
+					fflush(stdout);
+					m_Advertiser->StartOneStream(strSeesionID,strInputUrl,strOutputUrl,strSeesionID,1);
+					return true;
+				}
+				else if((Istype == 2) && (advflag == 1))
+				{
+
+					char smyip[32] = {0};
+					char smyport[32] = {0};
+					Smstrinfo::iterator itaddr = m_smstraddr.begin();
+					if(itaddr != m_smstraddr.end())
+					{
+						Smstream *temp = *itaddr;
+						memcpy(smyip,temp->sadvip,strlen(temp->sadvip)+1);
+						memcpy(smyport,temp->sadvport,strlen(temp->sadvport)+1);
+						m_smstraddr.erase(itaddr);
+						delete temp;
+						printf("----smyip = %s,smyport = %s\n",smyip,smyport);
+						fflush(stdout);
+						m_VGWVodPlayer->StartOneStream(iStreamID,strUrl,strRegion,username,vodname,posterurl,iFd,smyip,smyport);
+						usleep(1000*300);
+						
+						Smvodaddr::iterator itaddr = m_smvodaddr.find(iStreamID);
+						if(itaddr!= m_smvodaddr.end())
+						{
+							printf("-----to change the smip\n");
+							fflush(stdout);
+							Smstream *vodtemp = itaddr->second;
+							memcpy(vodtemp->sadvip,smyip,strlen(smyip)+1);
+							memcpy(vodtemp->sadvport,smyport,strlen(smyport)+1);
+						}
+						else
+						{
+							Smstream *mytemp = new Smstream;
+							memcpy(mytemp->sadvip,smyip,strlen(smyip)+1);
+							memcpy(mytemp->sadvport,smyport,strlen(smyport)+1);
+							m_smvodaddr.insert(Smvodaddr::value_type(iStreamID,mytemp));
+						}
+						
+						int myport = atoi(smyport);
+						sprintf(strInputUrl,"udp://%s:%d",smyip,myport);
+						printf("strInputUrl = %s\n",strInputUrl);
+						fflush(stdout);
+						m_Advertiser->StartOneStream(strSeesionID,strInputUrl,strOutputUrl,strSeesionID,1);
+						
+						return true;
+					}
+					else
+					{
+						printf("get the adv ip and port error\n");
+						fflush(stdout);
+						return false;
+					}
+				}
+#ifdef 	MAPREGION
+				sprintf(strInputUrl,"udp://%s:%d",strAdverIP,iRegionPort);  //写死	
+#else
+		//		int idex = pTmp->iStreamID % (iMulitNum-1);
+				sprintf(strInputUrl,"udp://%s:%d",strAdverIP,CIRegionID[idex]);  //写死
+#endif
+				char strMsg[32]="";
+				
+				m_Advertiser->StartOneStream(strSeesionID,strInputUrl,strOutputUrl,strSeesionID,1);
+
+				printf("---start one adv stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+						pTmp->strNetRegionNum,pTmp->iIPQAMNum);
+				fflush(stdout);
+				usleep(1000*100);
+			}
+			//组inputurl
+	}
+}
+
+bool SM_Manager::GetTaskStatus()
+{
+	return true;
+}
+
+bool SM_Manager::InitStream()
+{
+	m_icurrentidex = 0;
+	m_Navigation = new Navigation_Stream(this);
+	m_Advertiser = new Advertisement_Stream(this);
+	m_VGWVodPlayer = new VGW_Vod_Stream(this);
+	m_Msi_SMInter = new MSI_SM_Stream(this);
+	m_Advmulstream = new Advmul_stream();
+
+	//先开启清理模式
+	//首先导入状态表数据非空闲状态
+	if(LoadStreamStatus())
+	{
+		//开始清理
+		CleanAllStream();
+		//模块回复处理由各个对象处理
+		usleep(InitStream_clean);
+	}
+	else
+		printf("---load clean data error \n");
+		fflush(stdout);
+		
+	m_Advertiser->CleanALLAdverStream();
+	
+	//按组进行初始化
+	//先导入资源表
+	LoadStreamResource();
+	//usleep(1000);
+	LoadIPQAMInfo();
+	//usleep(1000);
+	LoadAdvinfo();
+	printf("---begin init network group\n");
+	fflush(stdout);
+	LoadNetWorkGroup();
+//	usleep(1000);
+	printf("---load success \n");
+	fflush(stdout);
+	
+	//查询当前VGW 的类型
+	m_VGWVodPlayer->Checktype();
+#ifdef TEST_DATA
+	//sleep(30);
+	MapStreamStatus::iterator iter = m_mapStreamStatus.begin();
+	FILE *fp = fopen("result.log","wb+");
+	while(iter != m_mapStreamStatus.end())
+	{
+		StreamStatus *ptm = iter->second;
+	   fprintf(fp,"%d \t %s \t %s \t %s \t %s \t %s \n",ptm->istreamID,
+			ptm->strStreamType,ptm->strStatus_date,ptm->strBind_userID,ptm->strBind_date,
+			ptm->strSwitch_task_id);
+		fflush(fp);
+		++iter;
+	}
+
+	MapStreamResource::iterator itResource = m_mapStreamResource.begin();
+	while(itResource != m_mapStreamResource.end())
+	{
+		StreamResource *ptmp = itResource->second;
+		fprintf(fp,"%d \t %d \t %s \n",ptmp->iStreamID,ptmp->iIPQAMNum,
+				ptmp->strNetRegionNum);
+		fflush(fp);
+		++itResource;
+	}
+	MapStreamGroup::iterator ittmp = m_mapStreamGroup.begin();
+	while(ittmp != m_mapStreamGroup.end())
+	{
+		ListStreamResource listTmp1 = ittmp->second;
+		ListStreamResource::iterator iterList1 = listTmp1.begin();
+		while(iterList1 != listTmp1.end())
+		{
+			printf("---group %s stream id =%d \n ",ittmp->first,*iterList1);
+			fflush(stdout);
+			++iterList1;
+			
+		}
+		++ittmp;
+	}
+	
+#endif
+
+	//开始开启组播流	
+			printf("---begin to add advmulstream\n");
+			fflush(stdout);
+			m_Advmulstream->CleanmulStream();
+			usleep(1000*2500);
+			
+			m_Advmulstream->StartadvStream();
+			printf("this is advmulstream\n");
+			fflush(stdout);
+			
+			printf("1111110000000\n");
+			fflush(stdout);
+
+	//总共分组m_mapNetworkGroup中
+	//关联流信息组在m_mapStreamGroup中
+	printf("StreamResoure size=%d ,status size=%d ,group size=%d ,streamGroup size=%d \n",
+		m_mapStreamResource.size(),m_mapStreamStatus.size(),m_mapNetworkGroup.size(),m_mapStreamGroup.size());
+	fflush(stdout);
+	
+	MapStreamGroup::iterator iterGroup = m_mapStreamGroup.begin();
+	bool bHasCreateStream = false;
+	while(iterGroup != m_mapStreamGroup.end())
+	{
+		int hdiNavtaionNum = 0;
+		int sdiNavtaionNum = 0;
+		int hdiAdverNum = 0;
+		int	sdiAdverNum = 0;
+		
+		MapNetWorkGroup::iterator itwork = m_mapNetworkGroup.find(iterGroup->first);
+		if(itwork != m_mapNetworkGroup.end())
+		{
+			NetworkGroup *ptmp = itwork->second;
+			hdiNavtaionNum = ptmp->hdiNavgationStreamNum;
+			sdiNavtaionNum = ptmp->sdiNavgationStreamNum;
+			hdiAdverNum = ptmp->hdiAdvertisementStreamNum;
+			sdiAdverNum = ptmp->sdiAdvertisementStreamNum;
+			
+		//分别加载高标清的流
+			SetGroupStream sdlistTmps;
+			SetGroupStream hdlistTmph;
+			
+			DBInterfacer::GetInstance()->FindSameGroupStream(ptmp->strNetRegionNum,1,sdlistTmps);
+			DBInterfacer::GetInstance()->FindSameGroupStream(ptmp->strNetRegionNum,0,hdlistTmph);
+			
+			int iGroupSize = sdlistTmps.size();
+			printf("---before  sdiNavtaionNum=%d\n",iGroupSize);
+			fflush(stdout);
+			sdiNavtaionNum =  (sdiNavtaionNum <= iGroupSize) ?  sdiNavtaionNum : iGroupSize;
+			
+			iGroupSize = hdlistTmph.size();
+			
+			printf("---before  sdiNavtaionNum=%d\n",iGroupSize);
+			fflush(stdout);
+			hdiNavtaionNum =  (hdiNavtaionNum <= iGroupSize) ?  hdiNavtaionNum : iGroupSize;
+
+			printf("----begin group %s ---add hdNav hdiNavtaionNum=%d,---add sdNav sdiNavtaionNum=%d\n",ptmp->strNetRegionNum,
+					hdiNavtaionNum,sdiNavtaionNum);
+			fflush(stdout);
+			
+		//开始下发标清导航流
+			SetGroupStream::iterator sditerList = sdlistTmps.begin();
+			while(sdiNavtaionNum-- > 0 && sditerList != sdlistTmps.end())
+			{
+
+				//导航流
+				int iStreamID = *sditerList;
+				printf("----streamid=%d ready\n",iStreamID);
+				fflush(stdout);
+				//找到对应流信息
+				MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+				if(iterStream != m_mapStreamResource.end())
+				{
+					StreamResource *pStream = iterStream->second;
+					//调用下发一路导航流
+					char strSeesionID[64] ={0};
+					sprintf(strSeesionID,"%d",pStream->iStreamID);
+					char strSID[64] ="1001";
+					char strReSID[64] ="2000"; //operid
+					char strSIP[64];
+					char strSPort[32];
+					memcpy(strSIP,strMyServerIP,strlen(strMyServerIP)+1);
+					sprintf(strSPort,"%d",iMSIServerPort);
+					char strAreaID[32] ="3301";
+					
+					int iIPQAMnum = pStream->iIPQAMNum;
+					printf("---ipqam info num=%d \n",iIPQAMnum);
+					fflush(stdout);
+					MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+					if(itIpqam != m_mapIpqamInfo.end())
+					{
+						IPQAMInfo *pIpqam = itIpqam->second;
+
+						char strOutPort[64]={0};
+						sprintf(strOutPort,"%d",pStream->iOutPutPort);
+						char strMsg[32]="";
+						//导航流的url是否需拼接
+						char naurl[512] = {0};
+						sprintf(naurl,"%s?id=%s",pStream->strNav_url,strSeesionID);
+						Navstream(strSeesionID,strSID,strReSID,naurl,strSIP,strSPort,strAreaID,strSeesionID,strMsg);
+						sdlistTmps.erase(sditerList);
+						printf("---start one nav sdstream %s,group id=%s,ipqamnum=%d,---sdlistTmps = %d\n",strSeesionID,
+								pStream->strNetRegionNum,pStream->iIPQAMNum,sdlistTmps.size());
+						fflush(stdout);
+					//	装载导航流的流id和标志
+						m_navinfo.insert(Navinfo::value_type(pStream->iStreamID,pStream->iStreamID));
+						usleep(1000*100);
+					}		
+				}
+				sditerList = sdlistTmps.begin();
+			}
+		//开始下发高清导航流	
+			SetGroupStream::iterator hditerList = hdlistTmph.begin();
+			while(hdiNavtaionNum-- > 0 && hditerList != hdlistTmph.end())
+			{
+
+				//导航流
+				int iStreamID = *hditerList;
+				printf("----streamid=%d ready\n",iStreamID);
+				fflush(stdout);
+				//找到对应流信息
+				MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+				if(iterStream != m_mapStreamResource.end())
+				{
+					StreamResource *pStream = iterStream->second;
+					//调用下发一路导航流
+					char strSeesionID[64] ={0};
+					sprintf(strSeesionID,"%d",pStream->iStreamID);
+					char strSID[64] ="1001";
+					char strReSID[64] ="2000"; //operid
+					char strSIP[64];
+					char strSPort[32];
+					memcpy(strSIP,strMyServerIP,strlen(strMyServerIP)+1);
+					sprintf(strSPort,"%d",iMSIServerPort);
+					char strAreaID[32] ="3301";
+					
+					int iIPQAMnum = pStream->iIPQAMNum;
+					printf("---ipqam info num=%d \n",iIPQAMnum);
+					fflush(stdout);
+					MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+					if(itIpqam != m_mapIpqamInfo.end())
+					{
+						IPQAMInfo *pIpqam = itIpqam->second;
+
+						char strOutPort[64]={0};
+						sprintf(strOutPort,"%d",pStream->iOutPutPort);
+						char strMsg[32]="";
+						//导航流的url是否需拼接
+						char naurl[512] = {0};
+						sprintf(naurl,"%s?id=%s",pStream->strNav_url,strSeesionID);
+						Navstream(strSeesionID,strSID,strReSID,naurl,strSIP,strSPort,strAreaID,strSeesionID,strMsg);
+						hdlistTmph.erase(hditerList);
+						printf("---start one nav hdstream %s,group id=%s,ipqamnum=%d,hdlistTmph = %d\n",strSeesionID,
+								pStream->strNetRegionNum,pStream->iIPQAMNum,hdlistTmph.size());
+						fflush(stdout);
+						//	装载导航流的流id和标志
+						m_navinfo.insert(Navinfo::value_type(pStream->iStreamID,pStream->iStreamID));
+						usleep(1000*100);
+					}		
+				}
+				//++iterList;
+				hditerList = hdlistTmph.begin();
+			}
+		//开始下发高清广告流	
+			iGroupSize = hdlistTmph.size();
+			hdiAdverNum =	hdiAdverNum <= iGroupSize ?  hdiAdverNum : iGroupSize;
+
+			hditerList = hdlistTmph.begin();
+			printf("----begin group %s adv %d\n",ptmp->strNetRegionNum,
+					hdiAdverNum);
+			fflush(stdout);
+			while(hdiAdverNum-- > 0 && hditerList != hdlistTmph.end())
+			{
+				//导航流
+				int iStreamID = *hditerList;
+				//找到对应流信息
+				MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+				if(iterStream != m_mapStreamResource.end())
+				{
+					StreamResource *pStream = iterStream->second;
+					//调用下发一路广告流
+					char strSeesionID[64] ={0};
+					sprintf(strSeesionID,"%d",pStream->iStreamID);
+					
+					int iIPQAMnum = pStream->iIPQAMNum;
+					printf("---12iIPQAMnum = %d\n",iIPQAMnum);
+					fflush(stdout);
+					MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+					printf("----hello world\n");
+					if(itIpqam != m_mapIpqamInfo.end())
+					{
+						printf("itIpqam->second\n");
+						IPQAMInfo *pIpqam = itIpqam->second;
+						
+						char strOutputUrl[128]={0};
+						printf("---1234\n");
+						fflush(stdout);
+						sprintf(strOutputUrl,"udp://%s:%d",pIpqam->strIpqamIP,pStream->iOutPutPort);
+
+						char strInputUrl[128] ={0};
+					/*
+						int idex = pStream->iStreamID % (iMulitNum-1);
+						strcpy(strInputUrl,strVLCMulitURL[idex]);
+					*/
+						SetAdvinfo::iterator itadv = m_mapadvinfo.find(pStream->iStreamID);
+						Advinfo *tempadv = itadv->second;
+						sprintf(strInputUrl,"udp://%s:%s",tempadv->advip,tempadv->advport);
+						char strMsg[32]="";
+
+						m_Advertiser->StartOneStream(strSeesionID,strInputUrl,strOutputUrl,strSeesionID);
+						hdlistTmph.erase(hditerList);
+						printf("---start one adv hdstream %s,group id=%s,ipqamnum=%d,hdlistTmph = %d\n",strSeesionID,
+								pStream->strNetRegionNum,pStream->iIPQAMNum,hdlistTmph.size());
+						fflush(stdout);
+						//	装载导航流的流id和标志
+						m_navinfo.insert(Navinfo::value_type(pStream->iStreamID,0));
+						usleep(1000*100);
+					}	
+				}
+				//++iterList;
+				printf("this is the next\n");
+				fflush(stdout);
+				hditerList = hdlistTmph.begin();
+			}
+		//开始下发标清广告
+			iGroupSize = sdlistTmps.size();
+			sdiAdverNum = sdiAdverNum <= iGroupSize ?  sdiAdverNum : iGroupSize;
+			sditerList = sdlistTmps.begin();
+			printf("----begin group %s adv %d\n",ptmp->strNetRegionNum,
+					sdiAdverNum);
+			fflush(stdout);
+			while(sdiAdverNum-- > 0 && sditerList != sdlistTmps.end())
+			{
+				//导航流
+				int iStreamID = *sditerList;
+				//找到对应流信息
+				MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+				if(iterStream != m_mapStreamResource.end())
+				{
+					StreamResource *pStream = iterStream->second;
+					//调用下发一路广告流
+					char strSeesionID[64] ={0};
+					sprintf(strSeesionID,"%d",pStream->iStreamID);
+					
+					int iIPQAMnum = pStream->iIPQAMNum;
+					printf("----123iIPQAMnum = %d\n",iIPQAMnum);
+					fflush(stdout);
+					MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+					if(itIpqam != m_mapIpqamInfo.end())
+					{
+						IPQAMInfo *pIpqam = itIpqam->second;
+
+						char strOutputUrl[128]={0};
+						sprintf(strOutputUrl,"udp://%s:%d",pIpqam->strIpqamIP,pStream->iOutPutPort);
+
+						char strInputUrl[128] ={0};
+					/*	
+						int idex = pStream->iStreamID % (iMulitNum-1);
+						strcpy(strInputUrl,strVLCMulitURL[idex]);
+					*/
+						SetAdvinfo::iterator itadv = m_mapadvinfo.find(pStream->iStreamID);
+						Advinfo *tempadv = itadv->second;
+						sprintf(strInputUrl,"udp://%s:%s",tempadv->advip,tempadv->advport);
+						char strMsg[32]="";
+						m_Advertiser->StartOneStream(strSeesionID,strInputUrl,strOutputUrl,strSeesionID);
+						sdlistTmps.erase(sditerList);
+						printf("---start one adv sdstream %s,group id=%s,ipqamnum=%d,sdlistTmps = %d\n",strSeesionID,
+								pStream->strNetRegionNum,pStream->iIPQAMNum,sdlistTmps.size());
+						fflush(stdout);
+						//	装载导航流的流id和标志
+						m_navinfo.insert(Navinfo::value_type(pStream->iStreamID,0));
+						usleep(1000*100);
+					}	
+				}
+				sditerList = sdlistTmps.begin();
+			}
+			
+			iterGroup++;	
+		}
+		else
+			++iterGroup;
+
+	}
+
+	//创建绑定超时检测线程
+//	pthread_t check_thread;
+//	pthread_create(&check_thread, NULL, Check_BindOverTime_thread, this);
+//	pthread_detach(check_thread);
+/*
+	if(sdadvport)
+	{
+			m_Advmulstream->StartadvStream(sdadvname,sdadvip,sdadvport);
+			printf("this is sdadv\n");
+			fflush(stdout);
+	}
+*/
+	
+	return true;
+}
+
+int SM_Manager::Bind_OneStream(int iStreamid,char *strUserID,char* strToken,int *iChannelInfo)
+{
+	printf("---begin bind onestream\n");
+	fflush(stdout);
+	//主要是更新数据库，补发导航流
+	//找到对应数据
+#ifndef USEMAP
+	char strkey_value[64] = {0};
+	sprintf(strkey_value,"%d",iStreamid);
+	StreamStatus pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value,&pTmpResource);
+	if(iret)
+	{
+		StreamStatus* pTmp = &pTmpResource;
+#else	
+ 	MapStreamStatus::iterator itfind = m_mapStreamStatus.find(iStreamid);
+	if(itfind != m_mapStreamStatus.end())
+	{
+		StreamStatus *pTmp = itfind->second;
+#endif		
+		
+		if(strcmp(pTmp->strBind_userID,strUserID) == 0 )
+		{
+			printf("----bind again \n");
+			fflush(stdout);
+			return -1;
+		}
+		else if(strcmp(pTmp->strStreamType,Status_Adver)==0 || strcmp(pTmp->strStreamType,Status_Idle)==0 ||
+			      strcmp(pTmp->strBind_userID,"") !=0||strcmp(pTmp->strStreamType,Status_Nav_Home)==0)
+		{
+			//已经有绑定用户
+			//返回失败
+			printf("***********bind error \n");
+			fflush(stdout);
+			return -1;
+		}
+		//
+		time_t timep; 
+		time (&timep); 
+		struct tm* tmpTime = gmtime(&timep);
+		char nowTime[128]={0};
+		// -%d-%d ,tmpTime->tm_hour,tmpTime->tm_min
+		// 月日时分秒
+		sprintf(nowTime,"%d-%d-%d-%d:%d:%d",tmpTime->tm_year+1900,tmpTime->tm_mon+1,tmpTime->tm_mday,
+			tmpTime->tm_hour,tmpTime->tm_min,tmpTime->tm_sec); //bind time
+		printf("-----time =%s \n",nowTime);
+		fflush(stdout);
+
+		//将绑定数据放入状态表中
+/*		pthread_mutex_lock(&m_BindStatuslocker);
+		m_mapBindStatus.insert(MapBindOverTime::value_type(iStreamid,timep));
+		pthread_mutex_unlock(&m_BindStatuslocker);
+*/		
+		strcpy(pTmp->strBind_date,nowTime);
+		strcpy(pTmp->strBind_userID,strUserID);
+		strcpy(pTmp->strStreamType,Status_Nav_Home);
+		//strcpy(pTmp->strSwitch_task_id,strToken);
+
+		//状态时间修改一次则更新
+		strcpy(pTmp->strStatus_date,nowTime);
+
+		DBInterfacer::GetInstance()->update_table(1,pTmp);
+
+		printf("bind one stream success\n",iStreamid);
+		fflush(stdout);
+		
+//  xinzhen
+#ifndef USEMAP
+		char strkey_value[64] = {0};
+		sprintf(strkey_value,"%d",iStreamid);
+		StreamResource pTmpResource;
+		memset(&pTmpResource,0,sizeof(pTmpResource));
+		int iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+		if(iret)
+		{
+			StreamResource* tmpResource = &pTmpResource;
+				
+#else
+		MapStreamResource::iterator itResource = m_mapStreamResource.find(iStreamid);
+		if(itResource != m_mapStreamResource.end())
+		{
+			StreamResource *tmpResource = itResource->second;
+#endif			
+			tmpResource->iBind_state = 1;
+
+			*iChannelInfo = tmpResource->iChannel_info;
+			//绑定一路流
+			//DBInterfacer::GetInstance()->update_table(4,tmpResource);
+		}
+		//成功之后需要补发一路导航流
+		//首先寻找可用的
+	//	AddOneStream(Navigation);
+	}
+	else
+	{
+		//不存在的流返回异常
+		return -1;
+	}
+
+
+	return 0;
+}
+
+bool SM_Manager::AddStream2GroupInfo(int iStreamID,int iType)
+{
+	if(1==iType)
+	{
+		MapStreamResource::iterator itfid = m_mapStreamResource.find(iStreamID);
+		if(itfid != m_mapStreamResource.end())
+		{
+			StreamResource *pTmp = itfid->second;
+			//从分组表中找到
+			MapStreamGroup::iterator itstremfind  = m_mapStreamGroup.find(pTmp->strNetRegionNum);
+			if(itstremfind != m_mapStreamGroup.end())
+			{
+				ListStreamResource listTmp = itstremfind->second;
+				//ListStreamResource::iterator iterList = listTmp.begin();
+				listTmp.push_back( iStreamID);
+			}
+
+		}
+	}	
+	else if(0==iType)
+	{
+		MapStreamResource::iterator itfid = m_mapStreamResource.find(iStreamID);
+		if(itfid != m_mapStreamResource.end())
+		{
+			StreamResource *pTmp = itfid->second;
+			//从分组表中找到
+			MapStreamGroup::iterator itstremfind  = m_mapStreamGroup.find(pTmp->strNetRegionNum);
+			if(itstremfind != m_mapStreamGroup.end())
+			{
+				ListStreamResource listTmp = itstremfind->second;
+				ListStreamResource::iterator iterList = listTmp.begin();
+				while(iterList != listTmp.end())
+				{
+					if(*iterList == iStreamID)
+					{
+						listTmp.erase(iterList);
+						break;
+					}
+					++iterList;
+				}
+				//listTmp.push_back( iStreamID);
+			}
+
+		}
+		
+	}
+	return true;
+}
+
+int SM_Manager::AddOneNavStream(int iStreamID)
+{
+	int ret = -1;
+	printf("------add one nav \n");
+	fflush(stdout);
+	int streamtype;
+		//创建一路导航流
+#ifndef USEMAP
+	char strkey_value[64] = {0};
+	sprintf(strkey_value,"%d",iStreamID);
+	StreamResource pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+	if(iret)
+	{
+		StreamResource* pStream = &pTmpResource;
+
+#else
+	MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+	if(iterStream != m_mapStreamResource.end())
+	{
+		StreamResource *pStream = iterStream->second;
+#endif
+		//调用下发一路导航流
+		char strSeesionID[64] ={0};
+		sprintf(strSeesionID,"%d",pStream->iStreamID);
+		char strSID[64] ="1001";
+		char strReSID[64] ="2000"; //operid
+		char strSIP[64];
+		char strSPort[32];
+		memcpy(strSIP,strMyServerIP,strlen(strMyServerIP)+1);
+		sprintf(strSPort,"%d",iMSIServerPort);
+		char strAreaID[32] ="3301";
+
+		streamtype = pStream->iWherether_HD;
+
+		int iIPQAMnum = pStream->iIPQAMNum;
+		printf("---ipqam info num=%d \n",iIPQAMnum);
+		fflush(stdout);
+#ifndef USEMAP
+		char strkey_value1[64] = {0};
+		sprintf(strkey_value1,"%d",iIPQAMnum);
+		IPQAMInfo pTmpResource1;
+		memset(&pTmpResource1,0,sizeof(pTmpResource1));
+		int iret = DBInterfacer::GetInstance()->FindOneStream(5,"iIPQAMNum",strkey_value1,&pTmpResource1);
+		if(iret)
+		{
+			IPQAMInfo* pIpqam = &pTmpResource1;
+#else
+		MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+		if(itIpqam != m_mapIpqamInfo.end())
+		{
+			IPQAMInfo *pIpqam = itIpqam->second;
+#endif
+			char strOutPort[64]={0};
+			sprintf(strOutPort,"%d",pStream->iOutPutPort);
+			char strMsg[32]="";
+			//导航流的url是否需拼接
+			if(streamtype == 0)
+			{
+				Navnext::iterator naiterList = hdm_navnext.begin();
+				if(naiterList != hdm_navnext.end())
+				{
+					sprintf(strkey_value,"%d",*naiterList);
+					printf("the hdnext anv id is %s\n",strkey_value);
+					fflush(stdout);
+					//删除掉最前端高清导航标志
+					hdm_navnext.erase(naiterList);
+					iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+					if(iret)
+					{
+						pStream = &pTmpResource;
+					}
+				}
+			}
+			else if(streamtype == 1)
+			{
+				Navnext::iterator naiterList = sdm_navnext.begin();
+				if(naiterList != sdm_navnext.end())
+				{
+					sprintf(strkey_value,"%d",*naiterList);
+					printf("the sdnext anv id is %s\n",strkey_value);
+					fflush(stdout);
+					//删除掉最前端的标清导航标志
+					sdm_navnext.erase(naiterList);
+					iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+					if(iret)
+					{
+						pStream = &pTmpResource;
+					}
+				}
+			}	
+			char naurl[512] = {0};
+			sprintf(naurl,"%s?id=%s",pStream->strNav_url,strSeesionID);
+			printf("----the naurl = %s\n",naurl);
+			fflush(stdout);
+			Navstream(strSeesionID,strSID,strReSID,naurl,strSIP,strSPort,strAreaID,strSeesionID,strMsg);
+			
+			//修改生成的导航流的标志
+			Navinfo::iterator itnav = m_navinfo.find(iStreamID);
+			if(itnav != m_navinfo.end())	
+			{
+				itnav->second = atoi(strkey_value);
+			}
+			printf("---start one nav stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+					pStream->strNetRegionNum,pStream->iIPQAMNum);
+			fflush(stdout);
+		}
+		ret = 0;
+		
+	}
+	return ret;
+}
+
+bool SM_Manager::VodStreamOver(int iStreamID,char *username)
+{
+	//开启一路新的导航流
+	//先清理
+	CleanStream(iStreamID);
+	
+	usleep(VodStreamOver_clean);
+	ListStreamResource::iterator iterList = m_ispause.begin();
+	while(iterList != m_ispause.end())
+	{
+		if(*iterList == iStreamID)
+		{
+			printf("---to erase the quit stream\n");
+			fflush(stdout);
+			m_ispause.erase(iterList);
+			break;
+		}
+		++iterList;
+	}
+
+	SetPauseVod::iterator itpausevod = m_SetPauseVod.begin();
+	while(itpausevod !=m_SetPauseVod.end())
+	{
+		if(*itpausevod == iStreamID)
+		{
+			printf("---to erase the itpausevod stream\n");
+			fflush(stdout);
+			m_SetPauseVod.erase(itpausevod);
+			break;
+		}
+		++itpausevod;
+	}
+
+	int ret = -1;
+	printf("------add one nav \n");
+	fflush(stdout);
+	//创建一路导航流
+#ifndef USEMAP
+			char strkey_value[64] = {0};
+			char newurl[128] = {0};
+			int ishd;
+			MapStreamResource::iterator iterhd = m_mapStreamResource.find(iStreamID);
+			if(iterhd!=m_mapStreamResource.end())
+			{
+				StreamResource *pStreamhd = iterhd->second;
+				ishd = pStreamhd->iWherether_HD;
+			}
+
+			if(!ishd)
+				sprintf(newurl,"%s?username=%s&streamid=%d&VodStreamOver=%s",navgoback,username,iStreamID,"goback");
+			else
+				sprintf(newurl,"%s?username=%s&streamid=%d&VodStreamOver=%s",sdnavgoback,username,iStreamID,"goback");	
+
+			sprintf(strkey_value,"%d",iStreamID);
+			StreamResource pTmpResource;
+			memset(&pTmpResource,0,sizeof(pTmpResource));
+			int iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+			if(iret)
+			{
+				StreamResource* pStream = &pTmpResource;
+		
+#else
+			MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+			if(iterStream != m_mapStreamResource.end())
+			{
+				StreamResource *pStream = iterStream->second;
+#endif
+				//调用下发一路导航流
+				char strSeesionID[64] ={0};
+				sprintf(strSeesionID,"%d",pStream->iStreamID);
+				char strSID[64] ="1001";
+				char strReSID[64] ="2000"; //operid
+				char strSIP[64];
+				char strSPort[32];
+				memcpy(strSIP,strMyServerIP,strlen(strMyServerIP)+1);
+				sprintf(strSPort,"%d",iMSIServerPort);
+				char strAreaID[32] ="3301";
+				
+				int iIPQAMnum = pStream->iIPQAMNum;
+				printf("---ipqam info num=%d \n",iIPQAMnum);
+				fflush(stdout);
+#ifndef USEMAP
+				char strkey_value1[64] = {0};
+				sprintf(strkey_value1,"%d",iIPQAMnum);
+				IPQAMInfo pTmpResource1;
+				memset(&pTmpResource1,0,sizeof(pTmpResource1));
+				int iret = DBInterfacer::GetInstance()->FindOneStream(5,"iIPQAMNum",strkey_value1,&pTmpResource1);
+				if(iret)
+				{
+					IPQAMInfo* pIpqam = &pTmpResource1;
+#else
+				MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+				if(itIpqam != m_mapIpqamInfo.end())
+				{
+					IPQAMInfo *pIpqam = itIpqam->second;
+#endif
+					char strOutPort[64]={0};
+					sprintf(strOutPort,"%d",pStream->iOutPutPort);
+					char strMsg[32]="";
+					
+					//导航流的url是否需拼接
+					printf("2222222222222%s\n",newurl);
+					fflush(stdout);
+					Navstream(strSeesionID,strSID,strReSID,newurl,strSIP,strSPort,strAreaID,strSeesionID,strMsg);
+	//			m_Navigation->StartOneStream(strSeesionID,strSID,strReSID,pStream->strNav_url,pIpqam->strIpqamIP,
+	//							strOutPort,strSIP,strSPort,strAreaID,strSeesionID,strMsg);
+					//listTmp.erase(iterList);
+					printf("---start one nav stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+							pStream->strNetRegionNum,pStream->iIPQAMNum);
+					fflush(stdout);
+				}
+				ret = 0;
+			}
+		//将广告流存入set
+		//m_SetPauseVod.insert(iStreamID);
+		//启动广告流
+		//AddOneAdvStream(iStreamID);
+		return true;
+}
+
+int SM_Manager::AddOneAdvStream(int iStreamID)
+{
+	StreamResource shTmpResource;
+	char strstream_id[64] = {0};
+	sprintf(strstream_id,"%d",iStreamID);
+	int shflag = 0;
+	int shiret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strstream_id,&shTmpResource);
+	if(shiret)
+	{
+		StreamResource *shpTmp = &shTmpResource;
+		shflag = shpTmp->iWherether_HD;
+		printf("hdisfull = %d,sdidfull = %d\n",hdisfull,sdisfull);
+		fflush(stdout);
+		if((hdisfull>0)||(sdisfull>0))
+		{
+	#ifndef USEMAP	
+			StreamStatus pTmpResource;
+			char username[128];
+			char streamid[64];
+			sprintf(streamid,"%d",iStreamID);
+			int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",streamid,&pTmpResource);
+			if(iret)
+			{
+				StreamStatus* pTmp = &pTmpResource;
+	#else
+				MapStreamStatus::iterator it = m_mapStreamStatus.find(iStreamID);
+				if(it != m_mapStreamStatus.end())
+				{
+					StreamStatus* pTmp = it->second;
+	#endif		
+					m_Msi_SMInter->CleanMSIStream(pTmp->strBind_userID,streamid);
+					usleep(1000*1000);
+				
+			}
+			AddOneNavStream(iStreamID);
+			if(!shflag)
+			{
+				printf("--------add one HD navstream over\n");
+				fflush(stdout);
+				hdisfull--;
+			}
+			else
+			{
+				printf("--------add one SD navstream over\n");
+				fflush(stdout);
+				sdisfull--;
+			}
+			return true;
+		}
+	}		
+#ifndef USEMAP
+	char strkey_value[64] = {0};
+	sprintf(strkey_value,"%d",iStreamID);
+	StreamResource pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+	if(iret)
+	{
+		StreamResource* pStream = &pTmpResource;
+
+#else
+	MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+	if(iterStream != m_mapStreamResource.end())
+	{
+		StreamResource *pStream = iterStream->second;
+#endif
+		//调用下发一路广告流
+		char strSeesionID[64] ={0};
+		sprintf(strSeesionID,"%d",pStream->iStreamID);
+		
+		int iIPQAMnum = pStream->iIPQAMNum;
+		printf("---456iIPQAMnum = %d\n",iIPQAMnum);
+		fflush(stdout);
+#ifndef USEMAP
+		char strkey_value1[64] = {0};
+		sprintf(strkey_value1,"%d",iIPQAMnum);
+		IPQAMInfo pTmpResource1;
+		memset(&pTmpResource1,0,sizeof(pTmpResource1));
+		int iret = DBInterfacer::GetInstance()->FindOneStream(5,"iIPQAMNum",strkey_value1,&pTmpResource1);
+		if(iret)
+		{
+			IPQAMInfo* pIpqam = &pTmpResource1;
+#else		
+		MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+		if(itIpqam != m_mapIpqamInfo.end())
+		{
+			IPQAMInfo *pIpqam = itIpqam->second;
+#endif
+			char strOutputUrl[128]={0};
+			sprintf(strOutputUrl,"udp://%s:%d",pIpqam->strIpqamIP,pStream->iOutPutPort);
+
+			char strInputUrl[128] ={0};
+		/*
+			int idex = pStream->iStreamID % (iMulitNum-1);
+			strcpy(strInputUrl,strVLCMulitURL[idex]);
+		*/
+			SetAdvinfo::iterator itadv = m_mapadvinfo.find(pStream->iStreamID);
+			Advinfo *tempadv = itadv->second;
+			sprintf(strInputUrl,"udp://%s:%s",tempadv->advip,tempadv->advport);
+			char strMsg[32]="";
+			m_Advertiser->StartOneStream(strSeesionID,strInputUrl,strOutputUrl,strSeesionID);
+
+			printf("---start one adv stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+					pStream->strNetRegionNum,pStream->iIPQAMNum);
+			fflush(stdout);
+			usleep(1000*100);
+		}
+		
+			
+	}	
+
+	return true;
+}
+
+void *SM_Manager::Check_BindOverTime_thread(void *arg)
+{
+	SM_Manager* this0 = (SM_Manager*)arg;
+	while(1)
+	{
+		usleep(1000*1000); // 1秒检测
+		time_t tmNow;
+		time(&tmNow);
+		pthread_mutex_lock(&this0->m_BindStatuslocker);
+		MapBindOverTime::iterator it = this0->m_mapBindStatus.begin();
+		while(it != this0->m_mapBindStatus.end())
+		{
+			
+			double difTime = difftime(tmNow,it->second);
+			
+			if(difTime > iBindOverTime)
+			{
+				//绑定超时
+				printf("*****bind dif time %f  ,stream =%d ,\n",difTime,it->first);
+				fflush(stdout);
+				this0->BindOverTime(it->first);
+				//移除
+				this0->m_mapBindStatus.erase(it++);
+			}
+			else
+				++it;
+		}
+		pthread_mutex_unlock(&this0->m_BindStatuslocker);
+	}
+}
+
+
+bool SM_Manager::BindOverTime(int iStreamID)
+{
+	//释放导航流
+	CleanStream(iStreamID);
+	//创建广告流 此过程不必解释
+	
+	usleep(BindOverTime_clean);
+	AddOneAdvStream(iStreamID);
+	return true;
+}
+
+int SM_Manager::AfterBindAddStream(int iNewStreamID,bool bNewStream)
+{
+#ifndef USEMAP
+	char strkey_value[64] = {0};
+	sprintf(strkey_value,"%d",iNewStreamID);
+	StreamStatus pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value,&pTmpResource);
+	printf("---==== iret =%d \n",iret);
+	fflush(stdout);
+	if(iret)
+	{
+		StreamStatus* pTmp = &pTmpResource; 	
+#else
+	MapStreamStatus::iterator it = m_mapStreamStatus.find(iNewStreamID);
+	if(it != m_mapStreamStatus.end())
+	{
+		StreamStatus* pTmp = it->second;
+#endif					
+			//首先清理掉上一路
+			//清理导航流
+			char strSID[128] = "1001";
+			char strReSID[128] = "1001";
+			char strAuthiName[128] = "cscs";
+			char strAuthcode[128] = "123456";
+			char strMsg[128] = "";
+			int iTaskID = 111;
+
+			//将需要转发的导航流存在vector
+			printf("----find new streamid %d \n",iNewStreamID);
+			fflush(stdout);
+			pthread_mutex_lock(&m_VecNewNavlocker); 							
+			m_vecNewNav.insert(iNewStreamID);
+			pthread_mutex_unlock(&m_VecNewNavlocker);	
+			printf("-----set size=%d \n",m_vecNewNav.size());
+			fflush(stdout);
+			
+			char strSeesionID[64] ={0};
+			sprintf(strSeesionID,"%d",pTmp->istreamID);
+
+
+			//先清理移动网关
+			if(strcmp(pTmp->strBind_userID, "") != 0)
+			{
+				m_Msi_SMInter->CleanMSIStream(pTmp->strBind_userID,strSeesionID); //seesionID作为serialno
+				usleep(1000*100);
+			}
+			
+			//根据数据类型进行不同模块的清理
+			//if (strcmp(pTmp->strStreamType, Status_Adver) == 0)
+			{
+					m_Advertiser->CleanAdverStream(strSeesionID,pTmp->strSwitch_task_id,pTmp->strSerialNo);
+					usleep(1000*100);
+			}
+			//else if (strcmp(pTmp->strStreamType, Status_Nav) == 0 ||	strcmp(pTmp->strStreamType, Status_Nav_Home) == 0)
+			{
+				//m_Navigation->CleanNavStream(strSeesionID,strSID,pTmp->strSwitch_task_id,strAuthiName,strAuthcode,pTmp->strSerialNo,strMsg);
+				Cleanonenav(strSeesionID);
+				usleep(1000*100);
+			}
+			//else if (strcmp(pTmp->strStreamType, Status_Vod) == 0 )
+			{
+				//m_VGWVodPlayer->CleanVODStream(strSeesionID,pTmp->strSwitch_task_id,strSeesionID);
+				Cleanonevod(strSeesionID);
+				usleep(1000*100);
+			}
+		}
+		else if(bNewStream)
+		{
+			printf("---new steam\n");
+			fflush(stdout);
+			AddOneNavStream(iNewStreamID);
+		}
+		//usleep(1000*2000);
+	
+						//创建一路导航流
+
+	return true;
+}
+
+
+bool SM_Manager::PauseVOD(int iStreamID,char *iUsername,char *vodname,char *posterurl,int temp)
+{
+	//首先该流程不应该释放  VOD  资源，只增加广告流资源
+	//增加的广告流需要在恢复时删除。并且该过程状态不应该修改
+	//释放切流器资源
+	    int ret = -1;
+		printf("------add one nav\n");
+		fflush(stdout);
+		printf("----begin to change\n");
+		fflush(stdout);
+
+		printf("----123iUsername = %s\n",iUsername);
+		fflush(stdout);	
+			//创建一路导航流
+#ifndef USEMAP
+		char strkey_value[64] = {0};
+		char newurl[512] = {0};
+		int ishd;
+		MapStreamResource::iterator iterhd = m_mapStreamResource.find(iStreamID);
+		if(iterhd!=m_mapStreamResource.end())
+		{
+			StreamResource *pStreamhd = iterhd->second;
+			ishd = pStreamhd->iWherether_HD;
+		}
+		if(temp)
+		{
+			char istrkey_value[64] = {0};
+			sprintf(istrkey_value,"%d",iStreamID);
+			StreamStatus mpTmpResource;
+			memset(&mpTmpResource,0,sizeof(mpTmpResource));
+			int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",istrkey_value,&mpTmpResource);
+			if(iret)
+			{
+				StreamStatus* mpTmp = &mpTmpResource;
+				if(strcmp(mpTmp->strStreamType,Status_Vod)==0)
+				{
+					CleanOneAdvStream(iStreamID);
+					m_SetPauseVod.insert(iStreamID);
+					usleep(PauseVOD_clean);
+				}
+				else if(strcmp(mpTmp->strStreamType,Status_Nav_Home)==0)
+				{
+					char strSID[128] = "1001";
+					char strReSID[128] = "1001";
+					char strAuthiName[128] = "cscs";
+					char strAuthcode[128] = "123456";
+					char strMsg[128] = "";
+					printf("----this is Status_Nav_Home\n");
+				
+					Cleanonenav(istrkey_value);
+					if(1==temp)
+					{
+						printf("---to push back the quit stream\n");
+						fflush(stdout);
+						m_ispause.push_back(iStreamID);
+					}
+					usleep(PauseVOD_clean);
+				}
+			}
+			printf("----this is the quit\n");
+			fflush(stdout);
+			//sprintf(newurl,"http://192.168.100.11:8181/NS/subinter1.jsp?username=%s&streamid=%d&VodStreamOver=%s",iUsername,iStreamID,"goback");
+			if(1==temp)
+			{	
+				printf("---temp = %d\n",temp);
+				fflush(stdout);
+				StreamStatus* spTmp = &mpTmpResource;
+				if(!ishd)
+				sprintf(newurl,"%s?username=%s",quiturl,spTmp->strBind_userID);
+				else
+				sprintf(newurl,"%s?username=%s",sdquiturl,spTmp->strBind_userID);	
+			}
+			else if(2==temp)
+			{
+				printf("---temp = %d\n",temp);
+				fflush(stdout);
+				printf("123iUsername = %s\n",iUsername);
+				fflush(stdout);
+				if(!ishd)
+				sprintf(newurl,"%s?username=%s&streamid=%d&vodname=%s&posterurl=%s",pauseurl,iUsername,iStreamID,vodname,posterurl);
+				else
+				{
+					sprintf(newurl,"%s?username=%s&streamid=%d&vodname=%s&posterurl=%s",sdpauseurl,iUsername,iStreamID,vodname,posterurl);
+				}
+			}
+		}
+		else
+		{
+			CleanOneAdvStream(iStreamID);
+			m_SetPauseVod.insert(iStreamID);
+			usleep(PauseVOD_clean);
+			printf("----now the vod is pause\n");
+			fflush(stdout);
+			//sprintf(newurl,"http://192.168.30.237:8080/NSCS/pause2.jsp?username=%s&streamid=%d&vodname=%s&posterurl=%s",iUsername,iStreamID,vodname,posterurl);
+			if(!ishd)
+			{
+				sprintf(newurl,"%s?username=%s&streamid=%d&vodname=%s&posterurl=%s",pauseurl,iUsername,iStreamID,vodname,posterurl);
+				printf("this is pause hd\n");
+			}
+			else
+			{
+				sprintf(newurl,"%s?username=%s&streamid=%d&vodname=%s&posterurl=%s",sdpauseurl,iUsername,iStreamID,vodname,posterurl);
+				printf("this is pause sd");
+			}
+			printf("------posterurl = %s\n",posterurl);
+			fflush(stdout);
+			printf("newurl: %s",newurl);
+			//sprintf(newurl,"http://192.168.100.11:8181/NS/pause.jsp?username=%s&streamid=%d",iUsername,iStreamID);
+		}
+		sprintf(strkey_value,"%d",iStreamID);
+		StreamResource pTmpResource;
+		memset(&pTmpResource,0,sizeof(pTmpResource));
+		int iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+		if(iret)
+		{
+			StreamResource* pStream = &pTmpResource;
+	
+#else
+		MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+		if(iterStream != m_mapStreamResource.end())
+		{
+			StreamResource *pStream = iterStream->second;
+#endif
+			//调用下发一路导航流
+			char strSeesionID[64] ={0};
+			sprintf(strSeesionID,"%d",pStream->iStreamID);
+			char strSID[64] ="1001";
+			char strReSID[64] ="2000"; //operid
+			char strSIP[64];
+			char strSPort[32];
+			memcpy(strSIP,strMyServerIP,strlen(strMyServerIP)+1);
+			sprintf(strSPort,"%d",iMSIServerPort);
+			char strAreaID[32] ="3301";
+			
+			int iIPQAMnum = pStream->iIPQAMNum;
+			printf("---ipqam info num=%d \n",iIPQAMnum);
+			fflush(stdout);
+#ifndef USEMAP
+			char strkey_value1[64] = {0};
+			sprintf(strkey_value1,"%d",iIPQAMnum);
+			IPQAMInfo pTmpResource1;
+			memset(&pTmpResource1,0,sizeof(pTmpResource1));
+			int iret = DBInterfacer::GetInstance()->FindOneStream(5,"iIPQAMNum",strkey_value1,&pTmpResource1);
+			if(iret)
+			{
+				IPQAMInfo* pIpqam = &pTmpResource1;
+#else
+			MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+			if(itIpqam != m_mapIpqamInfo.end())
+			{
+				IPQAMInfo *pIpqam = itIpqam->second;
+#endif
+				char strOutPort[64]={0};
+				sprintf(strOutPort,"%d",pStream->iOutPutPort);
+				char strMsg[32]="";
+				
+				//导航流的url是否需拼接
+				Navstream(strSeesionID,strSID,strReSID,newurl,strSIP,strSPort,strAreaID,strSeesionID,strMsg);
+	
+				printf("---start one nav stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+						pStream->strNetRegionNum,pStream->iIPQAMNum);
+				fflush(stdout);
+			}
+			ret = 0;
+		}
+//将广告流存入set
+//	m_SetPauseVod.insert(iStreamID);
+//启动广告流
+//AddOneAdvStream(iStreamID);
+
+	
+	return true;
+}
+
+bool SM_Manager::RecoverVodPlay(int iStreamID,char *username,char *vodname,char *posterurl)
+{
+	ListStreamResource::iterator iterList = m_ispause.begin();
+	while(iterList != m_ispause.end())
+	{
+		if(*iterList == iStreamID)
+		{
+			printf("---to recovery to the pause page username = %s\n",username);
+			fflush(stdout);
+			PauseVOD(iStreamID,username,vodname,posterurl,2);
+			m_ispause.erase(iterList);
+			return true;
+			break;
+		}
+		++iterList;
+	}
+	//删除原来的导航流
+	CleanStream(iStreamID,Navigation);
+	usleep(1000*1500);
+	//切流器切换对应的VOD 点播
+	//需要组装出输入地址，输出地址
+#ifndef USEMAP
+		char strkey_value[64] = {0};
+		sprintf(strkey_value,"%d",iStreamID);
+		StreamResource pTmpResource;
+		memset(&pTmpResource,0,sizeof(pTmpResource));
+		int iret = DBInterfacer::GetInstance()->FindOneStream(4,"iStreamID",strkey_value,&pTmpResource);
+		if(iret)
+		{
+			StreamResource* pTmp = &pTmpResource;
+#else
+		MapStreamResource::iterator it = m_mapStreamResource.find(iStreamID);
+		if(it != m_mapStreamResource.end())
+		{
+			StreamResource* pTmp = it->second;
+#endif
+			Stream *ptmpRequest = new Stream;
+	
+			int idex = m_icurrentidex;
+			m_icurrentidex = !m_icurrentidex;
+			char strRegion[128] = {0};
+			strcpy(strRegion,CstrRegion[idex]);
+
+			char strSeesionID[64] ={0};
+			sprintf(strSeesionID,"%d",pTmp->iStreamID);
+	
+			
+			int iIPQAMnum = pTmp->iIPQAMNum;
+#ifndef USEMAP
+			char strkey_value1[64] = {0};
+			sprintf(strkey_value1,"%d",iIPQAMnum);
+			IPQAMInfo pTmpResource1;
+			memset(&pTmpResource1,0,sizeof(pTmpResource1));
+			int iret = DBInterfacer::GetInstance()->FindOneStream(5,"iIPQAMNum",strkey_value1,&pTmpResource1);
+			if(iret)
+			{
+				IPQAMInfo* pIpqam = &pTmpResource1;
+#else		
+			MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+			printf("11111111this is RecoverVodPlay\n");
+			fflush(stdout);
+			if(itIpqam != m_mapIpqamInfo.end())
+			{
+				IPQAMInfo *pIpqam = itIpqam->second;
+#endif
+				char strOutputUrl[128]={0};
+				sprintf(strOutputUrl,"udp://%s:%d",pIpqam->strIpqamIP,pTmp->iOutPutPort);
+				printf("-----12345678llll\n");
+				fflush(stdout);
+				if(Istype != 1)
+				{
+					char strInputUrl[128] ={0};
+					if(advflag == 0)
+					{
+						sprintf(strInputUrl,"udp://%s:%d",strAdverIP,65000+iStreamID);
+					}
+					else
+					{
+						Smvodaddr::iterator itaddr = m_smvodaddr.find(iStreamID);
+						if(itaddr!= m_smvodaddr.end())
+						{
+							printf("-----1234 to change the smip\n");
+							fflush(stdout);
+							Smstream *vodtemp = itaddr->second;
+						
+							int advport = atoi(vodtemp->sadvport);
+							sprintf(strInputUrl,"udp://%s:%d",vodtemp->sadvip,advport);
+						}
+						else
+						{
+							printf("there no ip and port\n");
+							fflush(stdout);
+							return false;
+						}
+					}
+					printf("strInputUrl = %s\n",strInputUrl);
+					fflush(stdout);
+					m_Advertiser->StartOneStream(strSeesionID,strInputUrl,strOutputUrl,strSeesionID,3);
+					SetPauseVod::iterator itpausevod = m_SetPauseVod.begin();
+					while(itpausevod != m_SetPauseVod.end())
+					{
+						if(*itpausevod == iStreamID)
+						{
+							printf("---to erase the itpausevod stream\n");
+							fflush(stdout);
+							m_SetPauseVod.erase(itpausevod);
+							break;
+						}
+						++itpausevod;
+					}
+					usleep(1000*100);
+					return true;
+				}
+				SetUsedRegionID::iterator itregion = m_SetUsedRegionID.find(iStreamID);
+				if(itregion != m_SetUsedRegionID.end())
+				{
+					printf("-------oh my god\n");
+					fflush(stdout);
+					int  iregionport = itregion->second;
+					char strInputUrl[128] ={0};
+	           	//	int idex = pTmp->iStreamID % (iMulitNum-1);
+					sprintf(strInputUrl,"udp://%s:%d",strAdverIP,iregionport);
+					printf("strInputUrl = %s\n",strInputUrl);
+					fflush(stdout);
+				//sprintf(strInputUrl,"udp://%s:%d",strAdverIP,CIRegionID[idex]);  //写死
+					char strMsg[32]="";
+					m_Advertiser->StartOneStream(strSeesionID,strInputUrl,strOutputUrl,strSeesionID,3);
+					
+					printf("---start one adv stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+						pTmp->strNetRegionNum,pTmp->iIPQAMNum);
+					fflush(stdout);
+					
+					SetPauseVod::iterator itpausevod = m_SetPauseVod.begin();
+					while(itpausevod != m_SetPauseVod.end())
+					{
+						if(*itpausevod == iStreamID)
+						{
+							printf("---to erase the itpausevod stream\n");
+							fflush(stdout);
+							m_SetPauseVod.erase(itpausevod);
+							break;
+						}
+						++itpausevod;
+					}
+					usleep(1000*100);
+				}
+			}
+		}
+	return true;
+}
+
+
+bool SM_Manager::CleanOneAdvStream(int iStreamID)
+{
+	
+#ifndef USEMAP
+	char strkey_value[64] = {0};
+	sprintf(strkey_value,"%d",iStreamID);
+	StreamStatus pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value,&pTmpResource);
+	if(iret)
+	{
+		StreamStatus* pTmp = &pTmpResource;
+#else
+	MapStreamStatus::iterator it = m_mapStreamStatus.find(iStreamID);
+	if(it != m_mapStreamStatus.end())	
+	{
+		StreamStatus* pTmp = it->second;
+#endif			
+
+		char strSeesionID[64] ={0};
+		sprintf(strSeesionID,"%d",pTmp->istreamID);
+
+		m_Advertiser->CleanAdverStream(strSeesionID,pTmp->strSwitch_task_id,pTmp->strSerialNo);
+		usleep(1000*100);
+
+	}
+	return true;
+}
+
+bool SM_Manager::Tellcums(int istreamid)
+{
+	m_Msi_SMInter->TellMI(istreamid);
+	return true;		
+}
+bool SM_Manager::Userbehav(int iStreamID,char *iUsertype,char *strUserName,char *Commit,int result,char *date)
+{
+	UserBehaviour *user = new UserBehaviour;
+	time_t timep; 
+	time (&timep); 
+	struct tm* tmpTime = gmtime(&timep);
+	char nowTime[128]={0};
+	if(!date)
+	{
+		sprintf(nowTime,"%d-%d-%d %d:%d:%d",tmpTime->tm_year+1900,tmpTime->tm_mon+1,tmpTime->tm_mday,
+			tmpTime->tm_hour,tmpTime->tm_min,tmpTime->tm_sec); //bind time
+		printf("--time =%s \n",nowTime);
+		fflush(stdout);
+	}
+	else
+	{
+		memcpy(nowTime,date,strlen(date)+1);
+	}
+	user->iStreamID	= iStreamID;
+	user->result = result;
+	memcpy(user->strUserName,strUserName,strlen(strUserName)+1);
+	memcpy(user->strActionType,iUsertype,strlen(iUsertype)+1);
+	if(!Commit)
+	{
+		strcpy(user->strNetworkComment,"NULL");
+	}
+	else
+	{
+		memcpy(user->strNetworkComment,Commit,strlen(Commit)+1);
+	}
+	memcpy(user->strActionDate,nowTime,strlen(nowTime)+1);
+	printf("666666666666666666begin to insert\n");
+	fflush(stdout);
+	DBInterfacer::GetInstance()->insert_table(2,user);
+}
+
+
+bool SM_Manager::Bindagain(char *iUsername,int iiStreamid)
+{
+	StreamStatus pTmpResource;
+	int iStreamid;
+	printf("this is Bindagain\n");
+	fflush(stdout);
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"strBind_userID",iUsername,&pTmpResource);
+	if(!iret)
+	{
+		printf("00000000000000first bind\n");
+		fflush(stdout);
+		return true;
+	}
+	else
+	{
+		StreamStatus* pTmp = &pTmpResource;
+		if(pTmp->istreamID == iiStreamid)
+		{
+			printf("0000000000000000bind the sameone\n");
+			fflush(stdout);
+			return true;
+		}
+		iStreamid = pTmp->istreamID;
+		printf("0000000000000000000000000istreamid = %d\n",iStreamid);
+		fflush(stdout);
+		return false;
+	/*	
+		char isstreamid[32] = {0};
+		sprintf(isstreamid,"%s",iStreamid);
+		
+		strcpy(pTmp->strBind_userID,"");
+		printf("pTmp->strBind_userID = %s\n",pTmp->strBind_userID);
+		fflush(stdout);
+		memset(pTmp->strBind_userID,0,128);
+   
+		DBInterfacer::GetInstance()->update_table(1,pTmp);
+		char iid[32] = {0};
+		sprintf(iid,"%s",iStreamid);
+
+		m_Msi_SMInter->CleanMSIStream(iUsername,iid);
+		usleep(1000*1000);
+		AddOneAdvStream(iStreamid);
+		
+		Unbind(iUsername,isstreamid);
+
+		return true;
+	*/
+	}
+}
+
+bool SM_Manager::Findcsaddr(char *csip,char *csport,int iStreamID)
+{
+	MapCsaddr::iterator itCsaddr = m_mapCsaddr.find(iStreamID);
+	if(itCsaddr != m_mapCsaddr.end())
+	{
+		Csaddr *paddr = itCsaddr->second;
+		printf("paddr->csip = %s\n",paddr->csip);
+		fflush(stdout);
+		printf("paddr->csport = %s\n",paddr->csport);
+		fflush(stdout);
+		memcpy(csip,paddr->csip,strlen(paddr->csip)+1);
+		memcpy(csport,paddr->csport,strlen(paddr->csport)+1);
+	}
+		
+}
+
+bool SM_Manager::Unbind(char * usernam,char * streamid)
+{
+	printf("it is begin to unbind\n");
+	fflush(stdout);
+	
+	m_Msi_SMInter->CleanMSIStream(usernam,streamid);
+	usleep(1000*1000);
+	printf("---CleanMSIStream ok\n");
+	fflush(stdout);
+	int istreamid = atoi(streamid);
+	CleanStream(istreamid);
+	usleep(1000*1500);
+	printf("---CleanStream  ok\n");
+	AddOneAdvStream(istreamid);
+	printf("now it is unbind over\n");
+	fflush(stdout);
+}
+
+bool SM_Manager::Navstream(char *strSeesionId,char *strSID,char* strReSID,char *strUrl,char* strISIP,char* strSPort,\
+					char* strAreaID,char *strSerialno,char *strMsg)
+{
+	if(advflag == 0)
+	{
+		printf("----to begin a Navstream\n");
+		fflush(stdout);
+		int iStreamID = atoi(strSeesionId);
+		int port = iStreamID + Baseport;
+		char por2[64];
+		sprintf(por2,"%d",port);
+		char task_id[64] = "11111";
+		
+		m_Advertiser->CleanAdverStream(strSeesionId,task_id,strSerialno);
+		usleep(1000*800);
+		printf("---to add the m_Navigation stream iip = %s,iport = %s\n",strAdverIP,por2);
+		fflush(stdout);
+
+		MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+		if(iterStream != m_mapStreamResource.end())
+		{
+			StreamResource *pStream = iterStream->second;
+			//调用下发一路导航流
+			m_Navigation->StartOneStream(strSeesionId,strSID,strReSID,strUrl,strAdverIP,por2,strISIP,strSPort,strAreaID,strSerialno,strMsg,pStream->iWherether_HD);
+
+			char strSeesionID[64] ={0};
+					
+			int iIPQAMnum = pStream->iIPQAMNum;
+			printf("---1111iIPQAMnum = %d\n",iIPQAMnum);
+			fflush(stdout);
+			MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+			if(itIpqam != m_mapIpqamInfo.end())
+			{
+				IPQAMInfo *pIpqam = itIpqam->second;
+
+				char strOutputUrl[128]={0};
+				sprintf(strOutputUrl,"udp://%s:%d",pIpqam->strIpqamIP,pStream->iOutPutPort);
+
+				char strInputUrl[128] ={0};
+				sprintf(strInputUrl,"udp://%s:%d",strAdverIP,port);
+				m_Advertiser->StartOneStream(strSeesionId,strInputUrl,strOutputUrl,strSerialno,2);
+					
+				printf("---start one adv stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+				pStream->strNetRegionNum,pStream->iIPQAMNum);
+				fflush(stdout);
+				usleep(1000*100);
+			}
+		}
+	}
+	else if(advflag == 1)
+	{
+		printf("----to begin a Navstream\n");
+		fflush(stdout);
+		int iStreamID = atoi(strSeesionId);
+		int ifrecv = 100;
+		
+		char smyip[64] = {0};
+		char smyport[64] = {0};
+		char task_id[64] = "11111";
+		
+		m_Advertiser->CleanAdverStream(strSeesionId,task_id,strSerialno);
+		m_Advertiser->Getaddr(strSeesionId,strSerialno);
+		
+	   	MapStreamResource::iterator iterStream = m_mapStreamResource.find(iStreamID);
+		if(iterStream != m_mapStreamResource.end())
+		{
+			StreamResource *pStream = iterStream->second;
+			//调用下发一路导航流
+			while(ifrecv--)
+			{
+				Smstrinfo::iterator itaddr = m_smstraddr.begin();
+				if(itaddr != m_smstraddr.end())
+				{
+					Smstream *temp = *itaddr;
+					memcpy(smyip,temp->sadvip,strlen(temp->sadvip)+1);
+					memcpy(smyport,temp->sadvport,strlen(temp->sadvport)+1);
+					m_smstraddr.erase(itaddr);
+					delete temp;
+					printf("----smyip = %s,smyport = %s\n",smyip,smyport);
+					fflush(stdout);
+					break;
+				}
+				usleep(1000*100);
+			}	
+			if(ifrecv<=0)
+			{
+				printf("---get addr error\n");
+				fflush(stdout);
+				return false;
+			}
+			if(ifrecv>=91)
+			{
+				printf("ifrecv = %d\n",ifrecv);
+				fflush(stdout);
+				usleep(1000*500);
+			}
+			m_Navigation->StartOneStream(strSeesionId,strSID,strReSID,strUrl,smyip,smyport,strISIP,strSPort,strAreaID,strSerialno,strMsg,pStream->iWherether_HD);
+
+			char strSeesionID[64] ={0};
+					
+			int iIPQAMnum = pStream->iIPQAMNum;
+			printf("---1111iIPQAMnum = %d\n",iIPQAMnum);
+			fflush(stdout);
+			MapIPQAMInfo::iterator itIpqam = m_mapIpqamInfo.find(iIPQAMnum);
+			if(itIpqam != m_mapIpqamInfo.end())
+			{
+				IPQAMInfo *pIpqam = itIpqam->second;
+
+				char strOutputUrl[128]={0};
+				sprintf(strOutputUrl,"udp://%s:%d",pIpqam->strIpqamIP,pStream->iOutPutPort);
+
+				char strInputUrl[128] ={0};
+				sprintf(strInputUrl,"udp://%s:%s",smyip,smyport);
+				m_Advertiser->StartOneStream(strSeesionId,strInputUrl,strOutputUrl,strSerialno,2);
+					
+				printf("---start one adv stream %s,group id=%s,ipqamnum=%d\n",strSeesionID,
+				pStream->strNetRegionNum,pStream->iIPQAMNum);
+				fflush(stdout);
+				usleep(1000*100);
+			}
+		}
+	}
+}
+
+bool SM_Manager::Checksession()	
+{
+	MapStreamStatus::iterator iit = m_mapStreamStatus.begin();
+	printf("m_mapStreamStatus size = %d\n",m_mapStreamStatus.size());
+	fflush(stdout);
+	while(iit!=m_mapStreamStatus.end())
+	{
+		StreamStatus* pTmp = iit->second;
+		printf("---stream id = %d\n",pTmp->istreamID);
+		m_Advertiser->CheckStatus(pTmp->istreamID,pTmp->strSerialNo);
+		usleep(1000*1500);
+		iit++;
+	}
+}
+bool SM_Manager::Dealsession(int streamid)
+{
+	char strkey_value[64] = {0};
+	sprintf(strkey_value,"%d",streamid);
+	StreamStatus pTmpResource;
+	memset(&pTmpResource,0,sizeof(pTmpResource));
+	int iret = DBInterfacer::GetInstance()->FindOneStream(1,"istreamID",strkey_value,&pTmpResource);
+	if(iret)
+	{
+		StreamStatus *pTmp = &pTmpResource;
+		if((strcmp(pTmp->strStreamType,Status_Idle)==0)&&strcmp(pTmp->strBind_userID,"")==0)
+		{
+			printf("this is Status_Idle stream\n");
+			fflush(stdout);
+			return true;
+		}
+		else if(strcmp(pTmp->strStreamType,Status_Nav)==0)
+		{
+			Cleanonenav(strkey_value);
+			printf("this is Status_Nav stream\n");
+			fflush(stdout);
+			usleep(1000*500);
+			AddOneNavStream(streamid);
+		}
+		else
+		{
+			CleanStream(streamid);
+			printf("this is other stream\n");
+			fflush(stdout);
+			usleep(1000*1000);
+			AddOneAdvStream(streamid);
+		}
+	}
+}
+

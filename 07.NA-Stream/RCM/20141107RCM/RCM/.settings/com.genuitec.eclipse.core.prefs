@@ -1,0 +1,4 @@
+#Fri Sep 26 11:29:48 CST 2014
+eclipse.preferences.version=1
+validator.Checked=WebRoot/dist/validation,WebRoot/dist/dwz-ria,WebRoot/dist/kindeditor-4.1.3,WebRoot/dist/formValidator.2.5.2
+validator.Unchecked=

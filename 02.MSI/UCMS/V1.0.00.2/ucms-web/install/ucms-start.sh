@@ -1,0 +1,1 @@
+sh /home/bbcv/zhangdj/UCMS/ucms-tomcat/bin/startup.sh 

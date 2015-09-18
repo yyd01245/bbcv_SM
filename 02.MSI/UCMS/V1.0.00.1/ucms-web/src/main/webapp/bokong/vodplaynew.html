@@ -1,0 +1,2326 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+
+
+
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<meta name="page-view-size" content="1280*720"/>
+<title>vod play</title>
+<style type="text/css">
+#exit_tips_text{
+	font-size: 18px;
+	color: #250B36;
+}
+.text18{
+	font-size: 18px;
+	color: #250B36;
+}
+.style16{
+	font-size: 24px;
+	color:#FFFFFF;
+}
+.text24{
+	font-size: 24px;
+	color: #250B36;
+}
+.text28{
+	font-size: 28px;
+	color: #250B36;
+}
+.F128{
+	font-size: 28px;
+	color: #FFFFFF;
+}
+</style>
+<script src="vod_key_event.js"></script>
+<script language="javascript">
+	
+var version = "hangzhou_xuancai_20131030_01";//炫彩高清版本
+iPanel.debug("vod_version = "+version);
+hardware.STB.frontPanel(2,"0000",0,0,100);
+hardware.STB.statusLight(2,0,0,100);//显示数据载入指示灯
+hardware.STB.statusLight(31,0,0,100);//显示vod指示灯
+hardware.STB.statusLight(30,0,0,0);//灭掉浏览器指示灯
+iPanel.misc.enableIconLoading=0;
+iPanel.overlayFrame.close();
+/*****************************解析广告/点播rtsp*********************************/
+/*
+	插入位置：(start 片头  middle 片中 end 片尾 vedio 正片)
+	插入时间：600 (单位S)
+	视频时长：30  (单位S) 
+	播放地址：play-url
+*/
+var adVodUrl = iPanel.getGlobalVar("ads-url");		//投放随片广告时，获取RTSP地址
+iPanel.setGlobalVar("ads-url",""); 
+iPanel.debug("adVodUrl=="+adVodUrl);
+var tempUrl = adVodUrl.split(";");
+
+var startAdDuration = 0;	//片头广告时间
+var startAdUrl = "";	//片头广告地址
+var middleAdDuration = 0;	//片中广告时间
+var middleAdInsertTime = 0;		//片中广告插入时间点
+var middleAdUrl = "";	//片中广告地址
+var vedioUrl = "rtsp://192.168.60.238:5542/yjy_ip/bjfen01.ts";		//影片地址
+var endAdDuration = 0;	//片尾广告时间
+var endAdUrl = "";		//片尾广告地址
+iPanel.debug("OK");
+for(var i=0; i<tempUrl.length; i++){	//获取时间参数
+	iPanel.debug("tempUrl=="+tempUrl[i]);
+	var item = tempUrl[i].split(",");
+	if(item[0] == "vedio"){
+		vedioUrl = item[3];
+		iPanel.debug("vedioUrl=="+vedioUrl);
+	}else if(item[0] == "start"){
+		startAdDuration = parseInt(item[2]);
+		startAdUrl = item[3];
+		accessParameter(startAdUrl);//获取参数
+		iPanel.debug("startAdUrl=="+startAdUrl);
+	}else if(item[0] == "middle"){
+		middleAdInsertTime = parseInt(item[1]);
+		middleAdDuration = parseInt(item[2]);
+		middleAdUrl = item[3];
+	}else if(item[0] == "end"){
+		endAdDuration = parseInt(item[2]);
+		endAdUrl = item[3];
+	}
+}
+var middleAdEndSeekTime = "";
+var middleAdEndFlag = false;
+var isAdPlay = true;
+var adPlayError = false;
+var checkAdElapsedTimeFlag = -1;
+var checkVedioElapsedTimeFlag = -1;
+var checkVedioEndTimeFlag=-1;
+var adFlag = "start";
+var adDuration = 0;
+/******************************************************************************/
+//---------------屏蔽随片广告-----------------------------------
+var hVersion = hardware.STB.hVersion;//hardware.PCB.productionBatch;
+var sVersion = hardware.STB.sVersion;
+iPanel.debug("after-----hVersion=="+hVersion+",sVersion=="+sVersion);
+if(hVersion=="3716079f"&&(sVersion=="05710115"||sVersion=="05713108")||hVersion=="30353732"&&(sVersion=="00013002"||sVersion=="00012009")){
+	iPanel.debug("hVersion=="+hVersion+",sVersion=="+sVersion);
+	startAdUrl="";
+	startAdDuration=0;
+	middleAdDuration = 0;
+	middleAdInsertTime = 0;
+	middleAdUrl = "";
+	endAdDuration = 0;
+	endAdUrl = "";
+}
+//------------------------------------------------------
+var mute_status = (typeof(iPanel.getGlobalVar("mute_status")) != "undefined" && iPanel.getGlobalVar("mute_status")!= '') ? iPanel.getGlobalVar("mute_status") : '0'; //0表示未静音，1表示静音
+var ethernetItem = network.ethernets[0];
+var net_status = ethernetItem.LANStatus; //1：表示目前处于连接状态   0：表示没有连接上网络
+if(net_status==0||(net_status!=3&&network.ethernets[0].DHCPEnable==1)){
+	net_status="0";
+}else{
+	net_status="1";
+}
+var cable_connect_flag = iPanel.getGlobalVar("cable_connect_success");
+if(cable_connect_flag){
+	cable_connect_flag="1";
+}
+var vod_mode;
+var wasu_url=iPanel.getGlobalVar("url_parm");
+var rtsp_url = "";
+var jishu = 0;
+var conVodFlag=null;//用来判断点播是电视剧还是电影的标识位默认设置为false
+
+var link_tips=true;
+var can_volume=true;
+var can_ward=true;
+var can_info=true;
+var can_speed=true; 
+var currOriginVolume = media.sound.value;
+var currVolume = currOriginVolume;
+var has_set_sound=false;
+
+var ward_visible=false;
+var ward_timeout=-1;
+var speed_visible=false;
+var speed_timeout=-1;
+var speed_timeout_flag=-1;
+var speed_tip_timeout_flag = -1;
+var ward_speed=1;
+var refresh_speed_timeout=-1;
+var has_speed_timeout=false;
+var volumeBarVisible=false;
+var volumeBarTimeout = -1;
+//var exit_tips_visible=false;
+var pause_tips_visible=false;
+var network_tips_visible=false;
+//var network_timeout=-1;
+var f3_visible=false;
+var f3_timeout=-1;
+var info_visible=false;
+var info_timeout=-1;
+var information_visible = false;
+var information_visibleFive = false;
+var information_timeout = -1;
+var information_timeoutFive = -1;
+var exit_remind_visible = false;
+
+var first_play=true;
+var connect_failed=false;
+var has_stop=false;
+
+var butPosition = 1;	//0:否	1：是
+var duration = 0;	
+var elapsed_time=0;
+var is_now_seek=false;
+var seek_flag=false;//判断是不是处于调出进度条并按下确定键后到缓冲提示弹出之前的状态之中
+var continuePlayFlag = true;	//是否继续播放。默认暂停
+var time_position=0;
+var time_array=new Array();
+var show_front_time_timeout=-1;
+
+var NETWORK_CONNECT=0;
+var NETWORK_DISCONNECT=0;
+var load_page_timeout = -1;
+var socket_error = false;//当拔网线超时后会发送一个5225消息，p2为2106，收到此消息后应用关闭vod并重新建立连接，这个变量用来记录此状态
+var socket_error_seek_time = "";
+var check_net_status_timeout = -1;
+//var endplay_timeout = -1;
+//var endplay_flag = false;
+var endplay_time;
+var checkNowDate_time=-1;
+var displayNowDate_flag=-1;
+var requestNowText="";//跑马灯
+var nowTextStr="";
+
+var breakpointRequest="";//断点
+
+var playExitTime;//断点时间
+var help_visible = false; //帮助提示
+
+
+function event_handler(event_obj){
+	var key_value=event_obj.args.value;
+	
+	if(connect_failed&&((event_obj.code!="EXIT"&&event_obj.code!="BACK")&&event_obj.code!="EIS_IP_NETWORK_CONNECT")) return;
+	if((link_tips&&event_obj.code=="EXIT")||(link_tips&&event_obj.code=="BACK")){
+		if(typeof(wasu_url)!="undefined"&&wasu_url!=""){
+      		return;
+		}
+		has_stop=true;
+		close_widget();
+		closeAdverteventWidget();		
+		exit_page();
+		return;
+	}
+	if(link_tips&&key_value<5000) return;
+	if(seek_flag&&event_obj.code=="SELECT"&&exit_remind_visible){//正在缓冲时按退出后再按确定需要在这里处理，否则按键会被拦截
+		if(butPosition){
+			has_stop=true;
+			close_widget();
+			hide_pause_tips();
+			media.AV.close();
+			if(net_status=="0"){
+				exit_page();
+			}else{
+				exitThePage();
+			}
+		}else{
+			hide_exitRemind();	
+		}
+		return 0;
+	}
+	if(seek_flag&&event_obj.code=="SELECT") return;//调出进度条并按下确定键后到缓冲提示弹出之前不响应确定键
+	if((seek_flag||is_now_seek)&&key_value!=339&&(key_value==5222||key_value<5000)) return;//正在seek之中时只响应退出键和消息事件,不响应缓冲开始的消息
+	if (has_stop&&key_value>5000&&event_obj.code!="EIS_IP_NETWORK_CONNECT") return;//页面调用media.AV.stop()后就不再响应任何消息事件
+	if (has_stop&&(key_value==567||key_value==339)) return;//调用stop后就不响应信息键、退出键
+	iPanelReturnFlag = false;
+	switch(event_obj.code){
+		case "VOLUME_MUTE":
+			mute_status = (typeof(iPanel.getGlobalVar("mute_status")) != "undefined" && iPanel.getGlobalVar("mute_status") != '') ? iPanel.getGlobalVar("mute_status") : '0'; 
+			if (mute_status == "0"){
+					show_mute_icon();
+			}else if (mute_status == "1"){
+				hide_mute_icon();
+			}
+			iPanelReturnFlag = false;
+			break;
+		case "VOLUME_UP":
+			if(can_volume&&!f3_visible){
+				volumeAdjust(5);	
+			}
+			iPanelReturnFlag = false;
+			break;
+		case "VOLUME_DOWN":
+			if(can_volume&&!f3_visible){
+				volumeAdjust(-5);		
+			}
+			iPanelReturnFlag = false;
+			break;
+		case "LEFT":
+			if(pause_tips_visible&&!socket_error){//显示广告条的时候
+				$("continue-play").innerHTML="<img src='continue-play2.png'>";
+				$("hidden-ad").innerHTML="<img src='hidden-ad1.png'>";
+				continuePlayFlag = true;
+			}else{
+				if(can_volume&&!f3_visible){
+					volumeAdjust(-5);
+				}else if(f3_visible){
+					window.clearTimeout(f3_timeout);
+					change_time_focus(-1);
+					f3_timeout=window.setTimeout("hide_f3_tips()",10000);
+				}else if(exit_remind_visible){
+					if(butPosition){
+						butPosition = 0;
+						$("yesPosition").style.backgroundImage = "url(yes1.png)";		
+						$("noPosition").style.backgroundImage = "url(no.png)";			
+					}else{
+						butPosition = 1;
+						$("yesPosition").style.backgroundImage = "url(yes.png)";		
+						$("noPosition").style.backgroundImage = "url(no1.png)";
+					}	
+				}
+			}
+			break;
+		case "RIGHT":
+			if(pause_tips_visible&&!socket_error){//显示广告条的时候
+				$("continue-play").innerHTML="<img src='continue-play1.png'>";
+				$("hidden-ad").innerHTML="<img src='hidden-ad2.png'>";
+				continuePlayFlag = false;
+			}else{
+				if(can_volume&&!f3_visible){
+					volumeAdjust(5);			
+				}else if (f3_visible){
+					window.clearTimeout(f3_timeout);
+					change_time_focus(1);
+					f3_timeout=window.setTimeout("hide_f3_tips()",10000);
+				}else if(exit_remind_visible){
+					if(butPosition){
+						butPosition = 0;
+						$("yesPosition").style.backgroundImage = "url(yes1.png)";		
+						$("noPosition").style.backgroundImage = "url(no.png)";			
+					}else{
+						butPosition = 1;
+						$("yesPosition").style.backgroundImage = "url(yes.png)";		
+						$("noPosition").style.backgroundImage = "url(no1.png)";
+					}	
+				}
+			}
+			break;
+		case "UP":
+			if(isAdPlay) return;
+			if(f3_visible&&!network_tips_visible)
+			{
+				window.clearTimeout(f3_timeout);
+				set_time(1);
+				f3_timeout=window.setTimeout("hide_f3_tips()",10000);
+			}
+			else if(can_speed&&!ward_visible&&!f3_visible&&media.AV.status!="pause"&&!socket_error){
+				if(volumeBarVisible) hideVolumeBar();
+				if(has_speed_timeout){ //has_ward_timeout
+					has_speed_timeout=false;
+					ward_speed=media.AV.speed;
+				}
+				if(ward_speed<1) return;
+				else ward_speed=ward_speed*2;
+				if(ward_speed>32) ward_speed=1;
+				write_speed();
+	      		show_speed();
+				window.clearTimeout(speed_timeout);
+				speed_timeout=window.setTimeout("set_speed()",1000);
+			}
+			break;
+		case "DOWN":
+			if(isAdPlay) return;
+			if(f3_visible&&!network_tips_visible){
+				window.clearTimeout(f3_timeout);
+				set_time(-1);
+				f3_timeout=window.setTimeout("hide_f3_tips()",10000);
+			}else if(can_speed&&!ward_visible&&!f3_visible&&media.AV.status!="pause"&&!socket_error){
+				if(volumeBarVisible) hideVolumeBar();
+				if(has_speed_timeout){
+					has_speed_timeout=false;
+					ward_speed=media.AV.speed;
+				}
+				if(ward_speed==1) ward_speed=-1;
+				else if(ward_speed>1) return;
+				if(ward_speed!=1) ward_speed=ward_speed*2;
+				if(ward_speed<-32) ward_speed=1;
+				write_speed();
+	      		show_speed();
+				window.clearTimeout(speed_timeout);
+				speed_timeout=window.setTimeout("set_speed()",1000);
+			}
+			break;
+		case "NUMERIC":
+			if(f3_visible){
+				window.clearTimeout(f3_timeout);
+				set_time1(event_obj.args.value);
+				change_time_focus(1);
+				f3_timeout=window.setTimeout("hide_f3_tips()",10000);
+			}
+		    break;
+		case "FORWARD"://快进
+			if(isAdPlay) return;
+			if(typeof(wasu_url)!="undefined"&&wasu_url!=""){
+				return;
+			}
+			if(net_status=="0"&&vod_mode=="DVB"){
+				$("tips_text").innerText="请插上网线";
+				show_tips();
+				return;
+			}
+			if(can_ward&&!f3_visible&&media.AV.status!="pause"&&!socket_error){
+				if(volumeBarVisible) hideVolumeBar();
+				if (ward_visible){
+					window.clearTimeout(ward_timeout);
+					if(elapsed_time>=duration){
+						ward_timeout=window.setTimeout("hide_ward()",5000);
+					}else{
+						elapsed_time+=60;
+						if (elapsed_time>duration) elapsed_time=duration;
+						write_elapsed_time(elapsed_time);
+						show_ward();
+					}
+				}else{
+					elapsed_time=media.AV.elapsed;
+					if(!elapsed_time) elapsed_time=0;
+					write_elapsed_time(elapsed_time);
+					show_ward();
+				}
+			}
+			break;
+		case "BACKWARD"://快退
+			if(isAdPlay) return;
+			if (typeof(wasu_url)!="undefined"&&wasu_url!=""){
+				return;
+			}
+			if (net_status=="0"&&vod_mode=="DVB"){
+				$("tips_text").innerText="请插上网线";
+				show_tips();
+				return;
+			}
+			if (can_ward&&!f3_visible&&media.AV.status!="pause"&&!socket_error){
+				if(volumeBarVisible) hideVolumeBar();
+				if (ward_visible){
+					window.clearTimeout(ward_timeout);
+					if(elapsed_time<=0){
+						ward_timeout=window.setTimeout("hide_ward()",5000);
+					}else{
+						elapsed_time-=60;
+						if (elapsed_time<0) elapsed_time=0;
+						write_elapsed_time(elapsed_time);
+						show_ward();
+					}
+				}else{
+					elapsed_time=media.AV.elapsed;
+					if(!elapsed_time) elapsed_time=0;
+					write_elapsed_time(elapsed_time);
+					show_ward();
+				}
+			}
+			break;
+		case "SELECT":
+			if (typeof(wasu_url)!="undefined"&&wasu_url!=""){
+				var my_wasu_widget  = iPanel.pageWidgets.getByName("wasu_widget");
+				var widget_url = my_wasu_widget.location.href;
+				if(widget_url.indexOf("key=0") == -1){
+					return 0;
+				}
+			}
+			if(network_tips_visible){
+				has_stop=true;
+				hide_exit();
+				close_widget();
+				closeAdverteventWidget();
+				hide_pause_tips();
+				media.AV.close();
+				exit_page();
+			}else if(speed_visible&&!socket_error){
+				ward_speed = 1;
+				media.AV.play();
+				show_speed();
+				write_speed();
+			}else if(ward_visible&&!socket_error){
+				window.clearTimeout(ward_timeout);
+				hide_ward();
+				if(elapsed_time>=duration){
+					has_stop = true;
+					if("36"==37){
+						showContinuePlay();
+					}else if("36"==36){
+						showThankLook();
+					}
+					close_widget();
+					media.AV.close();
+					if(endAdUrl){
+						iPanel.debug("init()--endAdUrl");
+						checkVedioEndTime();
+					}					
+					exitThePage();
+					return;
+				}
+				var hour=Math.floor(elapsed_time/3600);
+				var minute=Math.floor((elapsed_time-hour*3600)/60);
+				var second=elapsed_time-hour*3600-minute*60;
+				hour=hour>9?hour:"0"+hour;
+				minute=minute>9?minute:"0"+minute;
+				second=second>9?second:"0"+second;
+				var goto_time=hour+":"+minute+":"+second;
+				media.AV.seek(goto_time);
+				seek_flag=true;
+			}else if(exit_remind_visible){
+				hide_exitRemind();
+				if(butPosition){
+					has_stop=true;
+					conVodFlag="false";
+					$("nowDate").style.visibility="hidden";//跑马灯等退出时隐藏
+					$("nowText").style.visibility="hidden";
+					$("nowImg").style.visibility="hidden";
+					if(help_visible){
+						hide_helpBar();
+					}
+					hide_pause_tips();
+					media.AV.close();
+					if("36"==36||"36"==37){ 
+						showThankLook();
+					}
+					close_widget();
+					if(net_status=="0")
+					{
+						close_widget();
+						closeAdverteventWidget();
+						exit_page();
+					}else{
+						exitThePage();
+						responseBreakpoint();
+					}
+				}else{
+					if(net_status=="0"&&vod_mode=="DVB"){
+						var remindText = "网络异常,插上网线继续播放,“确认”键退出！";
+						show_exit(remindText);
+						network_tips_visible = true;
+						return;
+					}
+					if(!socket_error){
+						media.AV.play();
+					}
+					seek_flag = false;
+				}
+			}else if(!volumeBarVisible&&!exit_remind_visible&&!info_visible&&!network_tips_visible&&!f3_visible){
+				/***liyq add 20110322走cable的点播，在拔掉网线的时候，就不响应暂停和取消暂停的操作了，避免出问题***/
+				if(net_status=="0"&&vod_mode=="DVB"){
+					$("tips_text").innerText="请插上网线";
+					show_tips();
+					return;
+				}
+				if(pause_tips_visible&&!socket_error){
+					if(continuePlayFlag){//隐藏广告，继续播放
+						hide_pause_tips();
+						media.AV.play();
+						show_front_play_status();     //修改vod暂停播放后面板灯显示
+						//continuePlayFlag=true;
+					}else{	//隐藏广告至右上方，暂停播放						
+						hide_pause_tips();
+						show_rightHiddenAd();	
+					}
+				}else if(media.AV.status!="pause"&&!socket_error){//弹出广告图片，暂时节目
+					elapsed_time=media.AV.elapsed;
+					if(!elapsed_time) elapsed_time=0;
+					write_elapsed_time(elapsed_time);
+					media.AV.pause();
+					show_pause_tips();
+					show_front_play_status();				
+				}else if(media.AV.status=="pause"&&!socket_error&&!pause_tips_visible){//隐藏右上方的DIV，继续播放节目
+					pause_tips_visible=false;
+					hidden_rightHiddenAd();
+					media.AV.play();
+					show_front_play_status();     //修改vod暂停播放后面板灯显示
+				}
+			}else if(volumeBarVisible){
+				hideVolumeBar();
+			}else if(info_visible){
+				window.clearTimeout(info_timeout);
+				hide_info();
+			}else if(f3_visible){
+				window.clearTimeout(f3_timeout);
+				//hide_f3_tips();
+				seek_f3_time();
+			}
+			break;
+		case "BACK":
+		case "EXIT":
+			if(typeof(wasu_url)!="undefined"&&wasu_url!=""){
+			    iPanel.debug("EXIT------typeof(wasu_url)!='undefined'&&wasu_url!=''");
+				close_widget();
+				closeAdverteventWidget();
+				exit_page();
+				return;
+			}
+			if(is_now_seek){
+			iPanel.debug("EXIT-----is_now_seek==true");
+				has_stop=true;
+				close_widget();
+				media.AV.close();
+				exitThePage();
+			}else if(network_tips_visible){
+			iPanel.debug("EXIT-----network_tips_visible==true");
+				has_stop=true;
+				close_widget();
+				closeAdverteventWidget();
+				media.AV.close();
+				//iPanel.overlayFrame.location.href="thank_look.htm";
+				exit_page();
+			}else if(speed_visible&&!socket_error){
+			iPanel.debug("EXIT-----speed_visible==true&&socket_error==false");
+				if(ward_speed!=1){
+					ward_speed = 1;
+					media.AV.play();
+					show_speed();
+					write_speed();
+				}else{
+					hide_speed();
+				}
+			}else if(ward_visible){
+			iPanel.debug("EXIT-----ward_visible==true");
+				window.clearTimeout(ward_timeout);
+				hide_ward();
+			}else if(volumeBarVisible){
+			iPanel.debug("EXIT-----volumeBarVisible==true");
+				hideVolumeBar();
+			}else if(info_visible){
+			iPanel.debug("EXIT-----info_visible==true");
+				window.clearTimeout(info_timeout);
+				hide_info();
+			}else if(connect_failed){
+			iPanel.debug("EXIT-----connect_failed==true");
+				hide_exit();
+				has_stop=true;
+				close_widget();
+				closeAdverteventWidget();
+				media.AV.close();	
+				exitThePage();							
+			}else if(!exit_remind_visible&&!f3_visible){
+			iPanel.debug("EXIT-----exit_remind_visible==false");
+				if(pause_tips_visible){
+					hide_pause_tips();
+				}
+				show_exitRemind();
+				playExitTime=media.AV.elapsed;//断点时间
+				if(seek_flag&&!socket_error)  {
+				  setTimeout("media.AV.pause()",500);     //解决seek后立即按退出问题
+			  }else{
+					if(!socket_error){
+						media.AV.pause();	
+					}
+				}
+			}else if(f3_visible){
+				window.clearTimeout(f3_timeout);
+				hide_f3_tips();
+			}
+			break;
+		/*case "BACK":
+			if(typeof(wasu_url)!="undefined"&&wasu_url!=""){
+				close_widget();
+				exit_page();
+				return;
+			}
+			if(ward_visible){
+				window.clearTimeout(ward_timeout);
+				hide_ward();
+			}else if(f3_visible){
+				window.clearTimeout(f3_timeout);
+				hide_f3_tips();
+			}else if(info_visible){
+				window.clearTimeout(info_timeout);
+				hide_info();
+			}
+			break;*/
+		case "HELP":
+			if(!help_visible){
+				show_helpBar();
+			}else{
+				hide_helpBar();
+			}
+			break;
+		case "INFO":
+			if(can_info&&!f3_visible){
+				if(!info_visible){
+					show_info();
+				}else{
+					window.clearTimeout(info_timeout);
+					hide_info();
+				}	
+			}
+			break;
+		case "RED":
+			var assetType="36";
+			if(assetType =='36'||assetType =='37'){
+				if(net_status=="0"&&vod_mode=="DVB"){
+					$("tips_text").innerText="请插上网线";
+					show_tips();
+				}
+				if(!information_visible&&!f3_visible&&!volumeBarVisible&&!exit_remind_visible&&!info_visible&&!network_tips_visible&&!pause_tips_visible&&!seek_flag&&!ward_visible){
+					show_informationBar();
+				}else if(information_visible){
+					hide_informationBar();
+				}	
+				return;
+			}/*else{	//新闻类F1功能暂停上线
+				if(!information_visibleFive){
+				 show_informationBarFive();
+				}else if(information_visibleFive){
+				 hide_informationBarFive();
+				}
+			}*/
+			return 0;
+			break;
+		case "GREEN":
+			if(isAdPlay) return;
+			if(net_status=="0"&&vod_mode=="DVB"){
+				$("tips_text").innerText="请插上网线";
+				show_tips();
+				return;
+			}
+			if(!volumeBarVisible&&!exit_remind_visible&&!info_visible&&!network_tips_visible&&!pause_tips_visible&&!seek_flag&&!ward_visible){
+				show_f3_tips();
+			}else if(f3_visible&&!network_tips_visible){
+				window.clearTimeout(f3_timeout);
+				f3_timeout=window.setTimeout("hide_f3_tips()",10000);
+			}
+			break;	
+		case "EIS_VOD_PREPAREPLAY_SUCCESS"://5202
+			if(socket_error){
+				media.AV.seek(socket_error_seek_time);
+				seek_flag=true;
+				first_play = true;
+				ward_speed = 1;
+			}else{
+				media.AV.play();
+			}
+			return 0;
+			break;
+		case "EIS_VOD_CONNECT_FAILED"://5203
+			if(isAdPlay){
+				adPlayError = true;
+				clearTimeout(checkAdElapsedTimeFlag);
+				media.AV.close();
+				rtsp_url = vedioUrl;
+				isAdPlay = false;
+				first_play = true;
+				if(adFlag == "middle"){
+					middleAdEndFlag = true;	
+				}
+				if(middleAdUrl&&!middleAdEndFlag){//有片中广告还没播放时
+					iPanel.debug("EIS_VOD_CONNECT_FAILED");
+					setTimeout("checkVedioElapsedTime();",2000);
+				}
+				if(endAdUrl){//有片中广告还没播放时
+					iPanel.debug("EIS_VOD_CONNECT_FAILED");
+					setTimeout("checkVedioEndTime();",2000);
+				}
+				modeChange(rtsp_url);
+				media.AV.open(rtsp_url,"VOD");
+				return;
+			}
+			media.AV.close();
+			hide_load_tips();
+			connect_failed=true;
+			var remindText = "连接异常,按“退出”键退出播放";
+			show_exit(remindText);
+			first_play=false;
+			close_widget();
+			link_tips=false;
+			clearTimeout(load_page_timeout);
+			break;
+		case "EIS_VOD_PLAY_SUCCESS"://5205
+			if(middleAdEndFlag){
+				middleAdEndFlag = false;
+				media.AV.seek(middleAdEndSeekTime);
+				seek_flag = true;
+			}
+			if(first_play){
+				if(mute_status=="0"){
+					media.sound.value=parseInt(currOriginVolume);
+					has_set_sound=true;
+				}
+				show_helpBar();
+				$("load_tips").style.visibility="hidden";
+				link_tips=false;
+				first_play=false;
+				duration = media.AV.duration;
+				if(!duration){
+					duration=0;
+				}
+				elapsed_time=media.AV.elapsed;
+				if(!elapsed_time){
+					elapsed_time=0;
+				}
+				write_duration_time();
+				if(typeof(wasu_url)!="undefined"&&wasu_url!=""&&!socket_error){
+					var my_wasu_widget  = iPanel.pageWidgets.getByName("wasu_widget");
+					my_wasu_widget.location.href = wasu_url;
+					my_wasu_widget.show();
+				}
+				if(pause_tips_visible && socket_error){
+					media.AV.pause();
+				}
+				socket_error = false;
+			}else if(is_now_seek){
+				hide_load_tips();
+				is_now_seek=false;
+			}
+			/*if(endplay_flag)
+			{
+				endplay_flag=false;
+				//Func_endplay();
+			}
+			else
+				clearTimeout(endplay_timeout);*/
+				
+			setTimeout("refreshPlayTime()", 5000);
+			seek_flag=false;
+			clearTimeout(load_page_timeout);
+			show_front_play_status();
+			break;
+		case "EIS_VOD_DVB_SERACH_FAILED":
+			if(vod_mode=="DVB"){
+				if(isAdPlay){
+					adPlayError = true;
+					clearTimeout(checkAdElapsedTimeFlag);
+					media.AV.close();
+					rtsp_url = vedioUrl;
+					isAdPlay = false;
+					first_play = true;
+					if(adFlag == "middle"){
+						middleAdEndFlag = true;	
+					}
+					if(middleAdUrl&&!middleAdEndFlag){//有片中广告还没播放时
+						iPanel.debug("EIS_VOD_DVB_SERACH_FAILED");
+						setTimeout("checkVedioElapsedTime();",2000);
+					}
+					if(endAdUrl){//有片中广告还没播放时
+						iPanel.debug("EIS_VOD_DVB_SERACH_FAILED");
+						setTimeout("checkVedioEndTime();",2000);
+					}
+					modeChange(rtsp_url);
+					media.AV.open(rtsp_url,"VOD");
+					return;
+				}
+				hide_load_tips();
+				connect_failed=true;
+				var remindText = "无信号,按“退出”键退出播放";
+				show_exit(remindText);
+				first_play=false;
+			}
+			break;
+		case "EIS_VOD_START_FAILED":
+			if(isAdPlay){
+				adPlayError = true;
+				clearTimeout(checkAdElapsedTimeFlag);
+				media.AV.close();
+				rtsp_url = vedioUrl;
+				isAdPlay = false;
+				first_play = true;
+				if(adFlag == "middle"){
+					middleAdEndFlag = true;	
+				}
+				if(middleAdUrl&&!middleAdEndFlag){//有片中广告还没播放时
+					iPanel.debug("EIS_VOD_START_FAILED");
+					setTimeout("checkVedioElapsedTime();",2000);
+				}
+				if(endAdUrl){//有片中广告还没播放时
+					iPanel.debug("EIS_VOD_START_FAILED");
+					setTimeout("checkVedioEndTime();",2000);
+				}
+				modeChange(rtsp_url);
+				media.AV.open(rtsp_url,"VOD");
+				return;
+			}
+			hide_load_tips();
+			connect_failed=true;
+			var remindText = "不能连接服务器,按“退出”键退出播放";
+			show_exit(remindText);
+			first_play=false;
+			break;
+		case "EIS_VOD_PLAY_FAILED"://5206,暂定不使用这个消息
+			cable_connect_flag = iPanel.getGlobalVar("cable_connect_success");
+			if(typeof(cable_connect_flag)!="undefined"&&cable_connect_flag=="1"&&vod_mode=="DVB"){ 
+				if(isAdPlay){
+					adPlayError = true;
+					clearTimeout(checkAdElapsedTimeFlag);
+					media.AV.close();
+					rtsp_url = vedioUrl;
+					isAdPlay = false;
+					first_play = true;
+					if(adFlag == "middle"){
+						middleAdEndFlag = true;	
+					}
+					if(middleAdUrl&&!middleAdEndFlag){//有片中广告还没播放时
+						iPanel.debug("EIS_VOD_PLAY_FAILED");
+						setTimeout("checkVedioElapsedTime();",2000);
+					}
+					if(endAdUrl){//有片中广告还没播放时
+						iPanel.debug("EIS_VOD_START_FAILED");
+						setTimeout("checkVedioEndTime();",2000);
+					}
+					modeChange(rtsp_url);
+					media.AV.open(rtsp_url,"VOD");
+					return;
+				}
+				$("load_tips_text").innerText="连接失败！";
+				close_widget();
+				setTimeout("exit_page()", 2000);
+			 }
+			break;
+		case "EIS_VOD_PROGRAM_BEGIN":
+		    hide_speed_tip();//隐藏右上角快进or快退图标
+			ward_speed = 1;
+			media.AV.close();
+			modeChange(rtsp_url);
+			media.AV.open(rtsp_url,"VOD");
+			write_speed();
+			break;
+		case "EIS_VOD_PROGRAM_END":
+			if(info_visible){
+				hide_info();
+			}
+			has_stop=true;
+			if(conVodFlag=="false"){ 	//如果为电影，弹出关联推荐
+				showThankLook();
+			}
+			close_widget()
+			media.AV.close();
+			//var assetType="36";
+			exitThePage();
+			break;
+		case "EIS_IP_NETWORK_READAY":
+			if(typeof(rtsp_url)!="undefined" && socket_error){
+				window.clearTimeout(check_net_status_timeout);
+				media.AV.open(rtsp_url,'VOD');
+			}
+			break;
+		case "EIS_IP_NETWORK_CONNECT":
+			NETWORK_DISCONNECT=0;
+			NETWORK_CONNECT++;
+			if (NETWORK_CONNECT>1) return;
+			net_status="1";
+		 if(connect_failed) return;//5203消息弹出提示后，只关闭请插入网线的提示，其他的正常显示
+			if(vod_mode=="IP"){
+				if(pause_tips_visible){
+						media.AV.play();
+						hide_pause_tips();//如果重新去play的时候，如果之前是显示了暂停图标的，需要隐藏掉
+					}
+					if(exit_remind_visible){
+						media.AV.play();
+						hide_exitRemind();	
+				}
+				show_front_play_status();
+				hide_exit();
+				window.clearTimeout(network_timeout);
+				network_tips_visible=false;
+			}else if(vod_mode=="DVB"){//liyq add 20110322 高清点播在拔掉网线退出后再按退出继续播放的时候，提示网络异常，插上网线后调用play播放
+				if(network_tips_visible){
+					network_tips_visible=false;
+					media.AV.play();
+					hide_exit();
+					if(pause_tips_visible){
+						media.AV.play();
+						hide_pause_tips();//如果重新去play的时候，如果之前是显示了暂停图标的，需要隐藏掉
+					}
+					if(exit_remind_visible){
+						media.AV.play();
+						hide_exitRemind();	
+					}
+				}
+				$("net_tips").style.visibility="hidden";	
+			}	
+			if(socket_error){
+				check_net_status_timeout = window.setTimeout("check_net_status()",200);
+			}
+			break;
+		case "EIS_IP_NETWORK_DISCONNECT":
+			NETWORK_DISCONNECT++;
+			NETWORK_CONNECT=0;
+			if(NETWORK_DISCONNECT>1) return;
+			net_status="0";
+			if(link_tips){
+				has_stop=true;
+				close_widget();
+				media.AV.close();
+				//iPanel.overlayFrame.location.href="thank_look.htm";
+				exit_page();
+				return;
+			}
+			if(vod_mode=="IP"){
+				if(!first_play){
+					elapsed_time=media.AV.elapsed;
+					var hour=Math.floor(elapsed_time/3600);
+					var minute=Math.floor((elapsed_time-hour*3600)/60);
+					var second=elapsed_time-hour*3600-minute*60;
+					hour=hour>9?hour:"0"+hour;
+					minute=minute>9?minute:"0"+minute;
+					second=second>9?second:"0"+second;
+					socket_error_seek_time = hour+":"+minute+":"+second;
+				}
+				if(f3_visible){
+					window.clearTimeout(f3_timeout);
+					hide_f3_tips();
+				}
+				network_tips_visible=true;
+				var remindText = "网络不通，按“确认”键结束播放，插上网线可继续播放.";
+				show_exit(remindText);
+			}else if(vod_mode=="DVB"){
+				$("net_tips_text").innerText="请插上网线";
+				$("net_tips").style.visibility="visible";
+			}
+			if(socket_error){
+				window.clearTimeout(check_net_status_timeout);
+			}
+			break;
+		case "DVB_CABLE_CONNECT_SUCCESS":
+			if(vod_mode=="DVB"){
+				if(!pause_tips_visible&&!link_tips&&media.AV.status=="pause"){
+					media.AV.play();
+				}
+				network_tips_visible=false;
+				hide_exit();
+			}
+			if(net_status=="0"){//网络没插上的话，保留网线的提示
+				$("net_tips_text").innerText="请插上网线";
+				$("net_tips").style.visibility="visible";
+			}else{
+				$("net_tips").style.visibility="hidden";
+			}
+			break;
+		case "DVB_CABLE_CONNECT_FAILED":
+			if(vod_mode=="DVB"){
+				if(link_tips){
+					$("net_tips_text").innerText="无信号";
+					$("net_tips").style.visibility="visible";
+					return;
+				}
+				if(media.AV.status!="pause"&&!link_tips&&net_status=="1"){
+					media.AV.pause();
+					show_front_play_status();
+				}
+				network_tips_visible=true;
+				var remindText = "没有信号,插上cable线继续播放,按“确认”键结束播放";
+				show_exit(remindText);
+			}
+			break;
+		case "EIS_VOD_START_BUFF"://底层开始缓冲数据，等待播放
+			show_load_tips();
+			is_now_seek=true;
+			seek_flag=false;
+			break;
+		/*case "EIS_VOD_STOP_BUFF"://缓冲数据结束，已开始播放,暂定不使用这个消息
+			break;*/
+		case "EIS_VOD_OUT_OF_RANGE"://传入的时间超出有效范围
+			break;
+		case "EIS_VOD_USER_EXCEPTION"://用户自定义错误,包括缓冲超时
+			if(isAdPlay){
+				adPlayError = true;
+				clearTimeout(checkAdElapsedTimeFlag);
+				media.AV.close();
+				rtsp_url = vedioUrl;
+				isAdPlay = false;
+				first_play = true;
+				if(adFlag == "middle"){
+					middleAdEndFlag = true;	
+				}
+				if(middleAdUrl&&!middleAdEndFlag){//有片中广告还没播放时
+					iPanel.debug("EIS_VOD_USER_EXCEPTION");
+					setTimeout("checkVedioElapsedTime();",2000);
+				}
+				if(endAdUrl){//有片中广告还没播放时
+						iPanel.debug("EIS_VOD_START_FAILED");
+						setTimeout("checkVedioEndTime();",2000);
+					}
+				modeChange(rtsp_url);
+				media.AV.open(rtsp_url,"VOD");
+				return;
+			}
+			user_error_code=event_obj.args.modifiers;
+			var ethernetItem = network.ethernets[0];
+			net_status = ethernetItem.LANStatus; 
+			if(user_error_code == 2106 && (net_status==0||(net_status!=3&&network.ethernets[0].DHCPEnable==1))){
+				socket_error = true;
+				media.AV.close();
+			}else{
+				hide_load_tips();
+				seek_flag=false;
+				if(is_now_seek){
+					is_now_seek=false;
+					can_ward=false;
+					can_info=false;
+				}
+				has_stop=true;
+				hide_exit();
+				closeAdverteventWidget();
+				var error_tips=check_error_code(user_error_code);
+				iPanel.overlayFrame.location.href="error_tips1.htm?"+error_tips;
+			}
+			break;
+		case "EIS_VOD_CLOSE_SUCCESS"://5211 close成功
+			break;
+		case "EIS_VOD_CLOSE_FAILED"://5212 close失败
+			break;
+	}
+}
+
+var open_timeout_flag = -1;
+
+function init(){
+	DVB.stopAV();  
+	var locationUrl = iPanel.mainFrame.location.href;
+	iPanel.debug("iPanel.mainFrame.location.href=="+locationUrl);
+	jishu = parseInt("0");
+	//----------是否弹出关联推荐页---------------    
+	var isconVod="";
+	iPanel.debug("isconVod=="+isconVod+",jishu = "+jishu);
+	if(isconVod == null||isconVod == ""||typeof(isconVod) == "undefined"){
+		conVodFlag = "false";
+	}else{
+		conVodFlag = isconVod;
+	}
+	iPanel.debug("tudou___conVodFlag=="+conVodFlag);
+	//----------是否优先使用全局变量---------------    
+	var isGlobalFlag="";
+	iPanel.debug("isGlobalFlag=="+isGlobalFlag);
+	if(isGlobalFlag == "true"){
+			vedioUrl = locationUrl.split("rtspUrl=")[1];
+	}
+	iPanel.debug("fengjh vedioUrl=="+vedioUrl);
+	//--------------------------------------------------------
+	var vipFlag = "";
+	var isVip="0";
+	if(isVip==null||isVip==""){
+		vipFlag = "0";
+	}else{
+		vipFlag=isVip;
+	}
+	if(vipFlag == 1){
+			startAdUrl="";
+			startAdDuration=0;
+			middleAdDuration = 0;
+			middleAdInsertTime = 0;
+			middleAdUrl = "";
+			endAdDuration = 0;
+			endAdUrl = "";
+			$("load_image").style.backgroundImage = "url(/template_images/index/vip_index_player_quit_ad_image.jpg)";
+			$("exitRemind_image").style.backgroundImage = "url(/template_images/index/vip_index_player_quit_ad_image.jpg)";
+			$("pauseTip_image").style.backgroundImage = "url(/template_images/index/vip_index_player_quit_ad_image.jpg)";
+			$("warBar_image").style.backgroundImage = "url(/template_images/index/vip_index_player_tip_ad_image.jpg)";
+			$("speedBar_image").style.backgroundImage = "url(/template_images/index/vip_index_player_tip_ad_image.jpg)";
+			$("volumeBar_image").style.backgroundImage = "url(/template_images/index/vip_index_player_tip_ad_image.jpg)";
+			$("f3_image").style.backgroundImage = "url(/template_images/index/vip_index_player_tip_ad_image.jpg)";			
+	}
+	if(startAdUrl){
+		isAdPlay = true;		
+		rtsp_url=startAdUrl;
+		if(typeof(rtsp_url)!="undefined"){
+			modeChange(rtsp_url);
+			iPanel.debug("vedio rtsp_url=="+rtsp_url);
+			media.AV.open(rtsp_url,'VOD');
+			adFlag = "start";
+			adDuration = startAdDuration;
+			setTimeout("checkAdElapsedTime();",2000);
+		}
+	}else{
+		isAdPlay = false;
+		if(vedioUrl){
+			rtsp_url = vedioUrl;
+		}else{
+			rtsp_url = locationUrl.split("rtspUrl=")[1];
+		}
+		if(typeof rtsp_url != "undefined"){
+			modeChange(rtsp_url);
+			media.AV.open(rtsp_url,'VOD');
+			if(middleAdUrl){
+				iPanel.debug("init()---middleAdUrl");
+				setTimeout("checkVedioElapsedTime();",2000);
+			}
+			if(endAdUrl){
+				iPanel.debug("init()--endAdUrl");
+				setTimeout("checkVedioEndTime();",2000);
+			}
+		}
+	}
+	media.video.fullScreen();
+	accessParameter(rtsp_url);//获取参数
+	modeChange(rtsp_url);//改变播放模式
+	media.video.fullScreen();
+	if(cable_connect_flag == "0"&&vod_mode=="DVB"){
+		network_tips_visible=true;
+		var remindText = "没有信号,插上cable线继续播放,按“确认”键结束播放";
+		show_exit(remindText);
+		return;	    
+	}	
+	if(link_tips) {
+		$("load_tips").style.visibility="visible";
+		load_page_timeout = setTimeout("show_page_load_timeout()", 12000);
+	}
+	var ethernetItem = network.ethernets[0];
+	var net_status = ethernetItem.LANStatus; //1：表示目前处于连接状态   0：表示没有连接上网络
+	if (net_status==0||(net_status!=3&&network.ethernets[0].DHCPEnable==1)){
+		$("net_tips").style.visibility="visible";
+	}
+	if (mute_status != "0"){
+		iPanel.misc.showWindow("muteIcon.gif",1116,59,88,67);//以防万一，显示一下吧
+	}
+	loadAd(101221);//loading  解决拔网线按确认键不能退出的问题
+	checkNowDate();//整半点报时
+	write_elapsed_time(elapsed_time);
+}
+
+function accessParameter(rtsp_url){  //获取参数	
+	if(rtsp_url.indexOf("&duration=")!= -1){
+		var duration_tmp = rtsp_url.split("&duration=")[1].split("&")[0];
+		endplay_time = parseInt(duration_tmp.split("_")[0]) + parseInt(duration_tmp.split("_")[1]);
+		endplay_flag = true;
+	}
+}
+function checkAdElapsedTime(){//检测广告的播放结束点
+	var elapsedTime = media.AV.elapsed;
+	iPanel.debug("elapsedTime == "+elapsedTime);
+	if(elapsedTime >= (adDuration-5)&&!adPlayError){
+		
+		clearTimeout(checkAdElapsedTimeFlag);
+		media.AV.close();
+		rtsp_url = vedioUrl;
+		isAdPlay = false;
+		first_play = true;
+		if(adFlag == "middle"){
+			middleAdEndFlag = true;	
+		}
+		if(middleAdUrl&&!middleAdEndFlag){//有片中广告还没播放时
+			setTimeout("checkVedioElapsedTime();",2000);
+		}
+		if(endAdUrl){
+				iPanel.debug("init()--endAdUrl");
+				setTimeout("checkVedioEndTime();",2000);
+		}
+		modeChange(rtsp_url);
+		setTimeout(function (){
+			media.AV.open(rtsp_url,"VOD");
+		},300);
+	}else{
+		checkAdElapsedTimeFlag = setTimeout(function(){
+			checkAdElapsedTime();
+		},1000);	
+	}
+}
+
+function checkVedioElapsedTime(){//检测片中广告的插播点
+	
+	var elapsedTime = media.AV.elapsed;
+	if(elapsedTime >= middleAdInsertTime){
+		clearTimeout(checkVedioElapsedTimeFlag);
+		isAdPlay = true;
+		middleAdEndSeekTime=time_to_str(elapsedTime,1);
+		media.AV.close();
+		rtsp_url = middleAdUrl;
+		modeChange(rtsp_url);
+		setTimeout(function (){
+			media.AV.open(rtsp_url,'VOD');
+		},300);
+		adFlag = "middle";
+		adDuration = middleAdDuration;
+		middleAdEndFlag = false;
+		setTimeout("checkAdElapsedTime();",2000);
+	}else{
+		checkVedioElapsedTimeFlag = setTimeout(function(){
+			checkVedioElapsedTime();
+		},1000);	
+	}
+}
+
+function checkVedioEndTime(){//检测片尾广告的插播点
+	var elapsedTime = media.AV.elapsed;
+	if(elapsedTime+2 >= duration){
+		clearTimeout(checkVedioEndTimeFlag);
+		isAdPlay = true;
+		media.AV.close();
+		rtsp_url = endAdUrl;
+		modeChange(rtsp_url);
+		setTimeout(function (){
+			media.AV.open(rtsp_url,"VOD");
+		},300);
+		adFlag = "end";
+		adDuration = endAdDuration;
+	}else{
+		checkVedioEndTimeFlag = setTimeout(function(){
+			checkVedioEndTime();
+		},1000);	
+	}
+}
+function modeChange(rtsp_url){
+		if (typeof(rtsp_url)!="undefined"){
+			if(rtsp_url.indexOf("isIpqam=")!= -1){
+				if( rtsp_url.indexOf("isIpqam=1")!= -1){
+					vod_mode = "DVB";
+				}else{
+					vod_mode = "IP";
+				}
+			}else{
+				if( rtsp_url.indexOf(".ts")!= -1){
+					vod_mode = "DVB";
+				}else{
+					vod_mode = "IP";
+				}
+			}
+		}
+		
+		if(typeof iPanel.eventFrame.service_mode_change == "function"){
+			iPanel.eventFrame.service_mode_change(vod_mode);
+		}else{
+			if(vod_mode == "DVB"){
+			  VOD.changeServer("isma_v2","dvb");
+			}else{
+				VOD.changeServer("sihua_3rd","ip");
+			}
+		}
+}
+function show_page_load_timeout() {
+	if(isAdPlay){
+		clearTimeout(checkAdElapsedTimeFlag);
+		media.AV.close();
+		rtsp_url = vedioUrl;
+		isAdPlay = false;
+		first_play = true;
+		if(adFlag == "middle"){
+			middleAdEndFlag = true;	
+		}
+		if(middleAdUrl&&!middleAdEndFlag){//有片中广告还没播放时
+			iPanel.debug("show_page_load_timeout()");
+			setTimeout("checkVedioElapsedTime();",2000);
+		}
+		modeChange(rtsp_url);
+		media.AV.open(rtsp_url,"VOD");
+		return;
+	}
+	$("load_tips_text").innerText="连接失败！";
+	setTimeout("exit_page()", 2000);
+	close_widget();  //解决第一次进华数眼失败再进VOD会显示华数眼控制云台
+	closeAdverteventWidget();
+}
+
+function write_duration_time(){
+	$("seek_duration_time").innerText = time_to_str(duration,1);
+	$("speed_duration_time").innerText = time_to_str(duration,1);
+	$("speedTip_duration_time").innerText = time_to_str(duration,1);
+	$("f3_duration_time").innerText = time_to_str(duration,1);
+	$("pause_duration_time").innerText = time_to_str(duration,1);
+	$("info_duration_time").innerText=time_to_str(duration,1);
+}
+
+function write_now_data(){
+	var d= new Date();
+	var year = d.getYear();
+	var month = d.getMonth() + 1;
+	var date = d.getDate();
+	var hour = d.getHours();
+	var minute = d.getMinutes();
+	var second = d.getSeconds();
+	if(parseInt(month) < 10) month = "0" + month;
+	if(parseInt(date) < 10) date = "0" + date;
+	if(parseInt(hour) < 10) hour = "0" + hour;
+	if(parseInt(minute) < 10) minute = "0" + minute;
+	if(parseInt(second) < 10) second = "0" + second;
+	var date_str = month+"/"+date+"&nbsp;&nbsp;"+hour+":"+minute+":"+second;
+	$("seek_now_date").innerHTML = date_str;
+	$("speed_now_date").innerHTML = date_str;
+	$("f3_now_date").innerHTML = date_str; 
+	$("volumeBar_now_date").innerHTML = date_str;
+}
+
+
+function write_elapsed_time(_elapsed_time){
+	if (_elapsed_time < 0){
+		_elapsed_time=0;
+	}else if(_elapsed_time > duration){
+		_elapsed_time=duration;
+	}
+	$("speed_now_time").innerText=time_to_str(_elapsed_time,1);
+	$("speedTip_now_time").innerText=time_to_str(_elapsed_time,1);
+	$("seek_now_time").innerText=time_to_str(_elapsed_time,1);
+	$("pause_now_time").innerText = time_to_str(_elapsed_time,1);
+}
+
+function exit_page(){
+	clearTimeout(open_timeout_flag);
+	media.AV.close();
+	if(ward_visible){
+		hide_ward();
+	}
+	hide_load_tips();
+	hide_exit();
+	
+	iPanel.misc.enableIconLoading=1;
+	iPanel.setGlobalVar("url_parm","");//这里要清除一下url_parm，避免上次未正常打开华数眼时，下次普通全屏点播是url_parm有残留
+	
+	/**从高清点播退出来，默认回IP的模式，因为卡拉OK没切换模式**/
+	if(vod_mode=="DVB"){	
+		var __providerName = hardware.STB.provider;
+		if(__providerName.indexOf("摩托") != -1){//第三方VOD的点播模式切换
+	  	VOD.changeServer("sihua_3rd","ip");
+		}else{
+			VOD.changeServer("isma_v2","ip");
+		}	
+  }
+	if(mute_status == "1"){
+		iPanel.misc.showWindow("muteIcon.gif",1116,59,88,67);
+	}
+	iPanel.overlayFrame.close();
+	var ethernet_item = network.ethernets[0];
+	if(ethernet_item.LANStatus==0 ||(ethernet_item.LANStatus!=3&&network.ethernets[0].DHCPEnable==1)){
+		iPanel.setGlobalVar("netlink_status", "0");
+		iPanel.eventFrame.flag = 1;
+		hardware.STB.frontPanel(2,"0000",0,0,0);
+		setTimeout('window.location.href = "ui://index.htm"', 50);
+	}else{
+		var cloud_incloud = iPanel.ioctlRead("Cloud_InCloud");
+		iPanel.debug("vodPlay.htm cloud_incloud="+cloud_incloud);
+		if(cloud_incloud=="0"){             //当前在云点播状态
+			window.location.href = "ui://vod_blank.htm";
+		}else{             //不在云点播状态
+			history.go(-3);
+		}
+		
+		hardware.STB.frontPanel(2,"IE::",0,0,100);
+		setTimeout("go_index()",7000);
+	}
+}
+function showContinuePlay(){	//弹出连播页面
+	var ad_widget = iPanel.pageWidgets.getByName("Advertevent");
+	if(ad_widget){
+		if(typeof ad_widget.continuePlay == "function"){
+			ad_widget.continuePlay();//continue_control.jsp
+		}
+	}
+}
+
+function showThankLook(){	//弹出关联推荐页面
+	var thank_widget = iPanel.pageWidgets.getByName("Advertevent");
+	if(thank_widget){
+		if(typeof thank_widget.gotoRelationRecommendUrl == "function"){
+			thank_widget.gotoRelationRecommendUrl();//continue_control.jsp
+			
+		}
+	}
+}
+
+function go_index(){
+	iPanel.eventFrame.flag = 1;
+	hardware.STB.frontPanel(2,"0000",0,0,0);
+	iPanel.mainFrame.location.href = 'ui://index.htm';
+}
+
+function volumeAdjust(offset){
+	if(!volumeBarVisible){
+		showVolumeBar();
+	}
+	clearTimeout(volumeBarTimeout);
+	volumeBarTimeout = setTimeout("hideVolumeBar()", 4000);
+	if((currVolume == 0 && offset < 0) || (currVolume == 100 && offset > 0)){
+		$("volumeValue").innerText = currVolume;
+		generateVolume(currVolume);
+		return;
+	}
+	currVolume += offset;
+	if (currVolume < 0) currVolume = 0;
+	else if (currVolume > 100) currVolume = 100;
+	media.sound.value = currVolume;
+	$("volumeValue").innerText = currVolume;
+	generateVolume(currVolume);
+}
+
+function generateVolume(num) {
+	var volumeNumber = parseInt(num/5);
+	var str = "";
+	for (var i = 0; i < volumeNumber; i++){
+		str += "<img src='volume_value.png' width='20', height='31'/>";
+	}
+	$("volume").innerHTML = str;
+}
+
+function showVolumeBar(){
+	loadAd(101217);//音量
+	write_now_data();
+	volumeBarVisible = true;
+	$("volumeBar").style.visibility = "visible";
+	var volumeAdWidget = iPanel.pageWidgets.getByName("volume_ad");
+	volumeAdWidget.withoutFocus = 1;
+	volumeAdWidget.show();
+	var marqueeAdWidget = iPanel.pageWidgets.getByName("marquee_ad");
+	marqueeAdWidget.iconize();
+}
+
+function hideVolumeBar(){
+	volumeBarVisible = false;
+	$("volumeBar").style.visibility = "hidden";
+	var volumeAdWidget = iPanel.pageWidgets.getByName("volume_ad");
+	volumeAdWidget.iconize();
+	var marqueeAdWidget = iPanel.pageWidgets.getByName("marquee_ad");
+	marqueeAdWidget.withoutFocus = 1;
+	marqueeAdWidget.show();
+}
+
+
+function show_mute_icon() {
+	if(volumeBarVisible){
+		hideVolumeBar();
+	}
+	iPanel.setGlobalVar("mute_status", "1");
+	media.sound.mute();
+	mute_status = "1";
+	iPanel.misc.showWindow("muteIcon.gif",1116,59,88,67);
+}
+
+function hide_mute_icon(){
+	if (!has_set_sound){
+		var currOriginVolume = media.sound.value;
+		media.sound.value=parseInt(currOriginVolume);
+		has_set_sound=true;
+	}
+	media.sound.resume();
+	mute_status="0";
+	iPanel.setGlobalVar("mute_status", "0");
+	iPanel.misc.hideWindow();
+}
+
+function show_ward(){
+	write_now_data();
+	var temp_width=(elapsed_time/duration)*555;
+	$("process_bar").style.width=temp_width+"px";
+	//if (140+temp_width>549) temp_width=549-140;不是很清楚这里干什么？
+	$("ward_bar").style.visibility="visible";
+	ward_visible=true;
+	can_speed=false;
+	can_volume=false;
+	can_info=false;
+	ward_timeout=window.setTimeout("hide_ward()",5000);
+}
+
+function hide_ward(){
+	loadAd(101219);//快进快退
+	$("ward_bar").style.visibility="hidden";
+	ward_visible=false;
+	can_speed=true;
+	can_volume=true;
+	can_info=true;
+}
+
+function write_speed(){
+	clearTimeout(refresh_speed_timeout);
+	clearTimeout(speed_timeout_flag);
+	clearTimeout(speed_tip_timeout_flag);
+	if(ward_speed < 0){
+		$("forward").innerHTML="";
+		$("backward").innerHTML="<img src='backwardMax.png' width='45' height='45'>快退X"+(ward_speed*-1);
+		$("forwardSpeed").innerHTML="<img src='backward.png' width='26' height='18'>X<span style='font-size:46px; '>"+(ward_speed*-1)+"</span>";
+		refresh_speed();
+		speed_tip_timeout_flag = setTimeout("show_speed_tip();",3000);
+	}else if(ward_speed > 1){
+		$("backward").innerHTML="";
+		$("forward").innerHTML="快进X"+ward_speed+"<img src='forwardMax.png' width='45' height='45'>";
+		$("forwardSpeed").innerHTML="<img src='forward.png' width='26' height='18'>X<span style='font-size:46px; '>"+ward_speed+"</span>";
+		refresh_speed();
+		speed_tip_timeout_flag = setTimeout("show_speed_tip();",3000);
+	}else{
+		$("forward").innerHTML="";
+		$("backward").innerHTML="<img src='play1.png' width='45' height='45'>播放";
+		speed_timeout_flag = setTimeout("hide_speed();",3000);
+	}
+}
+
+function refresh_speed(){
+	elapsed_time=media.AV.elapsed;
+	if(!elapsed_time) elapsed_time=0;
+	write_elapsed_time(elapsed_time);
+	var temp_width=(elapsed_time/duration)*555;
+	$("speed_process_bar").style.width=temp_width+"px";
+	refresh_speed_timeout = setTimeout("refresh_speed();",2000);
+}
+
+function set_speed(){
+	has_speed_timeout=true;
+	if(ward_speed==1){
+		if(media.AV.speed!=1){
+			media.AV.play();
+		}
+	}else if(ward_speed<0){
+		var __ward_speed=ward_speed*(-1);
+		media.AV.backward(__ward_speed);
+	}else if(ward_speed>1){
+		media.AV.forward(ward_speed);
+	}
+}
+
+function show_speed(){
+	hide_speed_tip();
+	write_now_data();
+	/*elapsed_time=media.AV.elapsed;
+	if(!elapsed_time) elapsed_time=0;
+	write_elapsed_time(elapsed_time);
+	var temp_width=(elapsed_time/duration)*555;
+	$("speed_process_bar").style.width=temp_width+"px";*/
+	$("speed_bar").style.visibility="visible";
+	speed_visible=true;
+	can_ward=false;
+	can_volume=false;
+	can_info=false;
+}
+
+function hide_speed(){
+	loadAd(101219);//快进快退
+	$("speed_bar").style.visibility="hidden";
+	speed_visible=false;
+	can_ward=true;
+	can_volume=true;
+	can_info=true;
+}
+
+function show_speed_tip(){
+	$("speed_bar").style.visibility="hidden";
+	$("speedTip").style.visibility="visible";
+}
+
+function hide_speed_tip(){
+	$("speedTip").style.visibility="hidden";
+}
+function show_pause_tips(){
+	loadAd(101215);//暂停
+	var temp_width=(elapsed_time/duration)*690;
+	$("pause_process_bar").style.width=temp_width+"px";
+	$("pause_tips").style.visibility="visible";
+	$("continue-play").innerHTML="<img src='continue-play2.png'>";
+	$("hidden-ad").innerHTML="<img src='hidden-ad1.png'>";
+	pause_tips_visible = true;
+}
+
+function hide_pause_tips(){
+	pause_tips_visible=false;
+	$("pause_tips").style.visibility="hidden";
+}
+
+//隐藏广告图片，在右上角显示暂停标识
+function show_rightHiddenAd(){
+	$("rightHiddenAd").style.visibility="visible";
+}
+  
+function hidden_rightHiddenAd(){
+	continuePlayFlag=true;
+	$("rightHiddenAd").style.visibility="hidden";
+	
+	
+}
+
+function show_exit(_remindText){
+	$("exit_tips_text").innerHTML = _remindText;
+	$("exit_tips").style.visibility="visible";
+	can_volume=false;
+	can_ward=false;
+	can_speed=false;
+	can_info=false;
+}
+
+function hide_exit(){
+	$("exit_tips").style.visibility="hidden";
+	can_volume=true;
+	can_ward=true;
+	can_speed=true;
+	can_info=true;
+}
+
+function show_exitRemind(){
+	loadAd(101213);//退出
+	butPosition = 1;
+	hidden_rightHiddenAd();
+	$("yesPosition").style.backgroundImage = "url(yes.png)";
+	$("noPosition").style.backgroundImage = "url(no1.png)";
+	$("exit_remind").style.visibility="visible";
+	exit_remind_visible=true;
+	can_volume=false;
+	can_ward=false;
+	can_speed=false;
+	can_info=false;
+}
+
+function hide_exitRemind(){
+	$("exit_remind").style.visibility="hidden";
+	exit_remind_visible=false;
+	can_volume=true;
+  can_ward=true;
+  can_speed=true;
+	can_info=true;
+}
+
+function show_info(){
+	info_visible=true;
+	show_elapsed_time();
+	$("info").style.visibility="visible";
+	can_volume=false;
+  can_ward=false;
+  can_speed=false;
+	info_timeout=window.setTimeout("hide_info()",5000);
+}
+
+function hide_info(){
+	$("info").style.visibility="hidden";
+	info_visible=false;
+	can_volume=true;
+	can_ward=true;
+	can_speed=true;
+}
+
+function show_informationBar(){
+	$("informationBar").style.visibility = "visible";
+	$("informationBar").style.left = "30px";
+	information_visible = true;
+    clearTimeout(information_timeout);
+	information_timeout = window.setTimeout("hide_informationBar();",10000);		
+}
+
+function hide_informationBar(){
+	clearTimeout(information_timeout);
+	$("informationBar").style.left = "-283px";
+	information_visible = false;
+}
+
+
+function show_informationBarFive(){
+	$("informationBarFive").style.visibility = "visible";
+	$("informationBarFive").style.left = "30px";
+	information_visibleFive = true;
+    clearTimeout(information_timeoutFive);
+	information_timeoutFive = window.setTimeout("hide_informationBarFive();",10000);		
+}
+
+function hide_informationBarFive(){
+	clearTimeout(information_timeoutFive);
+	$("informationBarFive").style.left = "-283px";
+	information_visibleFive = false;
+}
+
+
+function show_elapsed_time(){
+	var __elapsed_time=media.AV.elapsed;
+	$("info_now_time").innerText=time_to_str(__elapsed_time,1);
+	if(info_visible){
+		window.setTimeout("show_elapsed_time()",1000);
+	}
+}
+
+function show_load_tips(){
+	$("load_tips_text").innerText="正在缓冲，请稍候";
+	$("load_tips").style.visibility="visible";	
+}
+
+
+function hide_load_tips(){
+	$("load_tips").style.visibility="hidden";
+}
+
+
+function time_to_str(_time,flag){
+	if (_time < 0){
+		_time = 0;
+	}
+	var hour = Math.floor(_time/3600);
+	var minute = Math.floor((_time-3600*hour)/60);
+	var second = _time-3600*hour-minute*60;
+	hour = hour > 9 ? hour : "0"+hour;
+	minute = minute > 9 ? minute : "0"+minute;
+	second = second > 9 ? second : "0"+second;
+	if(flag == 1){
+		var _str=hour+":"+minute+":"+second;
+	}else{
+		var _str=""+hour+minute+second;
+	}
+	return _str;
+}
+
+function show_tips(){
+	$("tips").style.visibility="visible";
+	window.setTimeout("hide_tips()",3000);
+}
+
+function hide_tips(){
+	$("tips").style.visibility="hidden";
+}
+
+function show_f3_tips(){
+	loadAd(101219);//快进快退
+	write_now_data();
+	window.clearTimeout(f3_timeout);
+	var elapsed_time=media.AV.elapsed;
+	var __time_str=time_to_str(elapsed_time,2);
+	time_array=__time_str.split("");
+	for (var i=0;i<6;i++){
+		$("f3_time"+i).innerText=time_array[i];
+	}
+	f3_visible=true;
+	$("f3_time"+time_position).style.backgroundColor="#FF9900";
+	$("f3").style.visibility="visible";
+	f3_timeout=window.setTimeout("hide_f3_tips()",10000);
+}
+
+function hide_f3_tips(){
+	$("f3").style.visibility="hidden";
+	f3_visible=false;
+}
+
+function set_time1(__num){
+	switch (time_position){
+		case 2:
+		case 4:
+			if(__num>=6) return;
+			break;
+	}
+	time_array[time_position]=__num;
+	$("f3_time"+time_position).innerText=__num;
+}
+
+function set_time(__num){
+	switch (time_position){
+		case 2:
+		case 4:
+			write_time(0,5);
+			break;
+		case 0:
+		case 1:
+		case 3:
+		case 5:
+			write_time(0,9);
+			break;
+	}
+
+	function write_time(__min,__max){
+		time_array[time_position]=parseInt(time_array[time_position])+__num;
+		if (time_array[time_position]>__max){
+			time_array[time_position]=__min;
+		}else if (time_array[time_position]<__min){
+			time_array[time_position]=__max;
+		}
+		$("f3_time"+time_position).innerText=time_array[time_position];
+	}
+}
+
+function seek_f3_time(){
+	var f3_seek_time=(parseInt(time_array[0])*10+parseInt(time_array[1]))*60*60+(parseInt(time_array[2])*10+parseInt(time_array[3]))*60+parseInt(time_array[4])*10+parseInt(time_array[5]);
+	if (f3_seek_time>duration){
+		$("tips_text").innerText="超出选时范围";
+		show_tips();
+		clearTimeout(f3_timeout);
+		f3_timeout=window.setTimeout("hide_f3_tips()",10000);
+		return;
+	}else if(f3_seek_time==duration){
+		if("36"==37){
+			showContinuePlay();
+		}else if("36"==36){
+			showThankLook();
+		}
+		has_stop=true;
+		close_widget();
+		media.AV.close();
+		exitThePage();
+		return;
+	}else{
+		hide_f3_tips();
+		var f3_seek_time=""+time_array[0]+time_array[1]+":"+time_array[2]+time_array[3]+":"+time_array[4]+time_array[5];
+		media.AV.seek(f3_seek_time);
+		seek_flag=true;
+	}
+}
+
+function change_time_focus(__num){
+	$("f3_time"+time_position).style.backgroundColor="#FFFFFF";
+	time_position+=__num;
+	if (time_position>5)
+	   time_position=0;
+	else if(time_position<0)
+		time_position=5;
+	$("f3_time"+time_position).style.backgroundColor="#FF9900";
+}
+
+function $(id){
+	return document.getElementById(id);
+}
+
+function close_widget(){
+	if (typeof(wasu_url)!="undefined"&&wasu_url!=""){
+		var my_wasu_widget  = iPanel.pageWidgets.getByName("wasu_widget");
+		my_wasu_widget.iconize();
+		my_wasu_widget.location.href = "ui://blank.htm";
+		iPanel.setGlobalVar("url_parm","");
+	}
+	iPanel.overlayFrame.close();
+}
+
+function closeAdverteventWidget(){
+	var infobar_ad_widget = iPanel.pageWidgets.getByName("Advertevent");//点播失败之后，页面焦点丢失。update fengjh  2013.3.27
+	iPanel.debug("vodplay.jsp @ pageWidetIconize");
+	infobar_ad_widget.location.href="ui://itv_page.htm";
+	infobar_ad_widget.iconize();
+}
+
+function refreshPlayTime() {
+	showCurrPlayTime();
+	setTimeout("refreshPlayTime()", 30000);
+}
+
+function showCurrPlayTime() {
+	var progress = time_to_str(media.AV.elapsed, 1);
+	var currPlayTime = progress.substring(0, 5);
+	hardware.STB.frontPanel(2,currPlayTime,0,0,100);
+}
+
+function show_front_play_status(){//显示前面板播放状态
+	for (var i=60;i<64;i++){
+		hardware.STB.statusLight(i,0,0,0);
+	}
+	var status=media.AV.status;
+	switch (status){
+		case "play":
+			hardware.STB.statusLight(60,0,0,100);
+			break;
+		case "pause":
+			hardware.STB.statusLight(61,0,0,100);
+			break;
+		case "fastforward":
+			hardware.STB.statusLight(62,0,0,100);
+			break;
+		case "backward":
+			hardware.STB.statusLight(63,0,0,100);
+			break;
+	}
+}
+
+function check_net_status(){
+	var ethernet_item = network.ethernets[0];
+	if(ethernet_item.LANStatus==0 ||(ethernet_item.LANStatus!=3&&network.ethernets[0].DHCPEnable==1)){
+		window.clearTimeout(check_net_status_timeout);
+		check_net_status_timeout = window.setTimeout("check_net_status()",200);
+	}else{
+		if(typeof(rtsp_url)!="undefined" && socket_error){
+			window.clearTimeout(check_net_status_timeout);
+			media.AV.open(rtsp_url,'VOD');
+		}
+	}
+}
+function checkNowDate(){
+	var date = new Date();
+	var hour = date.getHours();
+	var minute = date.getMinutes();
+	var second = date.getSeconds();
+	if((minute==29&&second>=30)||(minute==59&&second>=30)){
+		$("nowDate").style.visibility="visible";
+		$("nowText").style.visibility="visible";	
+		$("nowImg").style.webkitTransitionDuration ="3s";	
+		$("nowImg").style.left="1080px";		
+		displayNowDate(hour,minute,second);
+		requestText();//跑马灯
+		window.clearTimeout(checkNowDate_timeout);
+	}else{
+		checkNowDate_time=window.setTimeout("checkNowDate()",1000);
+	}
+	
+}
+
+function displayNowDate(hour,minute,second){	
+	switch (second){
+		case 29:
+			$("nowDate").innerText = "";
+			$("nowDate").style.visibility="hidden";
+			$("nowText").style.visibility="hidden";
+			$("nowImg").style.webkitTransitionDuration ="3s";	
+			$("nowImg").style.left="1380px";
+			window.clearTimeout(displayNowDate_flag);
+			checkNowDate_time=window.setTimeout("checkNowDate()",1000);
+			break;
+		default:
+			if(second==59){
+				minute+=1;
+				second=0;
+			}else{
+				second+=1;
+			}
+			if(minute==60){
+				hour+=1;
+				minute=0;
+			}
+			if(hour==24){
+				hour=0;
+				minute=0;
+				second=0;
+			}
+			var timeStr = (hour<10 ? '0':'')+hour.toString()+":"+(minute<10 ? '0':'')+minute.toString()+":"+(second<10 ? '0':'')+second.toString(); 
+			$("nowDate").innerText = timeStr;
+			displayNowDate_flag=window.setTimeout(function(){displayNowDate(hour,minute,second);},1000);
+			break;
+	}
+}
+
+function requestText(){//跑马灯
+	requestNowText = new XMLHttpRequest();
+	requestNowText.onreadystatechange = readyGetmessage;
+	requestNowText.open('GET', "http://125.210.227.229:8080/data/pic/rolling/subtitles.txt", true);
+	requestNowText.send(null);
+	iPanel.debug("requestNowText is call end.");
+}
+function readyGetmessage(){
+	iPanel.debug(" requestNowText.readyState = "+requestNowText.readyState);
+	if(requestNowText.readyState==4){
+		iPanel.debug("requestNowText.status=="+requestNowText.status);		
+		if(requestNowText.status==200){			
+			iPanel.debug("[DEBUG]requestNowText.status = 200");
+			var nowTextStr=requestNowText.responseText;
+			$("marqueeText").innerText=nowTextStr;
+			iPanel.debug("[DEBUG] requestNowText.responseText = "+requestNowText.responseText);				
+		}
+	}
+	
+}
+function responseBreakpoint(){//断点续看回传数据	alert(media.AV.elapsed);
+	iPanel.debug("playExitTime=="+playExitTime);
+	iPanel.debug("playExitTime=="+playExitTime);
+	var folderCode="";
+	var programId="";
+	if(programId==null||programId==""){
+		programId = "0";
+	}
+	var breakpointURL="addResumePlayTime.jsp?assetId=37115829&assetType=36&folderCode="+folderCode+"&playExitTime="+playExitTime+"&programId="+programId+"&movieId=";
+	iPanel.debug("breakpointURL=="+breakpointURL);
+	breakpointRequest = new XMLHttpRequest();
+	//breakpointRequest.onreadystatechange = readyGetText;
+	breakpointRequest.open('GET',breakpointURL, false);
+	breakpointRequest.send(null);
+	iPanel.debug("breakpointRequest is call end.");
+}
+
+function exitThePage(){		
+	iPanel.overlayFrame.location.href="thank_look.htm";
+}
+
+//--------操作提示－－－－－－－－－－－－－－－－
+function show_helpBar(){
+	$("helpBar").style.visibility = "visible";
+	$("helpBar").style.top = "648px";
+	help_visible = true;
+  	clearTimeout(help_timeout);
+	help_timeout = window.setTimeout("hide_helpBar();",10000);		
+}
+
+function hide_helpBar(){
+	clearTimeout(help_timeout);
+	$("helpBar").style.top = "792px";
+	help_visible = false;
+}
+
+//-------- 广告统计回传------------------------
+function loadAd(adType){
+	//var ad = document.getElementById('wasu_ad');
+	var STBID = hardware.STB.serial;
+	//ad.src = "http://218.108.243.4:9090/a.html?ad="+adType+"&type=1&stb=" + STBID;*/
+	var loadAdURL="http://218.108.243.4:9090/a.html?ad="+adType+"&type=1&stb=" + STBID;
+	iPanel.debug("loadAdURL=="+loadAdURL);
+	if(net_status!="0"){//无网络连接时，不提交回传数据  update fengjh  2013.3.20
+		var loadAdRequest = new XMLHttpRequest();
+		loadAdRequest.open('GET',loadAdURL,true);
+		loadAdRequest.send(null);
+		iPanel.debug("loadAdRequest is call end.");
+	}
+}
+
+</script>
+</head>
+
+<body leftmargin="0" text="#FFFFFF" topmargin="0" bgcolor="transparent" onLoad="init()" onunLoad="close_widget()">
+
+<!--loading-->
+<div id="load_tips" style="position:absolute; width:806px; height: 505px; background-image:url(tck.png); left: 237px; top: 92px; visibility:hidden; z-index:1;">
+	<div id="load_image" style="position:absolute; width:751px; height:302px; background-image:url(/template_images/index/ad_loading.jpg); left: 24px; top:23px;"></div>
+	<div style="position:absolute; width:180px; height:70px; background-image:url(loadiog.gif); left: 121px; top: 373px;"></div>
+	<div id="load_tips_text" style="position:absolute; width:441px; height:44px; left:334px; top:390px; color: #250B36; font-size: 30px;">正在连接，敬请稍候...</div>
+</div>
+<!--exit_tips-->
+<div id="exit_tips" style="position:absolute; width:412px; height:190px; left:434px; top:265px; background-image:url(error_bg.png); visibility:hidden; z-index:3;">
+	<div style="position:absolute; width:369px; height:118px; left: 19px; top: 50px;">
+		<table width="369" height="118" border="0" cellpadding="0" cellspacing="0">
+		  <tr>
+			<td width="98" align="center" valign="middle"><img src="network_error.png" width="70" height="70"></td>
+			<td id="exit_tips_text" width="271" class="text24">连接错误。。。。</td>
+		  </tr>
+	  </table>
+	</div>
+</div>
+<!--net_tips-->
+<div id="net_tips" style="position:absolute; width:412px; height:190px; left:434px; top:265px; background-image:url(error_bg.png);visibility:hidden; z-index:3;">
+	<div style="position:absolute; width:369px; height:118px; left: 19px; top: 50px;">
+		<table width="369" height="118" border="0" cellpadding="0" cellspacing="0">
+		  <tr>
+			<td width="98" align="center" valign="middle"><img src="network_error.png" width="70" height="70"></td>
+			<td id="net_tips_text" width="271" class="text24">请插上网线</td>
+		  </tr>
+	  </table>
+	</div>
+</div>
+<!--tips-->
+<div id="tips" style="position:absolute; width:412px; height:190px; left:434px; top:265px; background-image:url(error_bg.png);visibility:hidden;z-index:3;">
+	<div style="position:absolute; width:369px; height:118px; left: 19px; top: 50px;">
+		<table width="369" height="118" border="0" cellpadding="0" cellspacing="0">
+		  <tr class="text24">
+			<td width="98" align="center" valign="middle"><img src="network_error.png" width="70" height="70"></td>
+			<td id="tips_text" width="271" class="text24">连接错误。。。。</td>
+		  </tr>
+	  </table>
+	</div>
+</div>
+<!--wardBar-->
+<div id="ward_bar" style="position:absolute; width:1059px; height:190px; left:110px; top:500px; background-image:url(seekBar_bg.png); visibility:hidden; z-index:1;">
+	<div id="seek_now_date" style="position:absolute; width:138px; height:22px; left:630px; top:23px; color: #FFFFFF; font-size: 18px;">09/21&nbsp;&nbsp;10:48:12</div>
+	<div style="position:absolute; width:569px; height:12px; left: 191px; top: 105px;">
+		<img src="left_jd.png" width="6" height="12"><img src="middle_jd.png" width="200" height="12" id="process_bar"><img src="right_jd.png" width="6" height="12">
+	</div>
+	<div style="position:absolute; width:579px; height:58px; left: 188px; top: 67px;">
+	  <table width="579" height="57" border="0" cellpadding="0" cellspacing="0">
+	  	<tr style=" font-size:24px; color: #250B36; ">
+				<td width="335" height="31">&nbsp;</td>
+				<td id="seek_now_time" width="100" align="right">09:20:30</td>
+				<td width="14">/</td>
+				<td id="seek_duration_time" width="130" align="left">10:30:20</td>
+      </tr>
+      <tr>
+				<td colspan="4"><img src="left_bg.png" width="9" height="20"><img src="middle.png" width="558" height="20"><img src="right_bg.png" width="9" height="20"></td>
+      </tr>
+    </table>
+  </div>
+	<div id="warBar_image" style="position:absolute; width:250px; height:147px; left: 787px; top: 20px; background-image:url(/template_images/index/ad_forward.jpg);"></div>
+	<div style="position:absolute; width:504px; height:30px; left: 33px; top: 136px; font-size: 24px; color: #250B36;">
+		&nbsp;&nbsp;&nbsp;&nbsp;按<img src="backward.png" width="26" height="18"><img src="forward.png" width="26" height="18">快进快退，按&nbsp;<span class="text28">[确认键]</span>&nbsp;继续播放</div>
+</div>
+<!--speedBar-->
+<div id="speed_bar" style="position:absolute; width:1059px; height:190px; left:110px; top:500px; background-image:url(seekBar_bg.png); visibility:hidden; z-index:1;">
+	<div id="speed_now_date" style="position:absolute; width:138px; height:22px; left:630px; top:23px; color: #FFFFFF; font-size: 18px;">09/21&nbsp;&nbsp;10:48:12</div>
+	<div style="position:absolute; width:569px; height:12px; left: 191px; top: 105px;">
+		<img src="left_jd.png" width="6" height="12"><img src="middle_jd.png" width="200" height="12" id="speed_process_bar"><img src="right_jd.png" width="6" height="12">
+	</div>
+	<div style="position:absolute; width:579px; height:97px; left: 188px; top: 52px;">
+	  <table width="579" height="96" border="0" cellpadding="0" cellspacing="0">
+	  	<tr style=" font-size:24px; color: #250B36; ">
+				<td width="335" height="45" align="left" id="backward"></td>
+				<td colspan="3" align="right" id="forward"></td>
+		</tr>
+      <tr>
+		<td colspan="4"><img src="left_bg.png" width="9" height="20"><img src="middle.png" width="558" height="20"><img src="right_bg.png" width="9" height="20"></td>
+      </tr>
+	  <tr style="font-size:24px; color: #250B36; ">
+		<td width="335" height="31">&nbsp;</td>
+		<td id="speed_now_time" width="100" align="right">09:20:30</td>
+		<td width="14">/</td>
+		<td id="speed_duration_time" width="130" align="left">10:30:20</td>
+      </tr>
+    </table>
+  </div>
+	<div id="speedBar_image" style="position:absolute; width:250px; height:147px; left: 787px; top: 20px; background-image:url(/template_images/index/ad_forward.jpg);"></div>
+	<div style="position:absolute; width:504px; height:30px; left: 33px; top: 136px; font-size: 24px; color: #250B36;">
+		&nbsp;&nbsp;按&nbsp;<span class="text28">[<img src="up.png">][<img src="down.png">]</span>&nbsp;快进快退，按&nbsp;<span class="text28">[确认键]</span>&nbsp;继续播放
+	</div>
+</div>
+<!--speedTip-->
+<div id="speedTip" style="position:absolute; left: 1100px; top: 30px; width: 100px; visibility:hidden; z-index:1;">
+	<table width="100" border="0" cellpadding="0" cellspacing="0" style="font-size:24px; color: #FFFFFF; ">
+	  <tr>
+		<td id="forwardSpeed" width="84" height="45" valign="bottom"><img src="forward.png" width="26" height="18">X<span style="font-size:46px; ">16</span></td>
+	  </tr>
+	  <tr>
+		<td id="speedTip_now_time" height="20">09:20:30</td>
+	  </tr>
+	  <tr>
+		<td height="2"><hr size="2" color="#FFFFFF"></td>
+	  </tr>
+	  <tr>
+		<td id="speedTip_duration_time" height="20">10:30:20</td>
+	  </tr>
+  </table>
+</div>
+<!--exitRemind-->
+<div id="exit_remind" style="position:absolute; width:806px; height: 505px; background-image:url(tck.png); left: 237px; top: 92px; visibility:hidden;z-index:1;">
+	<div id="exitRemind_image" style="position:absolute; width:751px; height:302px; background-image:url(/template_images/index/ad_exit.jpg); left: 24px; top:23px;"></div>
+	<div style="position:absolute; width:180px; height:70px; background-image:url(wasulogo.png); left: 62px; top: 378px;"></div>
+	<div style="position:absolute; width:203px; height:30px; left:263px; top:400px; color: #20002F; font-size: 28px;">是否结束播放？</div>
+	<div id="yesPosition" style="position:absolute; width:123px; height:53px; background-image:url(yes.png); left: 480px; top: 390px;"></div>
+	<div id="noPosition" style="position:absolute; width:123px; height:53px; background-image:url(no1.png); left: 620px; top: 390px;"></div>
+</div>
+<!--infoRemind-->
+<div id="info" style="position:absolute; width:412px; height:190px; left:434px; top:265px; background-image:url(error_bg.png); visibility:hidden; z-index:2;">
+	<div style="position:absolute; width:369px; height:118px; left: 19px; top: 50px;">
+	  <table width="369" height="117" border="0" cellpadding="0" cellspacing="0">
+        <tr class="text18">
+          <td width="184" align="center" >当前时间：</td>
+          <td width="185" id="info_now_time">&nbsp;</td>
+        </tr>
+        <tr class="text18">
+          <td align="center">影片总长：</td>
+          <td id="info_duration_time">&nbsp;</td>
+        </tr>
+      </table>
+	</div>
+</div>
+<!--volumeBar-->
+<div id="volumeBar" style="position:absolute; width:1059px; height:190px; left:110px; top:500px; background-image:url(seekBar_bg.png); visibility:hidden; z-index:1;">
+	<div id="volumeBar_now_date" style="position:absolute; width:138px; height:22px; left:630px; top:23px; color: #FFFFFF; font-size: 18px;">09/21&nbsp;&nbsp;10:48:12</div>
+	<div style="position:absolute; width:544px; height:33px; left: 213px; top: 59px; background-image:url(marquee_bg.png);">
+		<marquee behavior="scroll" width="483">
+			<span class="text24">华数TV提醒您，适度音量，保护听力。</span>
+		</marquee>
+	</div>
+	<div id="volumeBar_image" style="position:absolute; width:250px; height:147px; left: 787px; top: 20px; background-image:url(/template_images/index/ad_volume.jpg);"></div>
+	<div style="position:absolute; width:550px; height:57px; left: 210px; top: 100px; font-size: 24px; color: #250B36; background-image:url(volume.png);">
+		<div id="volumeValue" style="position:absolute; width:35px; height:22px; left: 57px; top: 23px; color: #FFFFFF; font-size: 20px;">35</div>
+		<div id="volume" style="position:absolute; width:401px; height:27px; left:125px; top: 20px;"><img src="volume_value.png"></div>
+	</div>
+</div>
+<!--pause_tips-->
+<div id="pause_tips" style="position:absolute; width:806px; height: 505px; background-image:url(tck.png); left: 237px; top: 92px; visibility: hidden; z-index:1;">
+	<div id="pauseTip_image" style="position:absolute; width:751px; height:302px; background-image:url(/template_images/index/ad_pause.jpg); left: 24px; top:23px;"></div>
+	<div style="position:absolute; width:710px; height:133px; left:46px; top:350px;">
+		<table width="710" height="133" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td width="82" height="51" class="text28">暂停</td>
+				<td width="376"><img src="pause1.png" width="45" height="45"></td>
+				<!--增加隐藏广告／继续播放按钮，重新布局　update  fengjh-->
+				<td width="102" align="center" id="continue-play"><img src="continue-play2.png"></td>
+				<td>&nbsp;</td>	
+				<td align="left" id="hidden-ad">&nbsp;<img src="hidden-ad1.png"></td>				
+			</tr>
+			<tr align="center">
+				<td height="23" colspan="5"><img src="left_bg.png" width="9" height="20"><img src="middle.png" width="690" height="20"><img src="right_bg.png" width="9" height="20"></td>
+			</tr>
+			<tr>
+				<td align="right" id="pause_now_time" style="color:#000000" colspan="3">21:30:30</td>
+				<td width="13" style="color:#000000">/</td>
+				<td width="137" id="pause_duration_time" align="left" style="color:#000000">21:30:30</td>
+			</tr>
+		</table>
+  </div>
+	<div style="position:absolute; width:705px; height:12px; left:53px; top:406px; "><img src="left_jd.png" width="6" height="12"><img src="middle_jd.png" width="200" height="12" id="pause_process_bar"><img src="right_jd.png" width="6" height="12"></div>
+</div>
+<!--增加右上角标识　fengjh-->
+<div style="position:absolute; width:140px; height:70px; left:1057px; top:45px; visibility:hidden;" id="rightHiddenAd">
+	<table height="70" cellpadding="0" cellspacing="0"  style="font-size:24px; color: #FFFFFF;">
+		<tr height="40" align="center">
+			<td width="199" align="left">&nbsp;<img src="pause2.png" width="37" height="37">&nbsp;<span style="font-size:37px; vertical-align:top; ">暂&nbsp;停</span></td>
+		</tr>
+		<tr height="5">
+			<td align="center"><hr size="2" color="#FFFFFF" width="135"></td>
+		</tr>
+		<tr height="25" align="center">
+			<td>按[确认]播放</td>
+		</tr>
+  </table>
+</div>
+<!--F3Remind-->
+<div id="f3" style="position:absolute; width:1059px; height:190px; left:110px; top:500px; background-image:url(seekBar_bg.png); visibility:hidden; z-index:1;">
+	<div style="position:absolute; width:138px; height:22px; left:630px; top:23px; color: #FFFFFF; font-size: 18px;" id="f3_now_date">09/21&nbsp;&nbsp;10:48:12</div>
+	<div style="position:absolute; width:514px; height:35px; left: 238px; top: 86px;">
+	  <table width="513" height="35" border="0" cellpadding="0" cellspacing="0">
+        <tr style=" font-size:24px; color: #250B36; ">
+          <td width="197">选择播放时间：</td>
+          <td width="18" align="right" bgcolor="#FFFFFF" id="f3_time0">0</td>
+          <td width="18" align="center" bgcolor="#FFFFFF" id="f3_time1">0</td>
+          <td width="18" bgcolor="#FFFFFF">:</td>
+          <td width="18" align="center" bgcolor="#FFFFFF" id="f3_time2">0</td>
+          <td width="18" align="center" bgcolor="#FFFFFF" id="f3_time3">0</td>
+          <td width="18" bgcolor="#FFFFFF">:</td>
+          <td width="18" align="center" bgcolor="#FFFFFF" id="f3_time4">0</td>
+          <td width="18" align="left" bgcolor="#FFFFFF" id="f3_time5">0</td>
+          <td width="34" align="center">/</td>
+          <td width="138" id="f3_duration_time">00:00:00</td>
+        </tr>
+      </table>
+	</div>
+	<div id="f3_image" style="position:absolute; width:250px; height:147px; left: 787px; top: 20px; background-image:url(/template_images/index/ad_forward.jpg);"></div>
+	<div style="position:absolute; width:720px; height:30px; left: 33px; top: 136px; font-size: 24px; color: #250B36;">
+	  &nbsp;&nbsp;&nbsp;&nbsp;操作&nbsp;<span class="text28">[数字键]</span>&nbsp;选择时间，按&nbsp;<span class="text28">[确认键]</span>&nbsp;播放
+	</div>
+</div>
+
+<!--informationBar for three-->
+<div id="informationBar" style="position:absolute; width:293px; height:592px; top:64px; left:-293px; background-image:url(infomation.png); visibility:hidden; z-index:2; -webkit-transition-duration:500ms;-webkit-transition-property:all;">
+	<div style="position:absolute; width:255px; height:434px; left: 0px; top: 100px;">
+	  <table width="255" height="420" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="90" height="70" align="right" valign="top"><span class="style16">片名&nbsp;</span></td>
+		  		<td width="10"></td>
+          <td width="165" align="left" valign="top"><span class="style16">蓝精灵</span></td>
+        </tr>
+        <tr>
+          <td height="143" align="right" valign="top"><span class="style16">演员&nbsp;</span></td>
+		  		<td width="10"></td>
+          <td align="left" valign="top"><span class="style16">蓝精灵 格格巫</span></td>
+        </tr>
+        <tr>
+          <td align="right" valign="top"><span class="style16">简介&nbsp;</span></td>
+		  		<td width="10"></td>
+			
+			
+			
+			
+			
+          <td align="left" valign="top"><span class="style16">这群可爱的蓝精灵们因为被格格巫追杀而逃出村庄，笨笨误将大家带进了禁地石窟，由于当...</span></td>
+        </tr>
+      </table>
+	</div>
+	<div style="position:absolute; width:268px; height:20px; top:524px; left:-1px; font-size:24px; "> 按 &nbsp;<span class="F128">[F1]</span>&nbsp; 消除提示信息 </div>
+</div>
+
+<!--informationBar for five-->
+<div id="informationBarFive" style="position:absolute; width:293px; height:592px; top:64px; left:-293px; background-image:url(infomationfive.png); visibility:hidden; z-index:2; -webkit-transition-duration:500ms;-webkit-transition-property:all;">
+	<div style="position:absolute; width:255px; height:434px; left: 0px; top: 75px;">
+	  <table width="255" height="420" cellpadding="0" cellspacing="0" border="0" bordercolor="#FFFF00">
+        <tr height="74">
+          <td width="90" align="right" valign="top"><span class="style16">名称&nbsp;</span></td>
+		  		<td width="10"></td>
+          <td width="165" align="left" valign="top"><span class="style16"  style="line-height:20px; top:0px;">蓝精灵</span></td>
+        </tr>
+        <tr height="35">
+          <td align="right" valign="top"><span class="style16">地区&nbsp;</span></td>
+		  		<td width="10"></td>
+          <td align="left" valign="top"><span class="style16">暂无</span></td>
+        </tr>
+        <tr height="35">
+          <td  align="right" valign="top"><span class="style16">频道&nbsp;</span></td>
+		  		<td width="10"></td>
+          <td align="left" valign="top"><span class="style16">暂无</span></td>
+        </tr>
+		 <tr height="35">
+          <td align="right" valign="top"><span class="style16">时长&nbsp;</span></td>
+		  		<td width="10"></td>
+          <td align="left" valign="top"><span class="style16">暂无</span></td>
+        </tr>
+		<tr>
+          <td align="right" valign="top"><span class="style16">看点&nbsp;</span></td>
+		  		<td width="10"></td>
+          <td align="left" valign="top"><span class="style16" style="line-height:20px; top:0px;">这群可爱的蓝精灵们因为被格格巫追杀而逃出村庄，笨笨误将大家带进了禁地石窟，由于当时是蓝月，所以大伙都被传送到了进入了我们的世界，当今世界的纽约中央公园</span></td>
+        </tr>
+      </table>
+	</div>
+	<div style="position:absolute; width:268px; height:20px; top:524px; left:-1px; font-size:24px;">&nbsp;&nbsp;按<span class="F128">[F1]</span>消除提示信息</div>
+</div>
+<div id="nowDate" style="position:absolute; width:68px; height:30px; top:44px; left:1040px; font-size:32px; visibility:hidden; " > 20:08:22 </div>
+<div id="nowText" style="position:absolute; width:1000px; height:30px; font-size:32px; top:44px; visibility:hidden;  " ><marquee id="marqueeText" behavior="scroll"></marquee></div>
+<div id="nowImg" style="position:absolute; width:168px; height:200px; top:480px; left:1380px; visibility:visible; " ><img src="http://125.210.227.229:8080/data/pic/rolling/rolling.png"/></div>
+<iframe id="wasu_ad" width="0" height="0" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+<!--
+<div id="mute_icon" style="position:absolute; width:44px; height:49px; left:1200px; top:43px; background-image:url(muteIcon.gif); visibility:hidden; z-index:4;"></div>
+-->
+<div id="helpBar" style="position:absolute; width:1148px; height:72; top:792px; left:80px;background-image:url(vodHelpBar1.png); visibility:visible; z-index:2; -webkit-transition-duration:500ms;-webkit-transition-property:all;"></div>
+</body>
+</html>

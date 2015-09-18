@@ -1,0 +1,29 @@
+body{margin:0px;padding:0px;font-size:12px;color:#343434;}
+input{height:14px;}
+a:link,a:visited{color:#343434;text-decoration:none;}
+a:active,a:hover{color:#343434;text-decoration:underline;}
+/*×ÖÌå*/
+.font-write{color:#fff;}
+.font-bgblue{background:#6FA3EC;color:#fff;}
+/*²Ëµ¥*/
+.menu{background:url(../../apps/mis/images/menu1.gif) repeat-x top;height:29px; line-height:29px; padding-left:10px;color:#FFF;}
+.menu a{color:#343434;text-decoration:none;}
+.menu a:hover{color:#343434;text-decoration:underline;}
+/*×ó²à*/
+.leftbg{background:#EEF5FF;border-right:1px solid #C8DBFC;width:212px;padding:3px 0 0 3px;}
+.leftmenu{background:url(../../apps/mis/images/left-menu.gif) no-repeat;width:209px;height:23px;line-height:23px;color:#fff;cursor:pointer;}
+.leftmenu2{background:url(../../apps/mis/images/ico3.gif) no-repeat left center;padding-left:33px;height:27px;line-height:27px;}
+.leftmenu2over{background:url(../../apps/mis/images/left-menu2over.gif) no-repeat center;padding-left:33px;height:27px;line-height:27px;}
+/*ÓÒ²à*/
+.rightbg{background:url(../../apps/mis/images/rightbg.gif) repeat-x #fff;border:1px solid #C8DBFC;padding:3px 10px;}
+.box-b{background:#FFFFE1;border:1px solid #C8DBFC;border-bottom:0;padding:0 12px;height:28px;line-height:28px;}
+.box-bb{background:#FFFFE1;border:1px solid #C8DBFC;border-bottom:0;padding:0 12px;height:28px;line-height:28px;font-weight:bold;}
+.box{border:1px solid #C8DBFC;}
+
+.table-tit2{background:url(../../apps/mis/images/table-tit.gif) no-repeat;border-right:0px solid #C8DBFC;border-left:0px solid #F4F7FC;padding-left:0px;text-align: center;}
+.table-tit{background:url(../../apps/mis/images/table-tit.gif) repeat-x;border-right:1px solid #C8DBFC;border-left:1px solid #F4F7FC;line-height:29px;padding-left:5px;text-align: center;}
+.table-line{border-bottom:1px solid #E6E7EB;border-right:1px solid #E6E7EB;border-left:1px solid #F4F7FC;height:24px;line-height:24px;padding-left:5px;height:24px;line-height:24px; text-align: center;}
+.table-bg{background:url(../../apps/mis/images/table-bg.gif) repeat-x top;border-bottom:1px solid #E6E7EB;border-right:1px solid #E6E7EB;border-left:1px solid #F4F7FC;padding-left:5px;height:24px;line-height:24px; text-align: center;}
+.table-heji{background:#FEFED4;border-bottom:1px solid #E6E7EB;border-right:1px solid #E6E7EB;border-left:1px solid #F4F7FC;padding-left:5px;height:24px;line-height:24px;font-weight:bold; text-align: center;}
+.table-over{background:#ECF6F9;}
+.table-bottom{background:#D7E8F7;padding:0 5px;height:28px;line-height:28px;}

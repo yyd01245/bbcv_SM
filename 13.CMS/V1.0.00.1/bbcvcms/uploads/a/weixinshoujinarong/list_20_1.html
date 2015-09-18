@@ -1,0 +1,116 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width,initial-scale=1.0, maximum-scale=1.0,user-scalable=0" name="viewport" />
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta content="telephone=no" name="format-detection" />
+<title>点播首页</title>
+<link href="/bbcvcms/uploads/filebase/vod/css/layout.css" rel="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="/bbcvcms/uploads/filebase/vod/js/jquery-1.9.0.min.js"></script>
+<script type="text/javascript" src="/bbcvcms/uploads/filebase/vod/js/main.js"></script>
+<script type="text/javascript" src="/bbcvcms/uploads/filebase/vod/js/data.js"></script>
+</head>
+
+<body>
+<div id="header" >
+		<h1 class="menu logo">目录</h1>
+		<h1 class="usr logo">首页</h1>        
+</div>
+<!--slider-begin-->
+<div class="flexslider">
+	<ul class="slides">
+        <li class=""><a class="links" data-id="35" href="/bbcvcms/uploads/plus/view.php?aid=35&assigntypeid=20"><img alt=""  class="js-v-img" data-src="/bbcvcms/uploads/uploads/gansu/2.png"/></a></li>
+<li class=""><a class="links" data-id="28" href="/bbcvcms/uploads/plus/view.php?aid=28&assigntypeid=20"><img alt=""  class="js-v-img" data-src="/bbcvcms/uploads/uploads/remen/wcwrs/wcwrs_1.png"/></a></li>
+<li class=""><a class="links" data-id="24" href="/bbcvcms/uploads/plus/view.php?aid=24&assigntypeid=20"><img alt=""  class="js-v-img" data-src="/bbcvcms/uploads/uploads/remen/aqgy/aqgy.png"/></a></li>
+
+	</ul>
+</div>
+<!--slider-over-->
+
+ <section class="homesection">
+	 <div class="sectionheader">
+			<h3>教育</h3>
+			<a class="more" href="#"></a>
+	 </div>
+	 <ul class="gallery">
+         <li><a class="links" data-id="29" href="/bbcvcms/uploads/plus/view.php?aid=29&assigntypeid=20"><img data-src="/bbcvcms/uploads/uploads/jiaoyu/clx/clx.png" class="js-v-img"><h3>测量学</h3></a></li>
+<li><a class="links" data-id="32" href="/bbcvcms/uploads/plus/view.php?aid=32&assigntypeid=20"><img data-src="/bbcvcms/uploads/uploads/jiaoyu/lsjne/lsjne.jpg" class="js-v-img"><h3>老鼠嫁女儿</h3></a></li>
+<li><a class="links" data-id="30" href="/bbcvcms/uploads/plus/view.php?aid=30&assigntypeid=20"><img data-src="/bbcvcms/uploads/uploads/jiaoyu/flx/flx.png" class="js-v-img"><h3>法理学</h3></a></li>
+
+	 </ul>
+ </section>
+
+<section class="homesection">
+    <div class="sectionheader">
+        <h3>经典</h3>
+        <a class="more" href="#"></a>
+    </div>
+    <ul class="gallery">
+        <li><a class="links" data-id="23" href="/bbcvcms/uploads/plus/view.php?aid=23&assigntypeid=20"><img data-src="/bbcvcms/uploads/uploads/jingdian/gyc/gyc_1.png" class="js-v-img"><h3>关云长</h3></a></li>
+<li><a class="links" data-id="22" href="/bbcvcms/uploads/plus/view.php?aid=22&assigntypeid=20"><img data-src="/bbcvcms/uploads/uploads/jingdian/ypzjs/ypzjs_1.png" class="js-v-img"><h3>营盘镇警事</h3></a></li>
+<li><a class="links" data-id="27" href="/bbcvcms/uploads/plus/view.php?aid=27&assigntypeid=20"><img data-src="/bbcvcms/uploads/uploads/jingdian/ydm/ydm_1.png" class="js-v-img"><h3>源代码</h3></a></li>
+
+    </ul>
+</section>
+
+ <script src="/bbcvcms/uploads/filebase/vod/js/jquery.flexslider-min.js"></script>
+ <script>
+     var poneOrWeiXin;
+     var username = poneOrWeiXin = getQueryStringByName("username")
+     var resolution = getQueryStringByName("resolution")
+	$(document).ready(function() {
+        $.get("http://218.108.50.246/wechat/oneway/openidmapstream",{
+            "openid": username
+        }, function(ajax_info){
+            if(ajax_info.retcode == "0"){
+                $(".links").click(function(e){
+                    e.preventDefault();
+                    var href = $(this).attr("href");
+                    href += "&username="+username;
+                    href += "&streamid="+ajax_info.info.channel;
+                    href += "&resolution="+resolution
+
+                    location.href = href;
+                    //location.href = 'http://192.168.100.11:8882/NS/mobile/ShowVodInfo?flag=set&resolution='+resolution+'&username='+username+'&streamid='+stream_id+'&name='+$(this).data("id")+'&vodid='+$(this).data("id")
+                })
+            }
+            else {
+                $(".links").click(function(e){
+                    e.preventDefault();
+                    //location.href = 'http://192.168.100.11:8882/NS/mobile/ShowVodInfo?flag=set&resolution='+resolution+'&username='+username+'&streamid='+stream_id+'&name='+$(this).data("id")+'&vodid='+$(this).data("id")
+                })
+            }
+        }, "jsonp")
+
+		/*添加跑马灯效果*/	
+		$('.flexslider').flexslider({		
+			animation: "slide",              //String: Select your animation type, "fade" or "slide"
+			selector: ".slides > li",       //{NEW} Selector: Must match a simple pattern. '{container} > {slide}' -- Ignore pattern at your own peril
+			startAt: 0,                     //Integer: The slide that the slider should start 
+			slideshowSpeed: 5000,           //Integer: Set the speed of the slideshow cycling, in milliseconds
+			animationSpeed: 800             //Integer: Set the speed of animations, in milliseconds
+		});
+
+
+
+        $(".js-v-img").each(function(index, ele){
+            if($(ele).data("src")){
+                $(ele).attr("src", regImgSrc($(ele).data("src")));
+            }
+        })
+
+        function regImgSrc(src){
+            var reg_img_src = /}(.+){/g;
+            var result = reg_img_src.exec(src)
+            if(result){
+                return $.trim(result[1])
+            }
+
+            return src;
+        }
+	})
+ </script>
+</body>
+</html>

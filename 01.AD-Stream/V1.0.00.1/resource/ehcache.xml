@@ -1,0 +1,16 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="ehcache.xsd" >
+    <diskStore path="java.io.tmpdir" />
+    <Cache
+        name="tmpDefault"
+        diskExpiryThreadIntervalSeconds="120"
+        diskPersistent="false"
+        diskSpoolBufferSizeMB="30"
+        eternal="false"
+        maxElementsInMemory="10000"
+        maxElementsOnDisk="10000000"
+        memoryStoreEvictionPolicy="LRU"
+        overflowToDisk="true"
+        timeToIdleSeconds="3600"
+        timeToLiveSeconds="3600" />
+</ehcache>

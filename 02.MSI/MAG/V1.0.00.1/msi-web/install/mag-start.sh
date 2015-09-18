@@ -1,0 +1,1 @@
+sh /home/bbcv/zhangdj/UCMS/mag-tomcat/bin/startup.sh

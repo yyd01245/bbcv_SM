@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byType" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	<!-- dataSource -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${db.source.driverClassName}"/>
+		<property name="url" value="${db.source.url}"/>
+		<property name="username" value="${db.source.username}"/>
+		<property name="password" value="${db.source.password}"/>
+		<property name="minIdle" value="${db.source.minIdle}"/>
+		<property name="maxIdle" value="${db.source.maxIdle}"/>
+		<property name="maxActive" value="${db.source.maxActive}"/>
+		<property name="maxWait" value="${db.source.maxWait}"/>
+    	<property name="validationQuery" value="${db.source.validationQuery}"/>
+		<property name="testWhileIdle" value="${db.source.testWhileIdle}"/>
+		<property name="removeAbandoned" value="${db.source.removeAbandoned}"/>  
+		<property name="removeAbandonedTimeout" value="${db.source.removeAbandonedTimeout}"/>  
+		<property name="defaultAutoCommit" value="${db.source.defaultAutoCommit}"/> 
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 基于注解的声明式事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<!--aop声明式事务 -->
+	<!-- 事务通知定义 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="save*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="del*" propagation="REQUIRED" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	<!-- aop代理设置 -->
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="txPointcut" expression="execution(* prod.nebula.service..*.*(..))"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+	</aop:config>
+	
+	<bean id="msiSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	  <property name="dataSource" ref="dataSource" />
+	  <property name="typeAliasesPackage" value="prod.nebula.model" />
+	  <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+	  <property name="mapperLocations" value="classpath:mybatis/**/*.xml" />
+	</bean>
+	
+	<bean id="msiSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+	  <constructor-arg index="0" ref="msiSqlSessionFactory" />
+	  <constructor-arg index="1" value="BATCH" />
+	</bean>
+	
+	<bean class="org.mybatis.spring.support.SqlSessionDaoSupport" abstract="true">
+		<property name="sqlSessionTemplate" ref="msiSqlSessionTemplate" />
+	</bean>
+</beans>

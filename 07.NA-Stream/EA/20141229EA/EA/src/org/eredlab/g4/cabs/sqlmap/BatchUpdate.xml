@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 应用组管理手工映射SQL语句 -->
+<sqlMap namespace="BatchUpdate">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<!-- 根据主键查询代码表 -->
+	<select id="getBatchUpdateByKey" parameterClass="map" resultClass="dto">
+		SELECT term_record_id,term_id,term_ip,term_desc,status
+		from yynm_term_info
+		 WHERE term_record_id = #term_record_id#
+	</select>
+	
+	<!-- 根据主键查询主机信息 -->
+	<select id="getServerByKey" parameterClass="map" resultClass="dto">
+		SELECT term_record_id,term_id,term_type,term_ip,term_port,status,term_desc
+		  FROM yynm_term_info 
+		 WHERE term_record_id = #term_record_id#
+	</select>
+	
+	<!-- 获取批量主机列表-->
+	<select id="getBatchUpdateListForPage" parameterClass="map" resultClass="dto">
+		select a.vncm_id,a.group_id,a.dev_type,a.vncm_ip,a.vncm_name,a.vncm_port,a.status,a.vncm_type,a.cpu_info,a.mem_info,a.vncm_total,a.vncm_online,a.version,a.vncm_message,a.create_time,a.update_time,v.dev_name,b.group_name,d.update_version 
+		from dgw_vncm_info a left join dgw_dev_info v on a.dev_type=v.dev_type left join dgw_group_info b on a.group_id=b.group_id left join (select a.group_id,b.update_version from dgw_group_version_info a, dgw_version_info b where a.version_id = b.version_id) d on a.group_id=d.group_id where a.status!=-1
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="dev_type">
+				a.dev_type=#dev_type#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				a.status=#status#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="group_id">
+				a.group_id=#group_id#
+			</isNotEmpty>
+		</dynamic> order by a.vncm_type
+	</select>
+	<select id="getBatchUpdateDStatusForPage" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT v.status FROM yynm_term_info t inner JOIN yynm_term_version_rel v 
+			ON t.term_record_id = v.term_record_id
+	</select>
+	
+	<!-- 获取批量主机总数-->
+	<select id="getBatchServerForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_vncm_info a,dgw_group_info b where a.status!=-1 and a.group_id = b.group_id
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="dev_type">
+				a.dev_type=#dev_type#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				a.status=#status#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="group_id">
+				a.group_id=#group_id#
+			</isNotEmpty>
+		</dynamic>order by a.vncm_type
+	</select>
+	
+	<!-- 获取可升级主机列表-->
+	<select id="getBatchUpdateValidList" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT t.term_record_id,t.term_ip,t.term_desc,t.status,v.current_version
+			FROM yynm_term_info t LEFT OUTER JOIN yynm_term_version_rel v 
+			ON t.term_record_id = v.term_record_id where v.status ='3'
+	</select>
+	
+	<!-- 获取可升级主机总数-->
+	<select id="getBatchUpdateValidPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT  count(*) FROM yynm_term_info t LEFT OUTER JOIN yynm_term_version_rel v 
+			ON t.term_record_id = v.term_record_id where v.status ='3'
+	</select>
+	
+	<!-- 获取升级包总数-->
+	<select id="getVersionPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT  count(*) FROM  yynm_version_info
+	</select>
+	
+	<!-- 改变机柜位置 -->
+	<update id="updateLocationItem" parameterClass="dto">
+		UPDATE dgw_vncm_info set update_time=#update_date# 
+		<dynamic prepend=",">
+			<isNotNull prepend="," property="dev_type">
+		         dev_type = #dev_type#
+			</isNotNull>
+			<isNotNull prepend="," property="group_id">
+		         group_id = #group_id#
+			</isNotNull>
+			</dynamic> 
+	        WHERE vncm_id = #vncm_id#
+	</update>
+	
+	<!-- 根据主键更新服务器信息-->
+	<update id="updateServerItem" parameterClass="dto">
+         UPDATE yynm_term_version_rel
+		<dynamic prepend="SET">
+		<isNotNull prepend="," property="status">
+	         status = #status#
+			</isNotNull>
+			<isNotNull prepend="," property="update_date">
+	         update_date = #update_date#
+			</isNotNull>
+		</dynamic> 
+	        WHERE term_record_id = #term_record_id#
+	</update>
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+</sqlMap>

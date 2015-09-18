@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="DateSyn">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<select id="queryMaxIndexForCag" parameterClass="map" resultClass="java.lang.Integer">
+		select max(cag_id) from cag_info
+	</select>
+	<!-- 根据ip、port查询数据库中是否存在数据 -->
+	<select id="queryCagIDbyIP" parameterClass="map" resultClass="java.lang.String">
+		select cag_id from cag_info where cag_ip='$host_ip$' and cag_port=#host_port#
+	</select> 
+	
+	<!-- 根据cagid查询ckg信息 -->
+	<select id="queryCkgIDbyKey" parameterClass="map" resultClass="java.lang.String">
+		select ckg_id from ckg_info where ckg_ip='$ckgip$' and ckg_port=#ckgport# and cag_id=#cag_id#
+	</select> 
+	
+	<!-- 根据cagid查询csg信息 -->
+	<select id="queryCsgIDbyKey" parameterClass="map" resultClass="java.lang.String">
+		select csg_id from csg_info where csg_ip='$csgip$' and csg_port=#csgport# and cag_id=#cag_id#
+	</select> 
+	
+	<!-- 查询CAG列表 -->
+	<select id="getCagList" resultClass="dto" >
+	select DISTINCT cag_ip as ip,cag_port as port from cag_info
+	</select>
+	
+	<!-- 查询CSG列表 -->
+	<select id="getCsgList" resultClass="dto" >
+	select DISTINCT csg_ip as ip,csg_port as port from csg_info
+	</select>
+	
+	<!-- 查询CKG列表 -->
+	<select id="getCkgList" resultClass="dto" >
+	select DISTINCT ckg_ip as ip,ckg_port as port from ckg_info
+	</select>
+	
+	<!-- 保存配置文件信息 -->
+	<insert id="saveConfigInfo" parameterClass="dto">
+		INSERT INTO key_mapping (
+		   config_ip,config_port,config_name,key_mean,key_name,key_value,state) 
+		VALUES (#config_ip#,#config_port#,#config_name#,#name#,#key#,#value#,#propty#)
+	</insert>
+	
+	
+	<!-- 保存CAG信息 -->
+	<insert id="saveCagInfo" parameterClass="dto">
+		INSERT INTO cag_info (
+		   cag_id,cag_ip,cag_port,cag_cpu_info,cag_mem_info,cag_gpu_info,cag_status,version,thread_id) 
+		VALUES (#cag_id#,#host_ip#,#host_port#,#cpu#,#mem#,#gpu#,#status#,#version#,#threadid#)
+	</insert>
+	
+	
+	<!-- 保存CKG信息 -->
+	<insert id="saveCkgInfo" parameterClass="dto">
+		INSERT INTO ckg_info (
+		   cag_id,ckg_ip,ckg_port,ckg_cpu_info,ckg_mem_info,ckg_gpu_info,ckg_status,version,thread_id,ckg_capacity_size) 
+		VALUES (#cag_id#,#ckgip#,#ckgport#,#cpu#,#mem#,#gpu#,#status#,#version#,#threadid#,#capacitysize#)
+	</insert>
+	
+	<!-- 保存CSG信息 -->
+	<insert id="saveCsgInfo" parameterClass="dto">
+		INSERT INTO csg_info (
+		   cag_id,csg_ip,csg_port,csg_cpu_info,csg_mem_info,csg_gpu_info,csg_status,version,thread_id,csg_capacity_size) 
+		VALUES (#cag_id#,#csgip#,#csgport#,#cpu#,#mem#,#gpu#,#status#,#version#,#threadid#,#capacitysize#)
+	</insert>
+	
+	
+	
+
+	<!-- 根据标识更新CAG信息-->
+	<update id="updateCagInfo" parameterClass="dto">
+         UPDATE cag_info 
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="host_ip">
+		         cag_ip = #host_ip#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="host_port">
+		         cag_port = #host_port#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="cpu">
+		         cag_cpu_info = #cpu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="mem">
+		         cag_mem_info = #mem#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gpu">
+		         cag_gpu_info = #gpu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+		         cag_status = #status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="version">
+		         version = #version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="threadid">
+		         thread_id = #threadid#
+			</isNotEmpty>			
+		</dynamic> 
+	        WHERE cag_id =#cag_id#
+	</update>
+	
+	<!-- 根据标识更新CSG信息-->
+	<update id="updateCsgInfo" parameterClass="dto">
+         UPDATE csg_info 
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="csgip">
+		         csg_ip = #csgip#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="csgport">
+		         csg_port = #csgport#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="cpu">
+		         csg_cpu_info = #cpu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="mem">
+		         csg_mem_info = #mem#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gpu">
+		         csg_gpu_info = #gpu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+		         csg_status = #status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="version">
+		         version = #version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="threadid">
+		         thread_id = #threadid#
+			</isNotEmpty>		
+			<isNotEmpty prepend="," property="capacitysize">
+		         csg_capacity_size = #capacitysize#
+			</isNotEmpty>		
+		</dynamic> 
+	        WHERE csg_id =#csg_id#
+	</update>
+	
+	<!-- 根据标识更新CKG信息-->
+	<update id="updateCkgInfo" parameterClass="dto">
+         UPDATE ckg_info 
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="ckgip">
+		         ckg_ip = #ckgip#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ckgport">
+		         ckg_port = #ckgport#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="cpu">
+		         ckg_cpu_info = #cpu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="mem">
+		         ckg_mem_info = #mem#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gpu">
+		         ckg_gpu_info = #gpu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+		         ckg_status = #status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="version">
+		         version = #version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="threadid">
+		         thread_id = #threadid#
+			</isNotEmpty>		
+			<isNotEmpty prepend="," property="capacitysize">
+		         ckg_capacity_size = #capacitysize#
+			</isNotEmpty>	
+		</dynamic> 
+	        WHERE ckg_id =#ckg_id#
+	</update>
+	
+	
+	<!-- 根据IP更新服务器信息-->
+	<update id="updateCAGtable" parameterClass="dto">
+         UPDATE cag_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="cpu_info">
+		         cag_cpu_info = #cpu_info#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="mem_info">
+		         cag_mem_info = #mem_info#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gpu_info">
+		         cag_gpu_info = #gpu_info#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE cag_ip =#host_ip#
+	</update>
+	<update id="updateCSGtable" parameterClass="dto">
+         UPDATE csg_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="cpu_info">
+		         csg_cpu_info = #cpu_info#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="mem_info">
+		         csg_mem_info = #mem_info#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gpu_info">
+		         csg_gpu_info = #gpu_info#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE csg_ip =#host_ip#
+	</update>
+	<update id="updateCKGtable" parameterClass="dto">
+         UPDATE ckg_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="cpu_info">
+		         ckg_cpu_info = #cpu_info#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="mem_info">
+		         ckg_mem_info = #mem_info#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gpu_info">
+		         ckg_gpu_info = #gpu_info#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE ckg_ip =#host_ip#
+	</update>
+	
+	<update id="updateCagInfoByIpPort" parameterClass="dto">
+         UPDATE cag_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="version">
+		         version = #version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="pid">
+		         thread_id = #pid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="app_status">
+		         cag_status = #app_status#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE cag_ip =#app_ip# and cag_port =#app_port#
+	</update>
+	
+	<update id="updateCsgInfoByIpPort" parameterClass="dto">
+         UPDATE csg_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="version">
+		         version = #version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="pid">
+		         thread_id = #pid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="app_status">
+		         csg_status = #app_status#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE csg_ip =#app_ip# and csg_port =#app_port#
+	</update>
+	
+	<update id="updateCkgInfoByIpPort" parameterClass="dto">
+         UPDATE cag_info
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="version">
+		         version = #version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="pid">
+		         thread_id = #pid#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="app_status">
+		         ckg_status = #app_status#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE ckg_ip =#app_ip# and ckg_port =#app_port#
+	</update>
+	
+	
+	
+	<delete id="delConfigInfo" parameterClass="map" >
+		delete from key_mapping where config_name=#app_name# and config_ip='$ip$' and config_port=#port#
+	</delete>
+	
+</sqlMap>

@@ -1,0 +1,22 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="slidingmenu_width">200dp</dimen>
+    <dimen name="slidingmenu_offset">200dp</dimen>
+    <dimen name="list_padding">10dp</dimen>
+    <dimen name="shadow_width">5dp</dimen>
+    <dimen name="bottom_tab_padding_drawable">2.0dip</dimen>
+    <dimen name="bottom_tab_padding_up">2.0dip</dimen>
+    <dimen name="bottom_tab_font_size">14.0sp</dimen>
+    
+    <dimen name="remote_control_btn_margin">10dp</dimen>
+
+    <!-- remote control activity -->
+    <dimen name="remote_control_plate_max_width">266.5dp</dimen>
+    <dimen name="remote_control_plate_max_height">278.0dp</dimen>
+    <dimen name="remote_control_ret_exit_margin_top">15dp</dimen>
+    <dimen name="remote_control_ret_exit_margin_each">20dp</dimen>
+
+</resources>

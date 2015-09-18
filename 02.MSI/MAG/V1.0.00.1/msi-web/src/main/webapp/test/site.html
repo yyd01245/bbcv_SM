@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="yes" name="apple-touch-fullscreen"/>
+<meta content="telephone=no" name="format-detection"/>
+<meta content="black" name="apple-mobile-web-app-status-bar-style">
+<meta name="viewport" content="width=device-width"/>
+<meta content="width=device-width,user-scalable=no" name="viewport">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style type="text/css">
+img {
+border: 0;
+}
+
+html {
+font-size: 10px;
+}
+
+* {
+-webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+h1, h2, h3, h4, h5, p {
+margin: 0;
+}
+
+h4 {
+display: block;
+-webkit-margin-before: 1.33em;
+-webkit-margin-after: 1.33em;
+-webkit-margin-start: 0px;
+-webkit-margin-end: 0px;
+font-weight: bold;
+}
+
+h4.decoration {
+margin-top: 6px;
+}
+
+body {
+width: 100%;
+padding: 0;
+margin: 0;
+background-color: #F1F1F1;
+}
+	#wrap {
+	width: 100%;
+	height: 100%;
+	background-color: #F1F1F1;
+	}
+	
+	#cards {
+margin: 0 auto;
+width: 320px;
+}
+
+#cards .card, #others {
+-webkit-box-sizing: border-box;
+width: 100%;
+padding: 28px 12px 6px;
+background: url(data:image/gif;base64,R0lGODlhDgAYANUAAL6+vru7u9DQ0Onp6dXV1fDw8NbW1tra2tPT0…7odNrDbrvdnbh8PgfZ7/i8fs/v+/+AgYKDhIV8AgtCGQJ7BA5ECQQVeBdNHwMSERSWnERBADs=) repeat-x 0 0;
+background-size: 7px 15px;
+}
+
+#cards .title, #we .title {
+width: 100%;
+height: 32px;
+line-height: 16px;
+text-align: center;
+}
+
+#cards .title span, #we .title span {
+color: #1B1B1B;
+font-size: 1.6rem;
+font-weight: 700;
+}
+
+.tpl.c2 .row1col1 {
+height: 148px;
+overflow: hidden;
+}
+
+.tpl.c2 .row1col1 a {
+border-radius: 4px;
+overflow: hidden;
+display: inline-block;
+width: 100%;
+height: 100%;
+text-align: center;
+background-color: #E8E8E8;
+}
+
+.tpl.c2 .row2col2 {
+margin-top: 4px;
+height: 148px;
+overflow: hidden;
+display: -webkit-box;
+-webkit-box-pack: justify;
+}
+
+.tpl.c2 .row2col2 .col1 {
+width: 148px;
+height: 100%;
+}
+
+.tpl.c2 .row2col2 .col1 a, 
+.tpl.c2 .row2col2 .col2 a {
+border-radius: 4px;
+display: inline-block;
+overflow: hidden;
+width: 100%;
+height: 100%;
+text-align: center;
+background-color: #E8E8E8;
+}
+
+.tpl.c2 .row2col2 .col2 {
+width: 144px;
+height: 100%;
+}
+
+.tpl.c2 .row2col2 .col2 .row1 {
+width: 100%;
+height: 72px;
+}
+
+.tpl.c2 .row2col2 .col2 .row2 {
+margin-top: 4px;
+width: 100%;
+height: 72px;
+}
+
+h4.decoration {
+margin-top: 6px;
+}
+
+h4 {
+-webkit-box-sizing: border-box;
+width: 100%;
+height: 12px;
+overflow: hidden;
+text-align: center;
+background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAABGdBT…UgSW1hZ2VSZWFkeXHJZTwAAAAPSURBVHjaYnrw8BFAgAEABVACpj+kJ0cAAAAASUVORK5CYII=) repeat-x 0 center;
+}
+
+h4.decoration span {
+background-image: url(data:image/gif;base64,R0lGODlhFAASAMQAAN3e4PLy8t7f4dXX2t7g4tve39PW2dzf4PT09…w3XE4HTBhqRytVYmQUWlGCKxMSVwoSTokvE0tNM14sQ0WXiiw7PZw2NZejNjMBIieqJQghADs=);
+background-position: center;
+background-repeat: no-repeat;
+width: 32px;
+}
+
+h4 span {
+display: inline-block;
+height: 12px;
+line-height: 12px;
+background-color: #F1F1F1;
+}
+
+
+#bar {
+width: 100%;
+height: 48px;
+display: -webkit-box;
+-webkit-box-shadow: 0 1px 2px #B1B1B1;
+position: relative;
+z-index: 9;
+background-color: #FFF;
+}
+
+#bar .tao-logo {
+width: 48px;
+height: 100%;
+background-image: url(data:image/gif;base64,R0lGODlhMAAfAOYAAP88AP/t5v9zQv9FBf/+/f/k2v+lhf86AP+Zd…5JLKEEAApcoM4FdaBBYCSDDgCTIaEIgMAHC0DARQjZbGNJI5z88ucBSTyq6aiklmrqqX8EAgA7);
+background-color: #FF4300;
+background-position: -3px 7px;
+background-repeat: no-repeat;
+}
+
+#bar .search {
+-webkit-box-flex: 1;
+padding: 9px 8px 9px 12px;
+}
+
+.c-form-suggest {
+position: relative;
+padding-top: 15px;
+}
+
+#bar .search form {
+width: 100%;
+border: 0;
+margin: 0;
+padding: 0;
+}
+
+#bar .search .sb-box {
+-webkit-box-sizing: border-box;
+border: 1px solid #939495;
+width: 100%;
+height: 30px;
+padding: 0 10px;
+background: -webkit-gradient(linear,left top,left bottom,from(#f8fafe),to(#fff),color-stop(0.5,#fefeff));
+-webkit-box-shadow: inset 0 2px 2px #d7dbdf;
+overflow: hidden;
+}
+
+#bar #sb-text {
+-webkit-box-sizing: border-box;
+width: 100%;
+padding-right: 16px;
+font-size: 1.8rem;
+background-color: transparent;
+}
+
+#bar .search button, #bar .search input {
+display: block;
+margin: 0;
+padding: 0;
+border: 0;
+height: 100%;
+}
+
+#bar #sb-submit {
+-webkit-box-sizing: border-box;
+position: relative;
+top: -100%;
+float: right;
+width: 16px;
+background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAfCAYAAADupU20AAAAGXRFW…+4ed+lPXuPHfr3758OI5nFujwQgxLIM8bRemE4GAAQYAAfFWZq7dUCvQAAAABJRU5ErkJggg==);
+background-color: transparent;
+background-position: 0 0;
+background-repeat: no-repeat;
+margin-left: 10px;
+}
+
+#bar .search button, #bar .search input {
+display: block;
+margin: 0;
+padding: 0;
+border: 0;
+height: 100%;
+}
+
+
+</style>
+<title>多屏互动</title>
+<meta name="revisit-after"  content="1 days" />
+</head>
+<body style="height: auto; min-height: 652px;">
+	<div id="wrap">
+		<header id="bar">
+		<div class="tao-logo"></div>
+		<div class="search c-form-suggest" id="J_searchcomplete">
+			<form method="post" id="J_searchform">
+				<div class="sb-box">
+					<input id="sb-text" autocomplete="off" name="q" placeholder="" value="">
+					<button id="sb-submit" type="submit"></button>
+				</div>
+			</form>
+		</div>
+	</header>
+	
+	
+		<section id="cards">
+			<div class="card tpl c2">
+				<div class="title"><span>淘宝</span></div>
+				<div class="row1col1">
+					<a href="#"><img class="" src="http://gtms01.alicdn.com/tps/i1/T1ZN2_FelfXXbHZFH2-592-296.png" height="100%" style="visibility: visible;"></a>
+				</div>
+				<div class="row2col2">
+					<div class="col1">
+						<a href="#"><img class="" src="http://gtms01.alicdn.com/tps/i1/T15utsFzXaXXc59qsD-296-296.png" height="100%" style="visibility: visible;"></a>
+					</div>
+					<div class="col2">
+						<div class="row1">
+							<a href="#"><img class="" src="http://gtms01.alicdn.com/tps/i1/T1OmIjFnReXXa8j.Iq-288-144.png" height="100%" style="visibility: visible;"></a>
+						</div>
+						<div class="row2">
+							<a href="#"><img class="" src="http://gtms01.alicdn.com/tps/i1/T1iNUJFj4fXXa8j.Iq-288-144.png" height="100%" style="visibility: visible;"></a>
+						</div>
+					</div>
+				</div>
+				<h4 class="decoration">
+					<span></span>
+				</h4>
+			</div>
+			
+			<div class="card tpl c2"><div class="title"><span>天猫</span></div><div class="row1col1"><a href="http://yyz.m.tmall.com/living/huangjin02.html?locate=home-4-1&amp;actparam=1_null_h6992_Card1-%E5%A4%A9%E7%8C%AB1%E6%B4%BB%E5%8A%A81217&amp;&amp;v=0&amp;ttid=taobao&amp;sprefer=p23889"><img class="" src="http://gtms01.alicdn.com/tps/i1/T1_mINFe4eXXbHZFH2-592-296.png" height="100%" style="visibility: visible;"></a></div><div class="row2col2"><div class="col1"><a href="http://page.m.tmall.com/ifx/index.html?locate=home-4-2&amp;actparam=1_null_h6993_Card1-%E5%A4%A9%E7%8C%AB2%E6%B4%BB%E5%8A%A81217&amp;ad_id=&amp;am_id=1301075730d8a070f615&amp;cm_id=&amp;pm_id=&amp;sprefer=p23890"><img class="" src="http://gtms01.alicdn.com/tps/i1/T1UDzqFnpdXXc59qsD-296-296.png" height="100%" style="visibility: visible;"></a></div><div class="col2"><div class="row1"><a href="http://page.m.tmall.com/nzCjd/nzCjdDJD.html?locate=home-4-3&amp;actparam=1_null_h6994_Card1-%E5%A4%A9%E7%8C%AB3%E6%B4%BB%E5%8A%A81217&amp;sprefer=p23891"><img class="" src="http://gtms01.alicdn.com/tps/i1/T1KwxsFptaXXa8j.Iq-288-144.png" height="100%" style="visibility: visible;"></a></div><div class="row2"><a href="http://yyz.m.tmall.com/baby/jmmmsapcq.html?locate=home-4-4&amp;actparam=1_null_h6995_Card1-%E5%A4%A9%E7%8C%AB4%E6%B4%BB%E5%8A%A81217&amp;&amp;v=0&amp;ttid=taobao&amp;sprefer=p23892"><img class="" src="http://gtms01.alicdn.com/tps/i1/T1zoNrFupcXXa8j.Iq-288-144.png" height="100%" style="visibility: visible;"></a></div></div></div><h4 class="decoration"><span></span></h4></div>
+			
+			<div class="card tpl c2"><div class="title"><span>微淘</span></div><div class="row1col1"><a href="http://m.taobao.com/channel/act/315/weqc.html?locate=home-6-1&amp;actparam=1_null_h6996_Card1-%E5%BE%AE%E6%B7%981%E6%B4%BB%E5%8A%A81217&amp;sprefer=p23894&amp;settab=1"><img class="" src="http://gtms01.alicdn.com/tps/i1/T1xXNtFuVXXXbHZFH2-592-296.png" height="100%" style="visibility: visible;"></a></div><div class="row2col2"><div class="col1"><a href="http://m.taobao.com/channel/act/discount/weitaobestshop13.html?locate=home-6-2&amp;actparam=1_null_h6997_Card1-%E5%BE%AE%E6%B7%982%E6%B4%BB%E5%8A%A81217&amp;sprefer=p23895"><img class="lazy" src="http://gtms02.alicdn.com/tps/i2/T1gtStFoVeXXbEBq2D-576-576.png_290x290.jpg" dataimg="http://gtms01.alicdn.com/tps/i1/T1.BRbFyhaXXc59qsD-296-296.png" height="100%"></a></div><div class="col2"><div class="row1"><a href="http://m.taobao.com/channel/act/AE/weitao4g.html?locate=home-6-3&amp;actparam=1_null_h6998_Card1-%E5%BE%AE%E6%B7%983%E6%B4%BB%E5%8A%A81217&amp;sprefer=p23896"><img class="lazy" src="http://gtms02.alicdn.com/tps/i2/T1gtStFoVeXXbEBq2D-576-576.png_290x290.jpg" dataimg="http://gtms01.alicdn.com/tps/i1/T1WX7ZFa8cXXa8j.Iq-288-144.png" height="100%"></a></div><div class="row2"><a href="http://m.taobao.com/channel/act/discount/square.html?locate=home-6-4&amp;actparam=1_null_h6999_Card1-%E5%BE%AE%E6%B7%984%E6%B4%BB%E5%8A%A81217&amp;sprefer=p23897"><img class="lazy" src="http://gtms02.alicdn.com/tps/i2/T1gtStFoVeXXbEBq2D-576-576.png_290x290.jpg" dataimg="http://gtms01.alicdn.com/tps/i1/T10GPFFlxeXXa8j.Iq-288-144.png" height="100%"></a></div></div></div><h4 class="decoration"><span></span></h4></div>
+		</section>
+	</div>
+</body>
+</html>

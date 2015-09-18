@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 业务系统 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	
+	<!-- crsm管理 -->
+	<bean id="crsmServerMonitorService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.crsm.service.impl.CrsmServerMonitorServiceImpl" >
+				<property name="crsmDao" ref="crsmDao"></property>
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- CABS -->
+	<bean id="serverMonitorService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.ServerMonitorServiceImpl">
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="packageVersionService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.PackageVersionServiceImpl">
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="appGroupManagerService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.AppGroupManagerServiceImpl">
+				<property name="g4Dao" ref="g4Dao" />
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="updateStrategyService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.UpdateStrategyServiceImpl">
+			    <property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="batchUpdateService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.BatchUpdateServiceImpl">
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="devManagerService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.DevManagerServiceImpl">
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+
+</beans>

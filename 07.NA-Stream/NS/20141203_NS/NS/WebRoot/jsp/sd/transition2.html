@@ -1,0 +1,75 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>广告页面</title>
+<style>
+*{	padding:0;
+	margin:0;}
+body{
+	margin:0;
+	padding:0;
+	color:#fff;
+	text-shadow:0 1px #000;
+	font:900 26px "Microsoft YaHei"
+}
+.container{
+	width:720px;
+	height:576px;
+	background:url("transitionbg.jpg") no-repeat;
+	background-size:720px 576px;
+	overflow:hidden;
+}
+.video{
+	position: absolute;
+	left: 80px;
+	top: 70px;
+	width:555px;
+	height:400px;
+}
+.video video{
+	width:555px;
+	height:400px;
+}
+.video div{
+	width: 510px;
+	margin: 22px 0 0 28px;
+	letter-spacing: 1.5px;
+	overflow: hidden;
+	height: 32px;
+}
+.video div #info{
+	height: 32px;
+	margin-left:520px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<!--<div class="logo">单向互动</div>-->
+<div class="video">
+	<video src="video/philips.mp4" autoplay="true" loop poster="img/vposter.jpg"></video>
+	<div><p id="info">使用手机在13-17频道中扫描二维码，点播海量电影、连续剧</p> </div>
+</div>	
+</div>
+<script src='js/jquery-latest.js'></script>
+<script>
+var tmpDelay=16000,$tmTip=$("#info");
+
+$(function(){
+	marquee();
+	setInterval(marquee,tmpDelay);
+})
+/*循环提示不同的问题在内容*/
+function marquee(){
+		$tmTip.fadeIn(function() {
+			$tmTip.animate({marginLeft: '-820'}, tmpDelay, 'linear',function() {
+				$tmTip.css("marginLeft","820px");
+			});
+		});
+}
+
+</script>
+</body>
+</html>

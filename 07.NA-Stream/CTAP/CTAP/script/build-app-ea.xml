@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="GB2312"?>
+<project default="CI" basedir=".">
+	 <!--		timestamp set		-->
+	 <tstamp><format property="today" pattern="yyyyMMdd"/></tstamp>
+	 
+     <!--		property set		-->
+	 <property name="project.name" value="ea" />
+     <property name="project.path" value="/home/compiler/compiler"/>
+	 <property name="svn.checkout.dir" value="${project.path}/${project.name}"/>
+	 <property name="backup.dir" value="${project.path}/dist/${today}" />
+	 <property name="war.name" value="${project.name}.war" />
+
+	 <!--		compile temp dir		 -->
+	 <property name="classes.dir" value="${svn.checkout.dir}/class" />
+	 <property name="webroot.dir" value="${svn.checkout.dir}/WebRoot" />
+	 <property name="resource.dir" value="${svn.checkout.dir}/resource" />
+   	 <property name="package.dir" value="${svn.checkout.dir}/WebRoot/WEB-INF/classes" />
+	 <property name="webapp.dir" value="${svn.checkout.dir}/WebRoot/WEB-INF" />
+     <property name="file.web.xml" value="${webapp.dir}/web.xml" />
+	 <property name="lib.dir" value ="${webapp.dir}/lib"/>
+	 <property name="ant.home" value="/home/compiler/apache-ant-1.9.0" />
+	
+	 <!--		compile property set		-->
+	 <property name="javasrc.dir" value="${svn.checkout.dir}/src" />
+	 <property name="tomcat.home.path" value="/home/bbcv/LRM/apache-tomcat-6.0.24"/> 
+	 <!--		FTP property set		-->
+     <property name="ftp.remotedir" value="/home/bbcv/LRM/apache-tomcat-6.0.24/webapps"/>
+     <property name="ftp.server" value="192.168.100.108"/>
+     <property name="ftp.userid" value="root"/>
+     <property name="ftp.password" value="kuanyun001"/>
+	 <!--		SVN property set		-->
+	 <path id="svnant.lib">      
+           <pathelement location="${ant.home}/lib/svnant.jar"/>
+           <pathelement location="${ant.home}/lib/svnClientAdapter.jar"/>
+           <pathelement location="${ant.home}/lib/svnjavahl.jar"/>   
+     </path>
+     <!--		other property set		-->           
+	 <property name="svn.user" value="liuyp"/>
+     <property name="svn.passwd" value="123456"/>
+     <property name="svn.server" value="http://192.168.100.21/svn/svn"/>
+     <property name="svn.path" value="CODE/01.product/07.ADMIN/00.EA/V0.1.0"/>
+     <property name="urlRepos" value="${svn.server}/${svn.path}"/>
+	
+     <!--		clean old dist dir		-->
+	 <target name="clean">
+		<delete file="${backup.dir}/${war.name}" />
+		<delete file="${svn.checkout.dir}"/>
+	 </target>
+
+	 <target name="init" depends="clean">
+	 	<mkdir dir="${classes.dir}" />
+		<mkdir dir="${backup.dir}" />
+     </target>
+    	 <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" 
+          classpathref="svnant.lib" />
+
+
+     <target name="checkout" depends="init">
+ 		<echo message="*******************************************************" />
+		<echo message="*                                                     *" />
+		<echo message="*        checkout code                                *" />
+		<echo message="*                                                     *" />
+		<echo message="*******************************************************" />
+        <svn username="compiler" password="123456" javahl="false">
+           <checkout url="${urlRepos}" destPath="${svn.checkout.dir}" />
+        </svn>
+     </target>
+
+	 <!--================================-->
+	 <!--		compile java		     -->
+	 <!--================================-->
+	 <target name="fullCompile" depends="">
+		<echo message="*******************************************************" />
+		<echo message="*                                                     *" />
+		<echo message="*        start compile                		         *" />
+		<echo message="*                                                     *" />
+		<echo message="*******************************************************" />
+	 	<javac destdir="${classes.dir}" encoding="UTF-8">
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+				<!--
+				<fileset dir="${tomcat.home.path}/lib">
+					<include name="*.jar" />
+				</fileset>
+				-->
+			</classpath>
+			<src path="${javasrc.dir}"/>
+	  </javac>
+	  <copy todir="${classes.dir}">
+		<fileset dir="${resource.dir}">
+            <include name="**" />
+        </fileset>
+	  </copy>
+	 	<copy todir="${classes.dir}">
+	 			<fileset dir="${javasrc.dir}">
+	 	            <include name="**/*.tpl" />
+	 				<include name="**/*.xml" />
+	 				<include name="**/*.properties" />
+	 	        </fileset>
+	     </copy>
+	 </target>
+     
+	 <!--================================-->
+	 <!-- build war   				     -->
+	 <!--================================-->
+	 <target name="build-war" >
+		<echo message="*******************************************************" />
+		<echo message="*                                                     *" />
+		<echo message="*        start build war            					 *" />
+		<echo message="*                                                     *" />
+		<echo message="*******************************************************" />
+	     <copy todir="${package.dir}">
+			 <fileset dir="${classes.dir}">
+				<include name="**/*" />
+			 </fileset>
+		 </copy>
+
+		 <war destfile="${backup.dir}/${war.name}" webxml="${file.web.xml}" >
+			 <fileset dir="${svn.checkout.dir}/WebRoot/" includes="**/*.*" />
+		 </war>
+	 </target>
+	
+     <!--=====================================================-->
+     <!--copy war to local apache tomcat					  -->
+     <!--=====================================================-->
+     <!--<target name="copy-war" description="copy war to local apache tomcat">
+		<echo message="****************************************" />
+		<echo message="*                                      *" />
+		<echo message="*   copy war to local apache tomcat    *" />
+		<echo message="*                                      *" />
+		<echo message="****************************************" />
+		<delete file="${tomcat.home.path}/webapps/${war.name}" />
+		<copy file="${backup.dir}/${war.name}" todir="${tomcat.home.path}/webapps" overwrite="yes" />
+	 </target>
+	 -->
+	
+  <target name="ftp-app" description="ftp app war to remote web server">
+          <echo message="****************************************"/>
+          <echo message="*                                      *"/>
+          <echo message="*       ftp upload to server           *"/>
+          <echo message="*                                      *"/>
+          <echo message="****************************************"/>
+          <ftp server="${ftp.server}" remotedir="${ftp.remotedir}" userid="${ftp.userid}" password="${ftp.password}" preservelastmodified="yes" verbose="yes">
+                  <fileset dir="${backup.dir}">
+                          <include name="*BusiCtrl*"/>
+                  </fileset>
+          </ftp>
+     </target>
+     <!--<target name="CI" depends="checkout,fullCompile,build-war,copy-war">-->
+	<target name="CI" depends="checkout,fullCompile,build-war">
+		<echo message="**********************************************************"/>
+		<echo message="*                                                      	*"/>
+		<echo message="* compile successful and sended it to server successful  *"/>
+		<echo message="*                                                      	*"/>
+		<echo message="**********************************************************"/>	
+	 </target>
+	
+     <!--5.send mail -->
+     <target name="send-email" depends="">
+         <echo>send report mail...</echo>
+         <mail mailhost="${mail.server}"
+             subject="test report : ${project.name} - ${DSTAMP}" user="${send.user}"
+             password="${send.passwd}" tolist="${accpet.user}">
+             <from address="${send.addr}" />
+         </mail>
+     </target>
+ </project>
+
+
+
+
+
+
+   
+
+

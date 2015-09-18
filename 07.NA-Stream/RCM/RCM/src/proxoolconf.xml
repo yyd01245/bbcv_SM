@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<something-else-entirely>
+	<proxool>
+		<alias>NSCS</alias>
+		
+		<driver-url>jdbc:mysql://192.168.100.11:3306/svstb</driver-url>
+		<!-- 
+		<driver-url>jdbc:oracle:thin:@220.191.86.145:1521:ORCL</driver-url>
+		 -->
+		<driver-class>com.mysql.jdbc.Driver</driver-class>
+		<driver-properties>
+			<property name="user" value="bbcv" />
+			<property name="password" value="bbcv" />
+		</driver-properties>
+
+<!--		<property name="characterEncoding" value="utf-8"/>   -->
+    <maximum-active-time>5</maximum-active-time>  
+    <minimum-connection-count>10</minimum-connection-count>  
+    <maximum-connection-count>50</maximum-connection-count>  
+  
+
+	</proxool>
+  	
+</something-else-entirely>

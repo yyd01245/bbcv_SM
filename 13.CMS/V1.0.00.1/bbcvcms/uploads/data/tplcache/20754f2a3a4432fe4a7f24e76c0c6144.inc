@@ -1,0 +1,1 @@
+{dede:img text='' width='607' height='428'} /bbcvcms/uploads/uploads/jingdian/ypzjs/ypzjs_1.png {/dede:img}

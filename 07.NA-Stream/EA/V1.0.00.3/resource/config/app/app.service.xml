@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 业务系统 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	
+	<bean id="r30aService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.caas.service.impl.R30aServiceImpl" >
+				<property name="g4Dao" ref="g4Dao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- URM -->
+	<bean id="qamService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.QamServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+<!--				<property name="cssDao" ref="cssDao" />-->
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="qamResourceService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.QamResourceServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="networkService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.NetworkServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+		<bean id="adsService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.AdsServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="navigateService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.NavigateServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="streamResourceService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.StreamResourceServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	
+	
+	<bean id="rfService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.RfServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="appAccessService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.AppAccessServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="newQamService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.NewQamServiceImpl">
+				<property name="urmDao" ref="urmDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- CABS -->
+	<bean id="serverMonitorService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.ServerMonitorServiceImpl">
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="packageVersionService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.PackageVersionServiceImpl">
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="appGroupManagerService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.AppGroupManagerServiceImpl">
+				<property name="g4Dao" ref="g4Dao" />
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="updateStrategyService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.UpdateStrategyServiceImpl">
+			    <property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="batchUpdateService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.BatchUpdateServiceImpl">
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="devManagerService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.eredlab.g4.cabs.service.impl.DevManagerServiceImpl">
+				<property name="crsmDao" ref="crsmDao" />
+			</bean>
+		</property>
+	</bean>
+
+
+	<!-- NGOD信息管理 -->
+	<bean id="ngodService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.NgodServiceImpl">
+				<property name="urmDao" ref="urmDao"></property>
+			</bean>
+		</property>
+	</bean>
+		<!-- QAMDY信息管理 -->
+	<bean id="qamDyService" parent="baseTransactionProxyUrm">
+		<property name="target">
+			<bean class="org.eredlab.g4.urm.service.impl.QamDyServiceImpl">
+				<property name="urmDao" ref="urmDao"></property>
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- crsm管理 -->
+	<bean id="crsmServerMonitorService" parent="baseTransactionProxyCrsm">
+		<property name="target">
+			<bean class="org.eredlab.g4.crsm.service.impl.CrsmServerMonitorServiceImpl" >
+				<property name="crsmDao" ref="crsmDao"></property>
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="core" class="prod.nebula.eabg.core.CoreLoader"></bean>
+
+</beans>

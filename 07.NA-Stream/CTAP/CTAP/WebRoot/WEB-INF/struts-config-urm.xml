@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+	<!-- 配置ActionFormBean -->
+	<form-beans>
+		<!-- 公共Form -->
+		<form-bean name="commonActionForm" type="org.eredlab.g4.rif.web.CommonActionForm" />
+	</form-beans>
+
+	<!-- Action映射 -->
+	<action-mappings type="org.apache.struts.action.ActionMapping">
+	<!--     网关配置-->     		
+		<action name="commonActionForm" path="/DataSynchronizate" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.DataSynchronizateAction">	
+		</action>
+	
+	
+	
+<!--     网关配置-->     		
+		<action name="commonActionForm" path="/GetewayConfig" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.GetewayConfigAction">	
+			<forward name="toManage" path="/gatewayConfig.jsp" />
+		</action>
+
+<!--     服务器管理-->     		
+		<action name="commonActionForm" path="/ServerManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.ServerManagerAction">	
+			<forward name="toManage" path="/serverManager.jsp" />
+		</action>
+
+
+	
+<!--     接入网关配置-->     		
+		<action name="commonActionForm" path="/AccessGetewayConfig" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.AccessGetewayConfigAction">	
+			<forward name="toManage" path="/accessGatewayConfig.jsp" />
+		</action>
+<!--键值网关配置-->
+ 			<action name="commonActionForm" path="/KeyGetewayConfig" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.KeyGetewayConfigAction">	
+			<forward name="toManage" path="/keyGatewayConfig.jsp" />
+		</action>
+<!-- 信令网关配置-->
+		<action name="commonActionForm" path="/SignalingGetewayConfig" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.SignalingGetewayConfigAction">	
+			<forward name="toManage" path="/signalingGatewayConfig.jsp" />
+		</action>
+
+<!--  概览-->
+		<action name="commonActionForm" path="/MonitorHomePage" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.MonitorHomePageAction">	
+			<forward name="initView" path="/monitorHomePage.jsp" />
+		</action>
+
+<!--键值映射管理-->		
+		<action name="commonActionForm" path="/KeyConfig" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.KeyConfigAction">
+			<forward name="initView" path="/keyConfig.jsp" />
+		</action>
+<!--报警管理-->		
+		<action name="commonActionForm" path="/Report" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.ReportAction">
+			<forward name="initView" path="/report.jsp" />
+		</action>
+
+<!-- 接入网关模块查询-->
+		<action name="commonActionForm" path="/AccessGatewayModelQuery" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.AccessGatewayModelQueryAction">
+			<forward name="initView" path="/accessGatewayModelQuery.jsp" />
+		</action>
+
+<!-- 用户键值路由查询-->
+		<action name="commonActionForm" path="/UserKeyRoutQuery" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.UserKeyRoutQueryAction">
+			<forward name="initView" path="/userKeyRoutQuery.jsp" />
+		</action>
+		
+		
+		
+		
+		
+		
+<!-- 编辑-->
+		<action name="commonActionForm" path="/Edit" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.EditAction">
+			<forward name="initView" path="/edit.jsp" />
+		</action>
+
+<!-- 查看-->
+		<action name="commonActionForm" path="/EmpowerFile" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.EmpowerFileAction">
+			<forward name="initView" path="/empowerFile.jsp" />
+		</action>
+
+
+
+<!-- （接入）网关信息info-->
+		<action name="commonActionForm" path="/AccessGatewayInfo" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.AccessGatewayInfoAction">
+			<forward name="toManage" path="/accessGatewayInfo.jsp" />
+		</action>
+
+
+
+
+
+
+
+
+<!--			<forward name="integrateFlashReport1View" path="/integrateFlashReport1.jsp" />-->
+
+
+
+
+       <!--信令网关分配管理-->		
+		<action name="commonActionForm" path="/SignalingGatewayDistribution" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.SignalingGatewayDistributionAction">
+			<forward name="initView" path="/signalingGatewayDistribution.jsp" />
+		</action>
+		<!--键值网关分配管理-->		
+		<action name="commonActionForm" path="/KeyGatewayDistribution" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.KeyGatewayDistributionAction">
+			<forward name="initView" path="/keyGatewayDistribution.jsp" />
+		</action>
+		
+		<!--服务地址分配管理-->		
+		<action name="commonActionForm" path="/ServiceUrlDistribution" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.ServiceUrlDistributionAction">
+			<forward name="initView" path="/serviceUrlDistribution.jsp" />
+		</action>
+		
+		<!--键值负载量配置-->		
+		<action name="commonActionForm" path="/KeyLoadNumConfig" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.KeyLoadNumConfigAction">
+			<forward name="initView" path="/keyLoadNumConfig.jsp" />
+		</action>
+		
+		<!--信令键值负载量配置-->		
+		<action name="commonActionForm" path="/SignalingLoadNumConfig" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.SignalingLoadNumConfigAction">
+			<forward name="initView" path="/signalingLoadNumConfig.jsp" />
+		</action>
+	
+		<!--授权管理-->		
+		<action name="commonActionForm" path="/Empower" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.EmpowerAction">
+			<forward name="initView" path="/editDemo.jsp" />
+		</action>
+
+
+
+
+
+
+
+
+
+
+		<!--网关监控管理-->		
+		<action name="commonActionForm" path="/KeyGatewayDistributionMonitor" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.KeyGatewayDistributionMonitorAction">
+			<forward name="initView" path="/keyGetewayDistribution_monitor.jsp" />
+		</action>
+
+
+
+
+	<!--网关监控图标详情-->		
+		<action name="commonActionForm" path="/ChartDetail" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.ChartDetailAction">
+			<forward name="initView" path="/chartDetail.jsp" />
+		</action>
+
+
+
+
+
+		
+<!--IPqam信息表维护		-->		
+		<action name="commonActionForm" path="/qamManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.QamAction">
+			<forward name="initView" path="/qamInfo.jsp" />
+			<forward name="initPage1" path="/thresholdUrl.jsp" />
+		</action>
+			
+		
+<!--IPqam资源表维护		-->			
+		<action name="commonActionForm" path="/qamResourceManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.QamResourceAction">
+			<forward name="initView" path="/qamResourceManager.jsp" />
+		</action>
+		
+		
+<!--网络地区		-->
+		<action name="commonActionForm" path="/networkManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.NetworkAction">
+			<forward name="initView" path="/network.jsp" />
+		</action>
+		
+		
+<!--广告配置		-->		
+		<action name="commonActionForm" path="/adsManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.AdsAction">
+			<forward name="initView" path="/ads.jsp" />
+		</action>	
+		
+<!--导航配置		-->			
+		<action name="commonActionForm" path="/navigateManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.NavigateAction">
+			<forward name="initView" path="/navigate.jsp" />
+		</action>		
+
+
+<!--流配置		-->			
+		<action name="commonActionForm" path="/streamResourceManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.StreamResourceAction">
+			<forward name="initView" path="/streamResource.jsp" />
+		</action>	
+	
+	
+		
+		<action name="commonActionForm" path="/appAccessManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.AppAccessManagerAction">
+			<forward name="initView" path="/appAccessManager.jsp" />
+			<forward name="control" path="/MemcacheRelest.jsp" />
+		</action>
+		<action name="commonActionForm" path="/rfManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.RfAction">
+			<forward name="initView" path="/rfUrl.jsp" />
+		</action>
+
+		
+		
+		<action name="commonActionForm" path="/cacheData" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.CacheData">
+			<forward name="initView" path="/cacheDataUrl.jsp" />  
+		<!-- 	<forward name="initView" path="/cacheData1.jsp" />  -->
+		</action>
+		<action name = "commonActionForm" path = "/queryQam" scope = "request"
+			validate = "false" parameter="reqCode"
+			type = "org.eredlab.g4.urm.web.NewQamAction" >
+			<forward name = "initView" path = "/queryQam.jsp" />
+			<forward name = "initView1" path = "/queryKeyHandler.jsp" />	
+		</action>
+		<action name = "commonActionForm" path = "/ngodInfoAction" scope = "request"
+			validate = "false" parameter="reqCode"
+			type = "org.eredlab.g4.urm.web.NgodInfoAction" >
+			<forward name = "ngodPageInit" path = "/NgodUrl.jsp" />	
+			<forward name = "ngodRFPageInit" path = "/qamReview.jsp" />	
+			<forward name = "D6R6PageInit" path="/NgodD6R6.jsp"></forward>
+			<forward name = "QAMPageInit" path="/qamDevice.jsp" ></forward>
+		</action>
+		<action name = "commonActionForm" path = "/qamDyAction" scope = "request"
+			validate = "false" parameter="reqCode"
+			type = "org.eredlab.g4.urm.web.DynamicQamAction" >
+			<forward name = "QAMPageInit" path="/qamDevice.jsp" ></forward>
+			<forward name = "QamDyPageInit" path = "/qamReview.jsp" />	
+			<forward name ="d6r6PageInit" path="/qamPrompt.jsp" ></forward>
+		</action>
+		
+		<action name ="commonActionForm" path="/resAction" scope="request" validate="false" parameter="reqCode" 
+		type="org.eredlab.g4.urm.web.ResQueryAction">
+			<forward name="resQuery" path="/resQuery.jsp"></forward>
+		</action>
+		
+	</action-mappings>
+</struts-config>

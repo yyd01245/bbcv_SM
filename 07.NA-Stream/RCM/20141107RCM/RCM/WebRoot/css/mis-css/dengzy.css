@@ -1,0 +1,547 @@
+/*body样式*/
+body{
+	font-size: 10px;
+	FONT-FAMILY: verdana;
+	SCROLLBAR-FACE-COLOR: #edf2f6;
+	SCROLLBAR-HIGHLIGHT-COLOR: #f8f7f9; 
+	SCROLLBAR-SHADOW-COLOR: #c5d9e8; 
+	SCROLLBAR-3DLIGHT-COLOR: #c5d9e8; 
+	SCROLLBAR-ARROW-COLOR: black; 
+	SCROLLBAR-DARKSHADOW-COLOR: white;
+	margin:0;
+	background:url(../images/1_right_1.jpg) repeat-x;
+	padding:3px;
+}
+/*开始说明：默认超链接样式*/
+a:link {color: #000;text-decoration: none;line-height: 18px;}
+a:visited {color: #000;text-decoration: none;line-height: 18px;}
+a:active {color:#000;text-decoration:none;line-height: 18px;}
+a:hover {color: #3D6096;text-decoration: underline;line-height: 18px;}
+/*白色12链接样式*/
+a.write:link{color: #fff;text-decoration: none;}
+a.write:visited {color: #fff;text-decoration: none;}
+a.write:active {color:#fff;text-decoration:none;}
+a.write:hover {color: #fff;text-decoration: underline;}
+/*兰色12粗链接样式*/
+a.blue12:link{color: #0044DD;text-decoration: none;}
+a.blue12:visited {color: #0044DD;text-decoration: none;}
+a.blue12:active {color:#0044DD;text-decoration:none;}
+a.blue12:hover {color: #ff6600;text-decoration: underline;}
+
+/*兰色12粗链接样式:下划线存在*/
+a.blue13:link{color: #0044DD; text-decoration: underline; font: bold;}
+a.blue13:visited {color: #0044DD; text-decoration: underline; font: bold;}
+a.blue13:active {color:#0044DD; text-decoration: underline; font: bold;}
+a.blue13:hover {color: #ff6600; text-decoration: underline; font: bold;}
+
+
+/*导航table样式
+例:<table id="navTbl" width="100%" cellspacing="0" cellpadding="0"
+		class="navTbl"> 
+*/
+table.navTbl{
+	background-image: url(../image/S2.jpg);	
+	border: 0px solid #808080;
+	border-collapse: collapse;
+	font-size: 10pt; 
+	margin-top:0; margin-bottom:0; margin-left:0 ; 
+}
+table.navTbl  tr td {
+	color: #2E88E9;
+	font-weight: bold;
+	font-size:12px;
+	font-family:宋体;
+}
+/*导航td样式(即显示"当前位置:XXXX"的td样式)
+例:
+          <td class="navtd">
+				 <span class='font_blackb'>人口信息查询</span>>>
+				<span class='font_blackb'>公安数据查询</span>>>查看明细
+			</td>
+*/
+table.navTbl td.navtd{	
+	text-align: left;
+	HEIGHT: 25px;
+}
+/*导航的字体显示
+例:<span class='font_blackb'>人口信息查询</span>>>
+				<span class='font_blackb'>公安数据查询</span>>>查看明细
+*/
+.font_blackb {
+	font-weight:bold;
+}
+/*导航中的"返回项"td样式
+例:
+<td class="atd">
+				<a href="javascript:window.history.go(-1);"><img
+						src="../images/ico/7.gif" alt="返回" border="0">
+				</a>
+				<a href="#"><img src="../images/ico/help.gif" alt="帮助" border="0">
+				</a>
+</td>
+*/
+table.navTbl td.atd{
+	text-align: right;
+	HEIGHT: 25px;
+}
+table.navTbl td.itd{
+	font-size: 12px;
+	font-weight: bold;	
+	text-align: center;
+	HEIGHT: 25px;
+}
+/* table form */
+/*查询条件的table样式
+例:		<table width="100%" align="center" cellpadding="2" cellspacing="0"
+			class="tabform" >	
+	 	 <tr>	  
+		  <td class="td-left" >姓名</td>
+          <td class="td-right"><input type="text" name="name" value=""></td>
+*/
+.tabform{
+	background-color:#F7F7F7;
+	border:1px solid #BFC7CA;
+	font-size:12px;
+	margin-top:3;
+	line-height:30px;
+}
+.tabform_hide{
+	background-color:#F7F7F7;
+	border:1px solid #BFC7CA;
+	font-size:12px;
+	margin-top:3;
+}
+/*查询条件下的input样式*/
+.tabform input{
+	border:1px double rgb(187,185,185);
+	font-size:12px;
+	width:120px
+}
+/*查询条件下的input样式*/
+.tabform_hide input{
+	border:1px double rgb(187,185,185);
+	font-size:12px;
+	width:120px
+}
+
+/*   查询条件的td样式
+例:  
+	<td class="td-left">
+	    性别
+	</td>
+	<td class="td-right">
+		<input type="text" name="faxTel" value="">
+	</td>
+*/
+.td-left{
+	 width:70px;
+	 
+}
+.td-right{
+	 width:140px;
+	 font:bold;
+}
+.td-right-bold{
+	 font:bold;
+}
+/*按钮样式*/
+.btn {
+	width:60px
+	FONT-WEIGHT: normal;
+	MARGIN: 1px;
+	LINE-HEIGHT: 15px;
+	HEIGHT: 20px;
+	TEXT-DECORATION: none;
+	border: 1px outset #99CCFF;
+	padding: 1px;
+	background-color: #FFFFFF;
+}
+/*查询的下拉框样式
+*/
+.select {
+	font-family:"宋体";
+	font-size: 12px;
+	BORDER-RIGHT: #000000 1px solid; 
+    BORDER-TOP: #FFFFFF 1px solid; 
+    FONT-SIZE: 12px; 
+    BORDER-LEFT: #FFFFFF 1px solid;
+    COLOR:#003366; 
+    BORDER-BOTTOM: #000000 1px solid; 
+    BACKGROUND-COLOR: #f4f4f4;
+	width:120px;
+ }
+ /*查询输入框样式(用与页记录数)*/
+.inputText {
+	border:1px double rgb(187,185,185);
+	font:9pt;
+	width:80px;
+}
+/*输入日期框样式*/
+.inputTextDate{
+	border:1px double rgb(187,185,185);
+	font:9pt;	
+	width:60px;
+}
+
+/*显示查询列表样式及明细列表显示样式
+例:<!--明细-->
+		<TABLE id="Infolist" class="itemList" cellSpacing=1 cellPadding=0
+			width="100%">
+*/
+table.itemList{
+	border:solid 0px #BFC7CA;
+	border-collapse: collapse;
+	font-size: 10pt; 
+	margin:0;
+}
+table.itemList tbody tr.even {
+	text-align: center;
+	background-color: expression(( this . sectionRowIndex % 2 == 0)?"FFFFFF" : "F7F7F7" );
+	height: 24;
+}
+
+table.itemList tbody tr.on_over {
+	text-align: center;
+	color: #284DA4;
+	height: 24px;
+	background: url(../images/1_tab_over.gif) repeat;
+}
+
+table.itemList tbody tr.out_over {
+	text-align: center;
+	background-color: #F7F7F7;
+	color: #000;
+	height: 24px;
+}
+table.itemList caption.head{
+	 font-size: 12px;
+	 text-align: center;
+	 background:url(../../apps/mis/images/1_tab_tit.jpg) right;
+	 height:26px;
+	 color:#000000;
+	 padding-left:5px
+}
+
+table.itemList caption.foot{
+	font-size: 12px;
+	text-align: right;
+}
+
+table.itemList th{						
+	height: 25;
+	font-size: 12px;
+	background:url(../../apps/mis/images/1_tab_tit.jpg) right;
+	color:#000;
+	padding-left:5px
+}
+
+table.itemList thead tr {
+   background-color: #DCDCDC ;   
+}
+/*明细标题*/
+table.itemList td.title{						
+	text-align:center;
+	font-size: 12px;
+	background:url(../../apps/mis/images/1_tab_tit.jpg) repeat;
+	height:26px;
+	color:#000;
+	padding-left:5px
+	
+}
+table.itemList tbody td {	 
+	color:#000;
+	height:24px;
+	padding-left:5px
+}
+
+table.itemList tbody a {
+  TEXT-DECORATION: none;
+  COLOR: #0000CD
+}
+table.itemList tbody td.nowrap1 {
+	white-space: nowrap;        
+}
+
+table.itemList tfoot tr {
+   background-color: #DCDCDC ;}
+   
+   
+/* detail of table */
+/*显示明细的tabel样式
+例:<table  width="100%" border="1" bordercolor="bed6e0" cellpadding="5" cellspacing="0" class="dititem">
+   <tr>
+      <td colspan="6"><b> 基本情况</b> </td>
+    </tr>
+    <tr>
+      <td width="116">姓名 </td>
+*/
+table.dititem{
+	background-color: #BEBEBE;
+	border: 1px solid #D4D0C8;
+	border-collapse: collapse;
+	font-size: 12px;
+	font-family: "宋体";
+	margin-top: 6px;
+	margin-bottom: 0;
+	margin-left: 0;
+}
+/*明细的tr样式,用了dititem后不用显试用class*/
+table.dititem tr {
+   background-color: expression(( this. sectionRowIndex % 2 == 0) ?
+		"FFFFFF": "ebf4ff" );
+}
+/*明细的td样式,用了dititem后不用显试用class*/
+table.dititem td {
+	text-align: left;
+	text-valign: bottom;
+	HEIGHT: 30px;
+	border-left-color: #C0C0C0;
+	border-left-width: 1px;
+ 
+} 
+.font-title{font-size:14px;font-weight:bold;height:40px;line-height:40px;}
+/**/
+table.tb-list {
+	border-color: #C3BFB3;
+	border-collapse: collapse;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	border-top-width: 1px;
+	font-size: 12px;
+	margin-top: 12px;
+}
+table.tb-list tr{
+	height: 25px;
+}
+table.tb-list caption.head{
+	 font-size: 16px;
+	 text-align: center;
+	 height:40px;
+	 color:#000000;
+	 padding-left:5px;
+	 font-weight: bold;
+	 
+	  
+}
+
+/*
+     页底
+     例:
+     		<table class="foot" width="100%" cellpadding="0" cellspacing="0">
+			<TR>
+				<td class=page>
+					页次：1/1 页&nbsp;&nbsp 每页：12&nbsp;&nbsp; 当前页：1&nbsp;&nbsp;
+					总数：3&nbsp;&nbsp; 分页：
+					<a href="javaScript:doPage(1)"> 首页</a>&nbsp;&nbsp;
+					<a href="javaScript:doPage(1)"> 上一页</a>&nbsp;&nbsp;
+					<a href="javaScript:doPage(1)"> 下一页</a>&nbsp;&nbsp;
+					<a href="javaScript:doPage(1)"> 末页</a>&nbsp;&nbsp;
+				</td>
+			</tr>
+		</table>
+*/
+   
+table.foot{
+	background-color: #708090;
+	border-collapse: collapse;
+	font-size: 12pt; 
+	margin-top:0;margin-bottom:1;
+	border:solid 1px #BFC7CA;border-top:0;
+}	
+table.foot td.page {
+	height:24px;
+	background-image: url(../images/tab_bottom.gif);	
+	background-color: #CCCCFF;
+	padding: 0px 0px 0px 0px;
+	display:block;
+	border-top: none;
+	margin-bottom: -5px;
+	font-size: 12px;
+	text-align: right;
+	LINE-HEIGHT: 12pt; 
+	FONT-FAMILY: "Arial"
+}
+table.foot td.page a {
+  TEXT-DECORATION: none;
+  COLOR: #0000CD
+}
+
+table.seacherTbl{
+	font-size: 10pt; 
+	margin-top:2;
+	margin-bottom:1;
+	border: 0px solid #808080;
+}
+ 
+table.seacherTbl td{
+	text-align: left;
+}
+
+
+
+
+
+table.edititem {
+	background-color: #BEBEBE;
+	border: 1px solid #D4D0C8;
+	border-collapse: collapse;
+	font-size: 12px;
+	font-family: "宋体";
+	margin-top: 6px;
+	margin-bottom: 0;
+	margin-left: 0;
+}
+table.edititem tr {
+	background-color: #FFFFFF;
+}
+table.edititem td {
+	text-align: left;
+	text-valign: bottom;
+	HEIGHT: 25px;
+	color: black;
+}
+
+
+ 
+table.opitem{
+	border: 0px solid #808080;
+	border-collapse: collapse;
+	font-size: 10pt; 
+	margin-top:10; margin-bottom:0; margin-left:2 ;
+	border-collapse: collapse;
+	font-size: 9pt;
+	margin-top:5;
+	margin-bottom:0;
+	margin-left:1 ;
+	border-collapse:collapse;
+	border-right-width:0px;
+	border-bottom-width:0px;
+	border-left-width:0px"
+}
+.button_bottom {
+	border-left:1 solid #ffffff;
+	border-top: 1 solid #ffffff;
+	border-right:1 solid #31659c;
+	border-bottom:1 solid #31659c;
+}
+
+.needInput{
+	color:red;
+}
+
+
+#btAdd{
+		background :"url(img/ico/add.gif) no-repeat";
+		width :"57px";
+		height :"21px";
+		border :"none";
+		cursor :"hand"; }
+#btSave{
+				background :"url(img/ico/save.gif) no-repeat";
+				width :"57px";
+				height :"21px";
+				border :"none";
+				cursor :"hand"; }
+#btModify{
+				background :"url(img/ico/update.gif) no-repeat";
+				width :"57px";
+				height :"21px";
+				border :"none";
+				cursor :"hand"; }
+#btRest{
+			background :"url(img/ico/rest.gif) no-repeat";
+			width :"57px";
+			height :"21px";
+			border :"none";
+			cursor :"hand" ;
+
+}	
+#btDelete{
+		background :"url(img/ico/delete.gif) no-repeat";
+		width :"57px";
+		height :"21px";
+		border :"none";
+		cursor :"hand" ;
+}							
+#btClose{
+ 	background :"url(img/ico/close1.gif) no-repeat";
+ 	width :"57px";
+	height :"21px";
+	border :"none";
+	cursor :"hand";
+	 
+}		
+
+#btQuery{
+	background :"url(img/ico/help.gif) no-repeat";
+	width :"58px";
+	height :"22px";
+	 border :"none";
+	  cursor :"hand" ;
+}
+	
+ #btBack{
+ 	background :"url(img/ico/back.gif) no-repeat";
+ 	width :"57px";
+				height :"21px";
+				 border :"none"; cursor :"hand";
+ }
+ 
+ 
+ 
+.btAdd{
+		background :"url(img/ico/add.gif) no-repeat";
+		width :"57px";
+		height :"21px";
+		border :"none";
+		cursor :"hand"; }
+.btSave{
+				background :"url(img/ico/save.gif) no-repeat";
+				width :"57px";
+				height :"21px";
+				border :"none";
+				cursor :"hand"; }
+.btModify{
+				background :"url(img/ico/update.gif) no-repeat";
+				width :"57px";
+				height :"21px";
+				border :"none";
+				cursor :"hand"; }
+.btRest{
+			background :"url(../img/ico/rest.gif) no-repeat";
+			width :"57px";
+			height :"21px";
+			border :"none";
+			cursor :"hand" ;
+
+}	
+.btDelete{
+		background :url(../img/ico/delete.gif) no-repeat;
+		width :"57px";
+		height :"21px";
+		border :"none";
+		cursor :"hand" ;
+}							
+.btClose{
+ 	background :"url(img/ico/close1.gif) no-repeat";
+ 	width :"57px";
+	height :"21px";
+	border :"none";
+	cursor :"hand";
+	 
+}		
+
+.btQuery{
+	background :"url(img/ico/help.gif) no-repeat";
+	width :"58px";
+	height :"22px";
+	 border :"none";
+	  cursor :"hand" ;
+}
+	
+ .btBack{
+ 	background :"url(img/ico/back.gif) no-repeat";
+ 	width :"57px";
+				height :"21px";
+				 border :"none"; cursor :"hand";
+ }

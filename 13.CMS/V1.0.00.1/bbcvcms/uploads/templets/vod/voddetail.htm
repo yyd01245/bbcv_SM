@@ -1,0 +1,231 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta content="telephone=no" name="format-detection" />
+<title>电影详情</title>
+<link href="{dede:global.cfg_filebase/}/vod/css/layout.css" rel="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="{dede:global.cfg_filebase/}/vod/js/jquery-1.9.0.min.js"></script>
+<!--<script type="text/javascript" src="{dede:global.cfg_filebase/}/vod/js/main.js"></script>-->
+<!--<script type="text/javascript" src="{dede:global.cfg_filebase/}/vod/js/data.js"></script>-->
+</head>
+
+<body class="detail">
+	<div id="header">
+		<div class="hover">
+			<h1 class="back" id="moviename">{dede:field.title /}</h1>
+			<h1 class="mainpage logo"></h1>  
+		</div>
+	</div>
+    <div id="detailInfo">
+    	<img id="poster" data-src="{dede:field.mb_poster_path1 /}" width="120" class="js-v-img img" />
+        <div>
+			<ul>
+				<li>主演：<span id="actor">{dede:field.actor /}</span> </li>
+				<li>导演：<span id="director">{dede:field.director /}</span> </li>
+				<li>类型：<span id="type">{dede:field.type /}</span></li>
+				<li>地区：<span id="ondate">{dede:field.area /}</span></li>
+			</ul>
+			<a href="#" class="play" id="playbtn" data-id="{dede:field.title /}" data-rtsp="{dede:field.rtsp_url /}" data-poster="{dede:field.tv_poster_path3 /}">播放</a>
+		</div>
+		
+    </div>
+
+	<div id="detailBt">			
+		<span class="xqlogo logo"></span>
+		<span class="pllogo logo"></span>
+		<span class="fxlogo logo"></span>
+		<span class="sclogo logo"></span>
+	</div>    
+    <div id="detail">
+		<div class="item">
+			<h3 class="title">剧情简介</h3>
+			<div id="detailintro" class="de">{dede:field.intro /}</div>
+		</div>
+		<div class="item">
+			<h3 class="title">
+				<!-- UY BEGIN -->
+				<div id="uyan_frame"></div>
+				<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js" charset="utf-8"></script>
+				<!-- UY END -->
+			</h3>
+			<div  class="de"></div>
+		</div>
+		<div class="item">
+			<h3 class="title">
+
+				<!-- JiaThis Button BEGIN -->
+				<div class="jiathis_style" id="fx" >
+					<span class="jiathis_txt" style="font-size: 15px">分享到：</span>
+					<a class="jiathis_button_tools_1"></a>
+					<a class="jiathis_button_tools_2"></a>
+					<a class="jiathis_button_tools_3"></a>
+					<a class="jiathis_button_tools_4"></a>
+
+				</div>
+				<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+				<!-- JiaThis Button BEGIN -->
+			</h3>
+			<div  class="de"></div>
+		</div>
+		<div class="item">
+			<h3 class="title">收藏《<span id="movieConllection"></span>》成功</h3>
+			<div  class="de"></div>
+		</div>
+
+
+	</div>
+
+
+	<script type="text/javascript">
+		var jiathis_config = {data_track_clickback:'true'};
+	</script>
+
+	<!-- JiaThis Button END -->
+
+	<script>
+		var poneOrWeiXin;
+		var stream_id = getQueryStringByName("streamid");
+		var username = poneOrWeiXin = decodeURIComponent(getQueryStringByName("username"))
+		var resolution = getQueryStringByName("resolution")
+		var beforepage = getQueryStringByName("beforepage");
+/*var moviename=getQueryStringByName("name"),currentEle,index=-1,timer,movieList=["gyc","aqgy","ypzjs"],rstp;
+$(function(){
+	changeMovie(moviename);
+	$("#detailBt span.logo").bind("hover click",function(){
+		var index = $(this).index();
+		$("#detail .item").hide().eq(index).show();
+	})
+	//timer=setInterval("changeMovie(checkIndex())",90000);
+})
+function checkIndex(){
+	index>1?index=0:index++;
+	return movieList[index];
+}*/
+function onTopClick(a) {
+	var c = document.getElementById(a);
+	window.location.hash =  "#"+a;
+}
+
+$(document).ready(function(e) {
+
+	//var beforepage ='<%=beforepage%>';
+	$("#header h1.back").click(function(){
+		//history.back();
+		if(beforepage=='vodjsp'){
+			//window.location.href = "vod.jsp?class=<%=bannername%>&username=<%=username%>&streamid=<%= streamid%>&resolution=<%=resolution%>";
+		}else{
+			window.location.href = "/bbcvcms/uploads/plus/list.php?tid=9&username="+username+"&streamid="+stream_id+"&resolution="+resolution;
+		}
+	})
+
+	$("#header h1.mainpage").click(function(){
+		window.location.href = "/bbcvcms/uploads/plus/list.php?tid=9&username="+username+"&streamid="+stream_id+"&resolution="+resolution;
+	})
+
+});
+var on_submit = false;
+function changeMovie(moviename, rtsp, posturl){
+    event.preventDefault();
+	$.ajax( {
+		url: "http://{dede:global.cfg_nav_server/}/NS/TransitionServlet?thisState=1&username="+username+"&vodname="+moviename+"&rstp="+rtsp, //这里是静态页的地址
+		type: "GET", //静态页用get方法，否则服务器会抛出405错误
+		success: function(data){}
+	});
+	var play_obj = {
+		"rtsp": rtsp,
+		"vodname": moviename,
+		"posterurl": regImgSrc(posturl)
+	}
+
+	setTimeout(function(){
+		kysxplay(JSON.stringify(play_obj))
+	}, 0)
+	/*$.get("http://218.108.50.246/wechat/oneway/detail",{
+		vodid: moviename
+	}, function(result){
+        on_submit = false;
+		var currentEle;
+		if(result.retcode == "0"){
+			currentEle = result.info;
+			$("#moviename").html(currentEle.name);
+			$("#director").html(currentEle.director);//导演
+			$("#actor").html(currentEle.actor);//主演：
+			$("#type").html(currentEle.type);//"类型："+
+			$("#ondate").html(currentEle.area);//"地区："+
+			$("#poster").attr("src",currentEle.mb_poster_path1)
+			//$("#movie").html(currentEle.name)
+			rstp = currentEle.rstp_url;
+			$("#playbtn").click(function(){
+				//console.log(rstp);
+				//kysxplay(rstp);
+				$.get("http://218.108.50.246/wechat/oneway/play", {
+					user: getQueryStringByName("openid"),
+					vodid: currentEle.id
+				}, function(keyboard){
+					if(keyboard.retcode == "0"){
+						document.location.href = keyboard.url+"&serial="+Date.now();
+					}
+					else {
+						alert("播放失败");
+					}
+				}, "jsonp");
+				return false;
+			})
+			$("#detailintro").html(currentEle.description);
+		}
+	}, "jsonp");*/
+}
+
+$("#detailBt span.logo").bind("hover click",function(){
+	var index = $(this).index();
+
+	$("#detail .item").hide().eq(index).show();
+
+	if(index==3){
+		var content="收藏成功";
+		collection(content);
+		//$("#detail .item").show();
+		//	alert("收藏成功");
+	}
+})
+
+function collection(str){
+
+	kysxcollection(str);
+}
+
+		function getQueryStringByName(name){
+			var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+			if(result == null || result.length < 1){
+				return "";
+			}
+			return result[1];
+		}
+
+$(".js-v-img").each(function(index, ele){
+    if($(ele).data("src")){
+        $(ele).attr("src", regImgSrc($(ele).data("src")));
+    }
+})
+
+		function regImgSrc(src){
+			var reg_img_src = /}(.+){/g;
+			var result = reg_img_src.exec(src)
+			if(result){
+				return $.trim(result[1])
+			}
+
+			return src;
+		}
+
+		$("#playbtn").click(function(){
+			changeMovie($(this).data("id"), $(this).data("rtsp"), $(this).data("poster"))
+		})
+
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="msi-web"
+  id="myeclipse.1410349068468"
+  context-root="/MAG"
+  j2ee-spec="6.0"
+  archive="msi-web.war">
+  <attributes>
+    <attribute name="webrootdir" value="src/main/webapp" />
+  </attributes>
+</project-module>
+

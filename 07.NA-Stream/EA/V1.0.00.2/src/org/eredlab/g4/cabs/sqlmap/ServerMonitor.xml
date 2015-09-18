@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 服务监控管理手工映射SQL语句 -->
+<sqlMap namespace="ServerMonitor">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<!-- 根据主键查询代码表 -->
+	<select id="getServerByKey" parameterClass="map" resultClass="dto">
+		SELECT vncm_id,group_id,dev_type,vncm_ip,vncm_name,vncm_port,status,vncm_type,cpu_info,
+		mem_info,vncm_total,vncm_online,version,vncm_message from dgw_vncm_info where vncm_id=#vncm_id#
+	</select>
+	
+	<!-- 根据group_id获取term_record_id-->
+	<select id="getServerByGroup" parameterClass="map" resultClass="dto">
+		SELECT term_record_id
+		  FROM yynm_term_info 
+		 WHERE group_id = #group_id#
+	</select>
+	
+	<!-- 根据group_version_id获取term_record_id -->
+	<select id="getTermRecordIdByGroupVersionId" parameterClass="map" resultClass="dto">
+		SELECT t.term_record_id 
+		FROM yynm_term_info t, yynm_group_version_rel gv 
+		WHERE t.group_id = gv.group_id 
+		AND gv.group_version_id = #group_version_id#;
+	</select>
+	
+	<!-- 获取服务监控管理列表-->
+	<select id="getServerMonitorList" parameterClass="map" resultClass="dto">
+		SELECT  term_record_id,term_id,term_type,term_ip,term_port,status
+		    FROM yynm_term_info WHERE group_id = #group_id#
+	</select>
+	
+	<!-- 获取服务监控管理总数-->
+	<select id="getServerListForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM yynm_term_info
+	</select>
+	
+	<!-- 获取所有服务器信息 -->
+	<select id="getServerStatusList" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT t.term_record_id ,t.term_name,t.term_ip,t.term_port,t.status tstatus,
+			t.cpu_info,t.mem_info,t.vnc_total,t.vnc_used,t.vnc_free,
+			v.status vstatus
+			FROM yynm_term_info t LEFT OUTER JOIN yynm_term_version_rel v 
+			ON t.term_record_id = v.term_record_id WHERE t.group_id = #group_id#
+	</select>
+	<select id="getServerStatusDetail" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT t.term_record_id ,t.term_name,t.term_ip,t.term_port,t.status tstatus,
+			t.cpu_info,t.mem_info,t.vnc_total,t.vnc_used,t.vnc_free,
+			v.status vstatus
+			FROM yynm_term_info t LEFT OUTER JOIN yynm_term_version_rel v 
+			ON t.term_record_id = v.term_record_id
+	</select>
+	<select id="getServerStatusDetailList" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT a.vncm_id,a.group_id,a.dev_type,a.vncm_ip,a.vncm_name,a.vncm_port,a.status,a.vncm_type,a.cpu_info,
+		a.mem_info,a.vncm_total,a.vncm_online,a.version,a.vncm_message,b.group_name,d.update_version from dgw_vncm_info a 
+		left join dgw_group_info b on a.group_id=b.group_id 
+		left join (select a.group_id,b.update_version from dgw_group_version_info a, dgw_version_info b where a.version_id = b.version_id) d on a.group_id=d.group_id
+		where a.status!=-1 order by a.group_id,a.vncm_ip
+	</select>
+		
+	<!-- 根据主键更新服务器信息-->
+	<update id="updateServerItem" parameterClass="dto">
+         UPDATE yynm_term_version_rel
+		<dynamic prepend="SET">
+		<isNotNull prepend="," property="status">
+	         status = #status#
+			</isNotNull>
+			<isNotNull prepend="," property="update_date">
+	         update_date = #update_date#
+			</isNotNull>
+		</dynamic> 
+	        WHERE term_record_id = #term_record_id#
+	</update>
+	
+</sqlMap>

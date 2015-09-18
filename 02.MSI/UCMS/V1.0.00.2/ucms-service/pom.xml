@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+	  <artifactId>ucms</artifactId>
+	  <groupId>prod.nebula.ucms</groupId>
+	  <version>1.0.00.0-SNAPSHOT</version>
+	</parent>
+	<groupId>prod.nebula.ucms.service</groupId>
+	<artifactId>ucms-service</artifactId>
+	<version>1.0.00.0-SNAPSHOT</version>
+	
+	<dependencies>
+		<dependency>
+  			<groupId>com.bbcv.mdb</groupId>
+  			<artifactId>MDB</artifactId>
+  		</dependency>
+  		
+		<dependency>
+			<groupId>prod.nebula.ucms.dao</groupId>
+			<artifactId>ucms-dao</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>prod.nebula.ucms.dto</groupId>
+			<artifactId>ucms-dto</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>prod.nebula.ucms.socket</groupId>
+			<artifactId>ucms-socket</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>prod.nebula.ucms.mdb</groupId>
+			<artifactId>ucms-mdb</artifactId>
+		</dependency>
+	</dependencies>
+</project>

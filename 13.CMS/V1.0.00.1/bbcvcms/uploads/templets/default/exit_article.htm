@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>高清退出页</title>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="This is my page">
+    <!--
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    -->
+    <link rel="stylesheet" href="{dede:global.cfg_filebase/}/exit/css/exit.css">
+</head>
+
+<body>
+
+<div class="container">
+    <div class="logo">单向终端云点播</div>
+
+    <p align="center" style="font-size: 20px;padding-left: 5px;padding-top: 540px;"><span id="endtime">9</span>秒后自动结束播放</p>
+    <!--<p align="center" style="padding-top: 0px;">按退出键退出，按其他键继续观看内容</p>-->
+
+
+
+</div>
+
+<script type="text/javascript">
+    var CID = "endtime";
+    var username = decodeURIComponent(getQueryStringByName("username"));
+    var stream_id = getQueryStringByName("streamid")
+    if(window.CID != null)
+    {
+        var iTime = document.getElementById(CID).innerText;
+        var Account;
+        RemainTime();
+    }
+    function RemainTime()
+    {
+
+        var sSecond="",sTime="";
+        if (iTime >= 0)
+        {
+
+
+            if (iTime >= 0){
+                sSecond = iTime;
+                sTime="<span style='color:darkorange'>" + sSecond + "</font>";
+            }
+
+            if(iTime==0){
+                clearTimeout(Account);
+                window.location.href="http://{dede:global.cfg_nav_server/}/NS/QuitServlet?streamid="+stream_id+"&username="+username;
+
+            }
+            else
+            {
+                Account = setTimeout("RemainTime()",1000);
+            }
+            iTime=iTime-1;
+        }
+        else
+        {
+            sTime="<span style='color:red'>倒计时结束！</span>";
+        }
+        document.getElementById(CID).innerHTML = sTime;
+    }
+
+    function getQueryStringByName(name){
+        var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+        if(result == null || result.length < 1){
+            return "";
+        }
+        return result[1];
+    }
+
+
+</script>
+</body>
+</html>

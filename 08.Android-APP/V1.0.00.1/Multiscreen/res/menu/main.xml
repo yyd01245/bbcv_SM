@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.bbcvision.Multiscreen.MainActivity" >
+
+   <!-- <item
+        android:id="@+id/item_exit"
+        android:orderInCategory="10"
+        android:title="退出"
+        android:showAsAction="never" /> -->
+
+</menu>

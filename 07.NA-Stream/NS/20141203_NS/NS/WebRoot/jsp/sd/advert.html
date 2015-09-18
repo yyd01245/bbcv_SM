@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html charset=utf-8">
+<script src="js/jquery-1.11.0.min.js" language="javascript" type="text/javascript"></script>
+<style>
+body,div,h1,h2,i,span,ul,li,a,p{margin:0px;padding:0px;}
+body{	
+	width:720px;
+	height:576px;
+	overflow: hidden;
+	font-size: 20px;
+	font-family: "黑体";
+	color:#000;
+}
+	.advert_page{
+	width:720px;
+	height:576px;
+	background:url("images/advert_bg.jpg") no-repeat;
+	overflow: hidden;
+	background-size:720px 576px;
+}
+.contair{
+	height:348px;
+	margin:102px 0px 0px 65px;
+}
+.play_advert{
+	width:438px; 
+	height:358px;
+	float:left;
+}
+.ing_player{
+	float:left;
+	width:164px;
+	margin-left:22px;
+	height:358px;
+	overflow:hidden;
+}
+.title{
+	text-align:center;
+	white-space:nowrap;
+	font-size: 28px;
+	color:#fff;
+	line-height:52px;
+	height:52px;
+	
+}
+
+.poster{
+	width:136px;
+	height:203px;
+	margin-left: 30px;
+}
+.poster img{
+	width:103px;
+	height:220px;
+}
+
+.advert{
+	width:438px;
+	height:356px;
+}
+.marquee{
+	margin:28px 0px 0px 25px;
+	width:400px;
+	height:34px;
+	font-size: 20px;
+	color:#fff;
+	overflow: hidden;
+	
+}
+.advert video{
+	width:402px;
+	height:285px;
+}
+.runtext img{
+	margin-bottom: -6px;
+	width:26px;
+	height:26px;
+}
+.tit{
+	height:58px;
+	margin:42px 0px 16px 0px;
+	margin-left:150px;
+}
+.tits{
+	height:58px;
+	margin:42px 0px 16px 0px;
+}
+</style>
+</head>
+<body>
+	<div class="advert_page">
+		<div class="contair">
+			<div class="play_advert">
+				<div class="advert">
+					<video  autoplay="true" ></video>
+				</div>
+				<div class="marquee">
+					<div class="runtext">
+						<div id ="scroll" style="width:500px;margin-left:100px;">用户<span>137****0000</span>暂停操作中,请按<img src="images/button.png">继续操作</div>
+					</div>
+				</div>
+			</div>
+			<div class="ing_player">
+				<h1 class="title"></h1>
+					<div class="poster">
+						<img/>
+					</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+
+	var web="js/movie.js"
+	$.getJSON(web).then(function(json){
+	 insert(json);
+	},
+	function(){
+	console.log(arguments)
+	});	
+	function insert(json){
+		$(json).each(function(index){
+				$("h1").html("《"+json[0].name+"》");
+				$(".advert").find("video").attr("src",json[0].videosrc);
+				$(".poster").find("img").attr("src",json[0].poster)
+			})
+			if($(".title").html().length>=7)
+				$("h1").wrap("<div class='tit'/>")
+			else
+				$("h1").wrap("<div class='tits'/>")
+				
+	}
+	
+	var tmpDelay=10000,$tmTip=$("#scroll");
+	$(function(){
+		marquee();
+		tit()
+		setInterval(tit,60)
+		setInterval(marquee,tmpDelay);
+		
+	})
+	function marquee(){
+		$tmTip.fadeIn(function() {
+			$tmTip.animate({marginLeft: '-400'}, tmpDelay, 'linear',function() {
+				$tmTip.css("marginLeft","400px");
+			});
+		});
+	}
+	function tit(){
+		$(".tit").fadeIn(function(){
+			$(".tit").animate({marginLeft:"-450"},8000,function(){
+				$(".tit").css("margin-left","150px")
+			})
+		})
+	}
+	
+	</script>
+</body>
+</html>

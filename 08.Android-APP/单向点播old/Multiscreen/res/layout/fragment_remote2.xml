@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/remote_control_bg_1" >
+
+    <RelativeLayout
+        android:id="@+id/rl_remote_control_tittle"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/remote_control_plate_tittle"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/iv_remote_control_tittle"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:gravity="center"
+            android:text="本地频道号："
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/iv_remote_control_tittleNUM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/iv_remote_control_tittle"
+            android:gravity="center"
+            android:text="1"
+            android:textColor="#FBCC4D"
+            android:textSize="35sp" />
+
+        <TextView
+            android:id="@+id/iv_remote_control_tittle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/vg_remote_control_ctrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl_remote_control_tittle"
+        android:gravity="center_vertical" >
+
+        <RelativeLayout
+            android:id="@+id/inner_rl_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp" >
+
+            <ImageView
+                android:id="@+id/iv_remote_control_bg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/remote_control_plate_bg_1" />
+
+            <ImageView
+                android:id="@+id/iv_remote_control_bg2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/remote_control_plate_bg_3" />
+
+            <ImageView
+                android:id="@+id/iv_remote_control_plate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:adjustViewBounds="true"
+                android:src="@drawable/remote_control_plate_bg" />
+
+            <ImageButton
+                android:id="@+id/btn_remote_control_play_pause"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:background="#00000000"
+                android:src="@drawable/selector_remote_control_play_pause" />
+
+            <ImageButton
+                android:id="@+id/btn_remote_control_up"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:layout_alignTop="@+id/iv_remote_control_plate"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:adjustViewBounds="true"
+                android:background="#00000000"
+                android:src="@drawable/selector_remote_control_up" />
+
+            <ImageButton
+                android:id="@+id/btn_remote_control_dowm"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:layout_alignBottom="@+id/iv_remote_control_bg2"
+                android:layout_alignLeft="@+id/btn_remote_control_up"
+                android:layout_marginBottom="20dp"
+                android:adjustViewBounds="true"
+                android:background="#00000000"
+                android:src="@drawable/selector_remote_control_down" />
+
+            <ImageButton
+                android:id="@+id/btn_remote_control_left"
+                android:layout_width="40dp"
+                android:layout_height="120dp"
+                android:layout_alignLeft="@+id/iv_remote_control_plate"
+                android:layout_centerVertical="true"
+                android:adjustViewBounds="true"
+                android:background="#00000000"
+                android:src="@drawable/selector_remote_control_left" />
+
+            <ImageButton
+                android:id="@+id/btn_remote_control_right"
+                android:layout_width="40dp"
+                android:layout_height="120dp"
+                android:layout_alignRight="@+id/iv_remote_control_plate"
+                android:layout_centerVertical="true"
+                android:adjustViewBounds="true"
+                android:background="#00000000"
+                android:src="@drawable/selector_remote_control_right" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/ll_inner_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/inner_rl_1"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/btn_remote_control_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/selector_remote_control_stop"
+                android:paddingTop="20dp"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_remote_control_quik_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/inner_rl_1"
+            android:layout_below="@+id/inner_rl_1"
+            android:background="@drawable/selector_remote_control_quik_back" />
+
+        <Button
+            android:id="@+id/btn_remote_control_quik_forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/inner_rl_1"
+            android:layout_below="@+id/inner_rl_1"
+            android:background="@drawable/selector_remote_control_quik_go" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/inner_ll_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="60dp"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/btn_remote_control_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/remote_control_ret_exit_margin_each"
+            android:background="@drawable/selector_def_btn"
+            android:gravity="center"
+            android:text="返  回"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/btn_remote_control_exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/remote_control_ret_exit_margin_each"
+            android:background="@drawable/selector_def_btn"
+            android:gravity="center"
+            android:text="退  出"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/sb_vodpart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/vg_remote_control_ctrl"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="7dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp" />
+
+</RelativeLayout>

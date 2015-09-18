@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+	<!-- 配置ActionFormBean -->
+	<form-beans>
+		<!-- 公共Form -->
+		<form-bean name="commonActionForm" type="org.eredlab.g4.rif.web.CommonActionForm" />
+	</form-beans>
+
+	<!-- Action映射 -->
+	<action-mappings type="org.apache.struts.action.ActionMapping">
+		<!-- 应用地址导入-->
+		<action name="commonActionForm" path="/urlManage" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.caas.web.UrlManageAction">
+			<forward name="r30aView" path="/r30aUrl.jsp" />
+		</action>
+	</action-mappings>
+</struts-config>

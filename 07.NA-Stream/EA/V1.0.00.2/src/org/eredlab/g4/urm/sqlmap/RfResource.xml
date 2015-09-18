@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- QAM手工映射SQL语句 -->
+<sqlMap namespace="RfResource">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<!-- 根据主键查询代码表 -->
+	<select id="getQamResByKey" parameterClass="map" resultClass="dto">
+		SELECT * FROM urm_ipqam_resource 
+		 WHERE ipqam_res_id = #ipqam_res_id#
+	</select>
+	<!-- 查询QAM信息 -->
+	<select id="getQamListForPage" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM urm_ipqam_info q
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="ipqam_ip">
+				q.ipqam_ip like '%$ipqam_ip$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="ipqam_name">
+				q.ipqam_name like '%$ipqam_name$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 获取QAM总数 -->
+	<select id="getQamListForPageCount" parameterClass="map"
+		resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info q
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="ipqam_ip">
+				q.ipqam_ip like '%$ipqam_ip$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="ipqam_name">
+				q.ipqam_name like '%$ipqam_name$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 获取QAM资源列表通过QAMID-->
+	<select id="getListWithQamID" parameterClass="map" resultClass="dto">
+		SELECT f.rf_id,f.ipqam_id,i.ipqam_ip,i.ipqam_port,f.order_port,f.sg_id,f.area_id,f.priority,f.remark
+			FROM urm_ipqam_info i LEFT OUTER JOIN  urm_ipqam_frequency f ON i.ipqam_id=f.ipqam_id
+			WHERE f.ipqam_id= #ipqam_id# ORDER BY f.rf_id DESC
+	</select>
+	<select id="getRfIDByIPqam" parameterClass="map" resultClass="dto">
+		SELECT f.rf_id FROM urm_ipqam_info i LEFT OUTER JOIN  urm_ipqam_frequency f ON i.ipqam_id=f.ipqam_id
+			WHERE f.ipqam_id= #ipqam_id#
+	</select>
+	<select id="getIdByrf_id" parameterClass="map" resultClass="dto">
+		SELECT ipqam_res_id FROM urm_ipqam_resource WHERE rf_code= #rf_code# and res_status = 1
+	</select>
+	<!-- 获取QAM资源总数通过QAMID-->
+	<select id="getListWithQamIDCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_frequency
+		 	WHERE ipqam_id= #ipqam_id#
+		ORDER BY rf_id DESC
+	</select>
+	<!-- 添加频点重复校验 -->
+	<select id="getListByRfID" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_frequency
+		 	WHERE rf_id= '$rf_id$' and status !=-1 and network_code= '$network_code$'
+	</select>
+	<!-- 修改频点重复校验 -->
+	<select id="getListByRfIDs" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_frequency
+		 	WHERE rf_id= '$rf_id$' and status !=-1 and network_code= '$network_code$' and rf_code !='$rf_code$'
+	</select>
+	<select id="getRfCodeByRfId" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT a.rf_code from urm_ipqam_frequency a INNER JOIN urm_ipqam_info d ON d.network_code=a.network_code WHERE a.status!=-1 and d.ipqam_id ='$ipqam_id$' and a.rf_id=#rf_id#
+	</select>
+	<select id="getCountByRfId" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT COUNT(*) from urm_ipqam_frequency a INNER JOIN urm_ipqam_info d ON d.network_code=a.network_code WHERE a.status!=-1 and d.ipqam_id ='$ipqam_id$' and a.rf_id=#rf_id#
+	</select>
+	<!-- 获取QAM资源列表-->
+	<select id="getListForPage" parameterClass="map" resultClass="dto">
+		SELECT f.rf_id,f.ipqam_id,i.ipqam_ip,i.ipqam_port,f.order_port,f.sg_id,f.area_id,f.priority,f.remark
+			FROM urm_ipqam_info i LEFT OUTER JOIN  urm_ipqam_frequency f ON i.ipqam_id=f.ipqam_id
+		   WHERE f.order_port LIKE '%$queryParam$%'
+		      OR f.area_id LIKE '%$queryParam$%'
+		ORDER BY f.rf_id DESC
+	</select>
+	<select id="queryItemsByNetworkCode" parameterClass="map" resultClass="dto">
+		SELECT rf_code,rf_id,order_port,rf_bandwidth,network_code,switch_type,remark,biz_ip,rf_type,r6_firm,app_name,admin_ip from urm_ipqam_frequency where status=1 and network_code=#network_code# ORDER BY rf_code DESC
+	</select>
+	<select id="queryItemsByNetworkCodeCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_frequency
+		 	WHERE status =1 and network_code=#network_code#
+	</select>
+	
+	
+	<!-- 获取QAM资源总数-->
+	<select id="getListForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_frequency
+		 WHERE order_port LIKE '%$queryParam$%'
+		      OR area_id LIKE '%$queryParam$%'
+		ORDER BY rf_id DESC
+	</select>
+	
+	<!-- 插入QAM表一条记录 -->
+	<insert id="saveRfItem" parameterClass="dto">
+		INSERT INTO urm_ipqam_frequency (
+		   rf_code,rf_id,order_port,rf_bandwidth,network_code,status,switch_type,remark) 
+		VALUES (#rf_code#,#rf_id#,#order_port#,#rf_bandwidth#,#network_code#,1,#switch_type#,#remark#)
+	</insert> 
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+	<insert id="saveRfItemHis" parameterClass="dto">
+		INSERT INTO urm_ipqam_frequency_his (
+		   rf_code,rf_id,order_port,rf_bandwidth,network_code,status,switch_type,remark,delete_time,busi_id) 
+		VALUES (#rf_code#,#rf_id#,#order_port#,#rf_bandwidth#,#network_code#,-1,#switch_type#,#remark#,SYSDATE(),#busi_id#)
+	</insert> 
+	<!-- 删除一条云应用表记录  -->
+	<delete id="deleteRfItems" parameterClass="map" >
+		delete from urm_ipqam_frequency  WHERE rf_code = #rf_code#
+	</delete>
+	<!-- 根据频点删除一条云应用表记录  -->
+	<delete id="deleteQamByrf_id" parameterClass="map" >
+		update urm_ipqam_resource set res_status =-2
+		      WHERE rf_code = #rf_code#
+	</delete>
+	<delete id="deleteItemsByCode" parameterClass="map" >
+		delete from urm_ipqam_frequency  WHERE network_code = #network_code#
+	</delete>
+	
+	<!-- 根据主键更新用户 -->
+	<update id="updateRfItem" parameterClass="dto">
+         UPDATE urm_ipqam_frequency
+		<dynamic prepend="SET">
+		<isNotNull prepend="," property="rf_id">
+	         rf_id = #rf_id#
+			</isNotNull>
+			<isNotNull prepend="," property="order_port">
+	         order_port = #order_port#
+			</isNotNull>
+			<isNotNull prepend="," property="rf_bandwidth">
+	         rf_bandwidth = #rf_bandwidth#
+			</isNotNull>
+			<isNotNull prepend="," property="switch_type">
+			switch_type = #switch_type#
+			</isNotNull>
+			<isNotNull prepend="," property="rf_type">
+			rf_type = #rf_type#
+			</isNotNull>
+			<isNotNull prepend="," property="biz_ip">
+			biz_ip = #biz_ip#
+			</isNotNull>
+			<isNotNull prepend="," property="r6_firm">
+			r6_firm = #r6_firm#
+			</isNotNull>
+			<isNotNull prepend="," property="app_name">
+			app_name = #app_name#
+			</isNotNull>
+			<isNotNull prepend="," property="admin_ip">
+			admin_ip = #admin_ip#
+			</isNotNull>
+			<isNotNull prepend="," property="remark">
+	         remark = #remark#
+			</isNotNull>
+		</dynamic> 
+	        WHERE rf_code = #rf_code# 
+	</update>
+	<update id="updateRfItem1" parameterClass="dto">
+         UPDATE urm_ipqam_frequency
+		<dynamic prepend="SET">
+			<isNotNull prepend="," property="order_port">
+	         order_port = #order_port#
+			</isNotNull>
+			<isNotNull prepend="," property="sg_id">
+	         sg_id = #sg_id#
+			</isNotNull>
+			<isNotNull prepend="," property="priority">
+	         priority = #priority#
+			</isNotNull>
+			<isNotNull prepend="," property="remark">
+	         remark = #remark#
+			</isNotNull>
+		</dynamic> 
+	        WHERE rf_id = #rf_id# 
+	</update>
+	<update id="updateRfItem2" parameterClass="dto">
+         UPDATE urm_ipqam_frequency
+		<dynamic prepend="SET">
+			<isNotNull prepend="," property="order_port">
+	         order_port = #order_port#
+			</isNotNull>
+			<isNotNull prepend="," property="area_id">
+	         area_id = #area_id#
+			</isNotNull>
+			<isNotNull prepend="," property="priority">
+	         priority = #priority#
+			</isNotNull>
+			<isNotNull prepend="," property="remark">
+	         remark = #remark#
+			</isNotNull>
+		</dynamic> 
+	        WHERE rf_id = #rf_id# 
+	</update>
+	<update id="updateRfItem3" parameterClass="dto">
+         UPDATE urm_ipqam_frequency
+		<dynamic prepend="SET">
+			<isNotNull prepend="," property="order_port">
+	         order_port = #order_port#
+			</isNotNull>
+			<isNotNull prepend="," property="area_id">
+	         area_id = 10000
+			</isNotNull>
+			<isNotNull prepend="," property="priority">
+	         priority = #priority#
+			</isNotNull>
+			<isNotNull prepend="," property="remark">
+	         remark = #remark#
+			</isNotNull>
+		</dynamic> 
+	        WHERE rf_id = #rf_id# 
+	</update>
+	<!-- 获取频点获得QAM资源-->
+	<select id="getListByrf_id" parameterClass="map" resultClass="dto">
+		SELECT * FROM urm_ipqam_resource
+			WHERE rf_code= #rf_code#
+	</select>
+	<select id="getDelByCode" parameterClass="map" resultClass="dto">
+		select * from urm_ipqam_frequency where rf_code = #rf_code#
+	</select>
+	<select id="getRfArea" parameterClass="map" resultClass="dto">
+		select a.area_id,a.sg_id ,b.rf_id from urm_network_area a inner join urm_ipqam_frequency b on a.network_code = b.network_code
+		where rf_code = #rf_code#
+	</select>
+</sqlMap>

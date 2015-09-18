@@ -1,0 +1,66 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width,initial-scale=1.0, maximum-scale=1.0,user-scalable=0" name="viewport" />
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta content="telephone=no" name="format-detection" />
+<title>点播列表页</title>
+<link href="css/base.css" rel="stylesheet" type="text/css" media="all" />
+<link href="css/layout.css" rel="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/data.js"></script>
+</head>
+
+<body>
+<div id="header">
+		<h1 class="back">电影</h1>
+		<h1 class="search logo"><a href="#" onclick="pageCtrl('search')"></a></h1>        
+</div>
+<div class="movielist">
+	<div class="item clone">
+		<a href="voddetail.html?name=ypzjs">
+			<div class="img"><img src="images/ypzjs.jpg"/></div>
+			<h2>营盘镇警事</h2>
+			<p class="actor">主演： 张嘉译 / 丁海峰</p>
+			<p class="director">导演：马进</p>
+			<p class="ondate">2012-09</p>
+			<p class="star">评分：5.6分</p>
+		</a>
+	</div>
+</div> 
+<script>
+	var fclass=decodeurl(getQueryStringByName("class"));
+	$("#header h1.back").text(fclass);
+	$(document).ready(function(){
+		initdata();		
+	})
+	function initdata(){
+		var nodesource;
+		$.each(data,function(i,ele){
+			if(ele.class==fclass){
+				nodesource=ele.resource;
+			}
+			else{
+				return;
+			}
+		})
+		console.log(nodesource);
+		nodesource.forEach(function(s){
+			var newEle = $(".movielist .item.clone").clone().removeClass("clone");
+			newEle.find("a").attr("href","voddetail.html?name="+s.id);
+			newEle.find("img").attr("src",s.poster);
+			newEle.find("a > h2").text(s.name);
+			newEle.find("p.actor").text("主演："+s.actor);
+			newEle.find("p.director").text("导演："+s.director);
+			newEle.find("p.ondate").text(s.ondata);
+			newEle.find("p.star").text("评分："+s.star+"分");
+			newEle.appendTo($(".movielist"));
+		})		
+	}
+</script>
+</body>
+</html>
+

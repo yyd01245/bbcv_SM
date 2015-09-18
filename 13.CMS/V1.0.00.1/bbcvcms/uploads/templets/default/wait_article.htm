@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>等待内容</title>
+	<link rel="stylesheet" href="{dede:global.cfg_filebase/}/ad/css/wait.css">
+</head>
+
+<body>
+<div class="container">
+	<div class="container">
+		<div class="logo">单向终端云点播</div>
+		<div class="video">
+			<video id="video" src="{dede:field.path /}" autoplay="true" loop></video>
+		</div>
+		<p class="text">
+			<a href="#" id="id1" style="display: block;"><span id="userType"></span>点播(<span id="endtime">30</span>)</a>
+			<a href="#" id="id2" style="display: none;"><span style='color:darkorange' >节目即将播放...</span></a>
+		</p>
+
+	</div>
+</div>
+<script src="{dede:global.cfg_filebase/}/ad/js/jquery-1.11.0.min.js"></script>
+<script>
+	var reg = /^(13[0-9]|14(5|7)|15(0|1|2|3|5|6|7|8|9)|18[0-9])\d{8}$/;
+	var poneOrWeiXin;
+	var stream_id = getQueryStringByName("streamid");
+	var username = poneOrWeiXin = decodeURIComponent(getQueryStringByName("username"))
+
+	if(reg.test(poneOrWeiXin)){// 手机用户
+		var mphone =poneOrWeiXin.substring(0,3);
+		var mphone1 =poneOrWeiXin.substring(7,11);
+		var u = mphone+"****"+mphone1;
+		document.getElementById("userType").innerHTML = "等待手机用户("+u+")";
+	}else{
+		document.getElementById("userType").innerHTML = "等待微信用户("+username+")";
+	}
+
+	//$("#video")[0].src = ;
+
+
+	var CID = "endtime";
+
+	if(window.CID != null)
+	{
+		var iTime = document.getElementById(CID).innerText;
+		var Account;
+		RemainTime();
+	}
+
+	function getQueryStringByName(name){
+		var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+		if(result == null || result.length < 1){
+			return "";
+		}
+		return result[1];
+	}
+
+
+	function RemainTime()
+	{
+
+		$.ajax( {
+			url: "http://{dede:global.cfg_nav_server/}/NS/TransitionServlet?method=2&username="+username,
+			type: "GET",
+			success: function(data){
+
+				if(data.trim()=="success"){
+					iTime=-1;
+				}
+				//document.getElementById(CID).innerHTML = "<span style='color:red'>我收不了啦！</span>";
+
+			}
+		});
+
+		var sSecond="",sTime="";
+		if (iTime >= 0)
+		{
+
+			//  document.getElementById("id2").style.display="none";//显示
+			if (iTime >= 0){
+				sSecond = iTime + "秒";
+				sTime="<span style='color:darkorange'>" + sSecond + "</font>";
+			}
+
+			if(iTime==0){
+				clearTimeout(Account);
+
+				window.location.href="http://{dede:global.cfg_nav_server/}/NS/OverTimeServlet?streamid="+stream_id+"";
+			}
+			else
+			{
+				Account = setTimeout("RemainTime()",1000);
+			}
+			iTime=iTime-1;
+		}
+		else
+		{
+			//  sTime="<span style='color:darkorange'>精彩马上呈现";
+			document.getElementById("id1").style.display="none";//显示
+			document.getElementById("id2").style.display="";//显示
+
+
+			// alert(iTime1);
+			//  document.getElementById(CID).innerHTML = "<span style='color:red'>我收不了啦！</span>";
+
+			$.ajax( {
+				url: "http://{dede:global.cfg_nav_server/}/NS/TransitionServlet?method=3&username="+username, //这里是静态页的地址
+				type: "GET", //静态页用get方法，否则服务器会抛出405错误
+				success: function(data){
+
+				}
+			});
+
+		}
+		document.getElementById(CID).innerHTML = sTime;
+	}
+
+	function queryStatus(){
+
+		var url ="http://{dede:global.cfg_nav_server/}/NS/mobile/ShowVodInfo?flag=get&streamid="+stream_id+"&vodid="+getQueryStringByName("aid")+"&username="+username+"&resolution=0";
+
+		$.post(url, function(data) {
+			if(data!=""&&"error"!=data.trim()){
+				window.location.href=data;
+			}
+		});
+	}
+
+	setInterval("queryStatus();",2000);
+</script>
+</body>
+</html>

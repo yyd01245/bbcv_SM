@@ -1,0 +1,25 @@
+@CHARSET "UTF-8";
+
+body {
+	font: 11px arial;
+}
+
+.suggest_link {
+	background-color: #EEEEEE;
+	padding: 2px 6px 2px 6px;
+}
+
+.suggest_link_over {
+	cursor: default;
+	color: white;
+	background-color: #3366CC;
+	padding: 2px 6px 2px 6px;
+	cursor:hand;
+}
+
+#suggest {
+	position: absolute;
+	text-align: left;
+	width: 240px;
+	border: 1px solid #000000;
+}

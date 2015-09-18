@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 升级包管理手工映射SQL语句 -->
+<sqlMap namespace="PackageVersion">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	<!-- 根据最大索引值 -->
+	<select id="queryVersionMaxIndex" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT MAX(version_id) from dgw_version_info
+	</select>
+	<!-- 根据主键查询 -->
+	<select id="ISJarRename" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) from dgw_version_info where tarname = #jarname#
+	</select>
+	<select id="reTarCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) from dgw_version_info where tarname = #jarname# and version_id = #version_id# and jar_type=#jar_type#
+	</select>
+	<!-- 根据主键查询 -->
+	<select id="ISUpdateJarRename" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) from dgw_version_info where tarname = #jarname# and version_id != #version_id#
+	</select>
+
+	<!-- 根据主键查询 -->
+	<select id="queryFileName" parameterClass="map" resultClass="dto">
+		SELECT tarname FROM dgw_version_info WHERE version_id = #version_id#
+	</select>
+	
+		
+	<!-- 保存版本信息 -->
+	<insert id="savePackageVersionItem" parameterClass="dto">
+		INSERT INTO dgw_version_info (
+		   version_id,targetaddr,update_version,jar_type,status,create_date,jar_size,tarname) 
+		VALUES (#version_id#, #targetaddr#,#update_version#,#jar_type#,#status#,#create_date#,#jar_size#,#jarname#)
+	</insert>
+	
+	<!-- 根据主键更新升级包-->
+	<update id="updatePackageItem" parameterClass="dto">
+         UPDATE dgw_version_info
+		<dynamic prepend="SET">
+		<isNotEmpty prepend="," property="update_version">
+	         update_version = #update_version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="version_addr">
+	         targetaddr = #version_addr#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="tarname">
+	         tarname = #tarname#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="update_date">
+	         update_date = #update_date#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE version_id = #version_id#
+	</update>
+	
+	<!-- 判断升级包、应用组关系表中是否有升级包ID-->
+	<select id="getJARID" parameterClass="map" resultClass="dto">
+		SELECT count(*) total FROM dgw_group_version_info 
+		 WHERE version_id = #version_id#
+	</select>
+	
+	
+	<!-- 获取应用组管理列表-->
+	<select id="getPackageVersionListForPage" parameterClass="map" resultClass="dto">
+		SELECT  version_id,targetaddr,update_version,jar_type,status,jar_size,tarname as file2,tarsh as file1
+		    FROM dgw_version_info ORDER BY version_id
+	</select>
+	<select id="getPackageVersionListForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_version_info ORDER BY version_id
+	</select>
+
+	<!-- 根据组类型查询升级包 -->
+	<select id="getPackageVersionListByType" parameterClass="map" resultClass="dto">
+		SELECT  version_id as value,tarname as text FROM dgw_version_info where jar_type =#jar_type# ORDER BY version_id
+	</select>
+	<select id="getPackageVersionListCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_version_info where jar_type =#jar_type# ORDER BY version_id
+	</select>
+	
+	<!-- 删除升级包 -->
+	<delete id="deletePackageVersionItems" parameterClass="map" >
+		DELETE FROM dgw_version_info WHERE version_id = #version_id#
+	</delete>
+	
+</sqlMap>

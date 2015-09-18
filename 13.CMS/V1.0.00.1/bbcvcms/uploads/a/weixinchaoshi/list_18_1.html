@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="<%=basePath%>">
+
+    <title>高清暂停页</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="This is my page">
+    <!--
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    -->
+    <link rel="stylesheet" href="/bbcvcms/uploads/filebase/expire/css/wechat.css">
+</head>
+
+<body>
+
+<div class="container">
+    <div class="logo">单向终端云点播</div>
+    <p style="padding-left: 81px;"></p>
+    <h5 align="center"><span id="userType"></span>暂停超时，你可在<span id="endtime"></span>之前再次免费点播</h5>
+</div>
+
+<script type="text/javascript">
+
+    var reg = /^(13[0-9]|14(5|7)|15(0|1|2|3|5|6|7|8|9)|18[0-9])\d{8}$/;
+
+    var stream_id = getQueryStringByName("streamid")
+    var poneOrWeiXin;
+    var username = poneOrWeiXin = decodeURIComponent(getQueryStringByName("username"));
+
+    if(reg.test(poneOrWeiXin)){// 手机用户
+        var mphone =poneOrWeiXin.substring(0,3);
+        var mphone1 =poneOrWeiXin.substring(7,11);
+        var u = mphone+"****"+mphone1;
+        document.getElementById("userType").innerHTML = "手机用户("+u+")";
+    }else{
+        document.getElementById("userType").innerHTML = "微信用户("+username+")";
+    }
+
+</script>
+
+<script type="text/javascript">
+    var CID = "endtime";
+    document.getElementById(CID).innerHTML = getDay(5);
+
+
+    function getDay(day){
+        var today = new Date();
+
+        var targetday_milliseconds=today.getTime() + 1000*60*60*24*day;
+
+        today.setTime(targetday_milliseconds); //注意，这行是关键代码
+
+        var tYear = today.getFullYear();
+        var tMonth = today.getMonth();
+        var tDate = today.getDate();
+        tMonth = doHandleMonth(tMonth + 1);
+        tDate = doHandleMonth(tDate);
+        return tMonth+"月"+tDate+"号";
+    }
+    function doHandleMonth(month){
+        var m = month;
+        if(month.toString().length == 1){
+            m = "0" + month;
+        }
+        return m;
+    }
+
+
+    function RemainTime(){
+        window.location.href="http://192.168.100.11:8882/NS/PauseServlet?streamid="+stream_id+"&username="+username;
+    }
+
+    setTimeout("RemainTime()",4000);
+</script>
+</body>
+</html>

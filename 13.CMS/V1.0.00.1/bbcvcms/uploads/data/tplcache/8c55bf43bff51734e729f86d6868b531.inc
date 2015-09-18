@@ -1,0 +1,16 @@
+{
+	        id:"[field:en/]",
+			name:"[field:title/]",
+			movieintro:"[field:intro/]",
+			videosrc:"[field:demosrc/]",
+			director:"[field:director/]",
+			actor:"[field:actor/]",
+			type:"[field:type/]",
+			ondata:"[field:redate/]",
+			rstp:"[field:rtsp/]",
+			poster:"[field:poster/]",
+			sliderposter:"[field:bigposter/]",
+			area:"[field:area/]",
+			star:"[field:grade/]",
+			other:"[field:other/]"
+		},

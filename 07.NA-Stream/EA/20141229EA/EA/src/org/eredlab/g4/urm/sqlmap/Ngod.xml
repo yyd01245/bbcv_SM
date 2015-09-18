@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- QAM手工映射SQL语句 -->
+<sqlMap namespace="ngod">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	<!-- NGOD信息表查询语句开始 -->
+	<!-- 获取ngod数据库ID -->
+	<select id="queryMaxIndexForNgod" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT max(ngod_id) FROM urm_ipqam_ngod
+	</select>
+	
+	<!-- 查询NGOD信息 -->
+	<select id="getNgodInfoList" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM urm_ipqam_ngod where status !=-1
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="area_id">
+				area_id like '%$area_id$%'
+			</isNotEmpty>
+		</dynamic>
+		order by area_id
+	</select>
+	<!-- 查询NGOD信息数量 -->
+	<select id="getNgodInfoListForCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_ngod where status !=-1  
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="area_id">
+				area_id like '%$area_id$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="getNgodCount" parameterClass="map" resultClass="java.lang.Integer">
+		select count(*) from urm_ipqam_ngod n inner join urm_ipqam_ngod_rfinfo r on n.ngod_id = r.ngod_id 
+		where n.ngod_id = #ngod_id# 
+	</select>
+	<!-- 重名校验 -->
+	<select id="getCountByName" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_ngod where ipqam_name=#ipqam_name# 
+	</select>
+	<!-- QAMIP重复校验 -->
+	<select id="getCountByQAMIP" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_ngod where ipqam_ip=#ipqam_ip# and ipqam_port=#ipqam_port# and area_id=#area_id# and region_id=#region_id# 
+	</select>
+	<!-- 重名校验 -->
+	<select id="getCountUpByName" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_ngod where ipqam_name=#ipqam_name# and ngod_id!=#ngod_id#
+	</select>
+	<!-- QAMIP重复校验 -->
+	<select id="getCountUpByQAMIP" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_ngod where ipqam_ip=#ipqam_ip# and ipqam_port=#ipqam_port# and area_id=#area_id# and region_id=#region_id# and ngod_id!=#ngod_id#
+	</select>
+	<!-- 插入NGOD表一条记录 -->
+	<insert id="saveNgodInfo" parameterClass="dto">
+		INSERT INTO urm_ipqam_ngod (ngod_id,ipqam_name,ipqam_ip,ipqam_port,device_firm,device_type,status,dy_level,area_id,region_id,port_step,service_step,remark) 		   
+		VALUES (#ngod_id#,#ipqam_name#,#ipqam_ip#,#ipqam_port#,#device_firm#,#device_type#,1,#dy_level#,#area_id#,#region_id#,#port_step#,1,#remark#)
+	</insert>
+	<insert id="saveNgodInfoHis" parameterClass="dto">
+		INSERT INTO urm_ipqam_ngod_his (ngod_id,ipqam_name,ipqam_ip,ipqam_port,device_firm,device_type,status,dy_level,area_id,region_id,port_step,service_step,remark,delete_time,busi_id) 		   
+		VALUES (#ngod_id#,#ipqam_name#,#ipqam_ip#,#ipqam_port#,#device_firm#,#device_type#,-1,#dy_level#,#area_id#,#region_id#,#port_step#,1,#remark#,SYSDATE(),#busi_id#)
+	</insert>
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+	
+	<!-- 删除一条NGOD记录  -->
+	<delete id="deleteNgodInfo" parameterClass="map" >
+		delete from urm_ipqam_ngod WHERE ngod_id = #ngod_id#
+	</delete>
+	
+	<!-- 根据主键更新NGOD -->
+	<update id="updateNgodInfo" parameterClass="dto">
+         UPDATE urm_ipqam_ngod
+		<dynamic prepend="SET">
+			<isNotNull prepend="," property="ipqam_name">
+	         ipqam_name = #ipqam_name#
+			</isNotNull>			
+			<isNotNull prepend="," property="ipqam_ip">
+	         ipqam_ip = #ipqam_ip#
+			</isNotNull>
+			<isNotNull prepend="," property="ipqam_port">
+	         ipqam_port = #ipqam_port#
+			</isNotNull>
+			<isNotNull prepend="," property="device_firm">
+	         device_firm = #device_firm#
+			</isNotNull>
+			<isNotNull prepend="," property="dy_level">
+	         dy_level = #dy_level#
+			</isNotNull>
+			<isNotNull prepend="," property="area_id">
+	         area_id = #area_id#
+			</isNotNull>
+			<isNotNull prepend="," property="region_id">
+	         region_id = #region_id#
+			</isNotNull>
+			<isNotNull prepend="," property="port_step">
+	         port_step = #port_step#
+			</isNotNull>
+			<isNotNull prepend="," property="service_step">
+	         service_step = #service_step#
+			</isNotNull>
+			<isNotNull prepend="," property="device_type">
+			 device_type = #device_type#
+			</isNotNull>
+			<isNotNull prepend="," property="status">
+	         status = #status#
+			</isNotNull>
+			<isNotNull prepend="," property="remark">
+	         remark = #remark#
+			</isNotNull>
+		</dynamic> 
+	        WHERE ngod_id = #ngod_id# 
+	</update>
+	<!-- NGOD信息表查询语句结束 -->
+	<!-- NGOD频点信息表查询语句开始 -->
+	<!-- 获取ngod数据库ID -->
+	<select id="queryMaxIndexForNgodRf" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT max(info_id) FROM urm_ipqam_ngod_rfinfo
+	</select>
+	<!-- 信息重复校验 -->
+	<select id="getCountByKey" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_ngod_rfinfo where ngod_id=#ngod_id# and rf_id=#rf_id# 
+	</select>
+		<!-- 信息重复校验 -->
+	<select id="getCountUpByKey" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_ngod_rfinfo where ngod_id=#ngod_id# and rf_id=#rf_id# and info_id!=#info_id#
+	</select>
+	
+	<!-- 查询NGOD信息下拉队列 -->
+	<select id="getNgodInfoDownList" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqam_name,ngod_id FROM urm_ipqam_ngod where status =1 order by ngod_id 
+	</select>
+	
+	<!-- 查询y应用信息下拉队列 -->
+	<select id="getAppInfoDownList" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT app_name,login_id FROM urm_app_login order by app_name
+	</select>
+	
+	<!-- 查询NGOD频点信息 -->
+	<select id="getNgodRfInfoList" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM urm_ipqam_ngod_rfinfo where status != -1
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="rf_type">
+				rf_type like '%$rf_type$%'
+			</isNotEmpty>
+		</dynamic>
+		order by rf_type
+	</select>
+	<!-- 查询NGOD频点信息数量 -->
+	<select id="getNgodRfInfoListForCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_ngod_rfinfo where status != -1
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="rf_type">
+				rf_type like '%$rf_type$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+		<!-- 插入NGOD表一条记录 -->
+	<insert id="saveNgodRfInfo" parameterClass="dto">
+		INSERT INTO urm_ipqam_ngod_rfinfo (info_id,ngod_id,rf_id,order_port,rf_bandwidth,rf_type,app_name,rf_portnum,switch_type,status) 		   
+		VALUES (#info_id#,#ngod_id#,#rf_id#,#order_port#,#rf_bandwidth#,#rf_type#,#app_name#,#rf_portnum#,#switch_type#,1)
+	</insert>
+	<insert id="saveNgodRfInfoHis" parameterClass="dto">
+		INSERT INTO urm_ipqam_ngod_rfinfo_his (info_id,ngod_id,rf_id,order_port,rf_bandwidth,rf_type,app_name,rf_portnum,switch_type,status,delete_time,busi_id) 		   
+		VALUES (#info_id#,#ngod_id#,#rf_id#,#order_port#,#rf_bandwidth#,#rf_type#,#app_name#,#rf_portnum#,#switch_type#,-1,SYSDATE(),#busi_id#)
+	</insert>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+	
+	<!-- 删除一条NGOD记录  -->
+	<delete id="deleteNgodRfInfo" parameterClass="map" >
+		delete from  urm_ipqam_ngod_rfinfo WHERE info_id = #info_id#
+	</delete>
+	<delete id="deleteRfById" parameterClass="map">
+		delete from urm_ipqam_ngod_rfinfo where ngod_id = #ngod_id#
+	</delete>
+	<update id= "updateRfStatus" parameterClass="dto">
+		update urm_ipqam_ngod_rfinfo set status=#status# where ngod_id = #ngod_id#
+	</update>
+	<!-- 根据主键更新NGOD -->
+	<update id="updateNgodRfInfo" parameterClass="dto">
+         UPDATE urm_ipqam_ngod_rfinfo
+		<dynamic prepend="SET">
+			<isNotNull prepend="," property="rf_bandwidth">
+	         rf_bandwidth = #rf_bandwidth#
+			</isNotNull>			
+			<isNotNull prepend="," property="rf_type">
+	         rf_type = #rf_type#
+			</isNotNull>
+			<isNotNull prepend="," property="rf_portnum">
+	         rf_portnum = #rf_portnum#
+			</isNotNull>
+			<isNotNull prepend="," property="switch_type">
+			switch_type = #switch_type#
+			</isNotNull>
+			<isNotNull prepend="," property="ngod_id">
+			 ngod_id = #ngod_id#
+			</isNotNull>
+			<isNotNull prepend="," property="rf_id">
+			rf_id = #rf_id#
+			</isNotNull>
+			<isNotNull prepend="," property="app_name">
+			app_name = #app_name#
+			</isNotNull>
+			<isNotNull prepend="," property="order_port">
+			order_port = #order_port#
+			</isNotNull>
+			<isNotNull prepend="," property="status">
+			status = #status#
+			</isNotNull>
+		</dynamic> 
+	        WHERE info_id = #info_id# 
+	</update>
+	<!-- NGOD频点信息表查询语句结束 -->
+	
+	<select id="getDelNgod" parameterClass="map" resultClass="dto">
+		select * from urm_ipqam_ngod where ngod_id = #ngod_id#
+	</select>
+	<select id= "getDelNgodRf" parameterClass="map" resultClass="dto">
+		select * from urm_ipqam_ngod_rfinfo where ngod_id = #ngod_id#
+	</select>
+	<select id="getDelNgodRfById" parameterClass="map" resultClass="dto">
+		select * from urm_ipqam_ngod_rfinfo where info_id = #info_id#
+	</select>
+	<select id="getAreaById" parameterClass="map" resultClass="dto">
+		select a.area_id,a.region_id,b.rf_id from urm_ipqam_ngod a inner join urm_ipqam_ngod_rfinfo b
+		on a.ngod_id = b.ngod_id where info_id = #info_id# 
+	</select>
+	
+	<!-- D6R6查询、删除 -->
+	<select id="getD6R6" parameterClass="map" resultClass="dto">
+		select admin_ip,admin_port,id,ipqam_name,a.device_firm,a.device_type,biz_ip,rf_id,data_zone,ts_id,a.status 
+		from urm_d6r6_info a,urm_ipqam_ngod b where a.ngod_id = b.ngod_id 
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="admin_ip">
+				admin_ip = #admin_ip#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="area_id">
+			   b.area_id = '$area_id$%'
+			</isNotEmpty>
+		</dynamic> 
+	</select>
+	<select id="getD6R6Count" parameterClass="map" resultClass="java.lang.Integer">
+		select count(*)	from urm_d6r6_info a,urm_ipqam_ngod b where a.ngod_id = b.ngod_id 
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="admin_ip">
+				admin_ip = #admin_ip#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="area_id">
+			   b.area_id = '$area_id$%'
+			</isNotEmpty>
+		</dynamic> 
+	</select>
+	<select id="getD6R6Del" parameterClass="map" resultClass="dto">
+		select * from urm_d6r6_info 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="ngod_id">
+			 ngod_id = #ngod_id#
+			</isNotNull>
+			<isNotNull prepend="and" property="info_id">
+			 info_id = #info_id#
+			</isNotNull>
+		</dynamic>
+	</select>
+	<delete id="delD6R6" parameterClass="map">
+		delete from urm_d6r6_info
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="ngod_id">
+			 ngod_id = #ngod_id#
+			</isNotNull>
+			<isNotNull prepend="and" property="info_id">
+			 info_id = #info_id#
+			</isNotNull>
+		</dynamic>
+	</delete>
+	<insert id="savaD6R6His" parameterClass="map">
+	insert into urm_d6r6_info_his(id,admin_ip,admin_port,biz_ip,rf_id,data_zone,ts_id,ngod_id,info_id,device_firm,device_type,status,delete_time,busi_id)
+	 values(#id#,#admin_ip#,#admin_port#,#biz_ip#,#rf_id#,#data_zone#,#ts_id#,#ngod_id#,#info_id#,#device_firm#,#device_type#,-1,SYSDATE(),#busi_id#)
+	</insert>
+	
+	<!--                      QAM 设备管理                                   -->
+	<insert id="saveQamDevice" parameterClass="map">
+	insert into urm_ipqam_firm_conf(conf_id,firm_name,rtsp_port,device_firm,device_type,hardware_version,software_version,status,port_step,service_step,pid_rule,r6_firm,switch_type,rf_type,remark) 
+	values(#conf_id#,#firm_name#,#rtsp_port#,#device_firm#,#device_type#,#hardware_version#,#software_version#,1,#port_step#,#service_step#,#pid_rule#,#r6_firm#,#switch_type#,#rf_type#,#remark#) 
+	</insert>	
+	<select id="queryInCount" parameterClass="map" resultClass="java.lang.Integer">
+	select count(*) from urm_ipqam_firm_conf where firm_name = '$firm_name$' or device_firm = #device_firm# 
+	</select>
+	<select id="queryUpCount" parameterClass="map" resultClass="java.lang.Integer">
+	select count(*) from urm_ipqam_firm_conf where (firm_name = '$firm_name$' or device_firm = #device_firm#) and conf_id != #conf_id#
+	</select>
+	<select id="getQamList" resultClass="dto" >
+	select firm_name ,conf_id from urm_ipqam_firm_conf where status = 1
+	</select>
+	<update id="updateQamDevice" parameterClass="map" >
+	update urm_ipqam_firm_conf 
+	<dynamic prepend="set">
+	<isNotNull prepend="," property="firm_name">
+		firm_name = '$firm_name$'
+	</isNotNull>
+	<isNotNull prepend="," property="rtsp_port">
+		rtsp_port = #rtsp_port#
+	</isNotNull>
+	<isNotNull prepend="," property="device_type">
+		device_type = #device_type#
+	</isNotNull>
+	<isNotNull prepend="," property="hardware_version">
+		hardware_version = #hardware_version#
+	</isNotNull>
+	<isNotNull prepend="," property="software_version">
+		software_version = #software_version# 
+	</isNotNull>
+	<isNotNull prepend="," property="status">
+		status = #status#
+	</isNotNull>
+	<isNotNull prepend="," property="port_step">
+		port_step = #port_step#
+	</isNotNull>
+	<isNotNull prepend="," property="service_step">
+		service_step = #service_step#
+	</isNotNull>
+	<isNotNull prepend="," property="pid_rule">
+		pid_rule = #pid_rule#
+	</isNotNull>
+	<isNotNull prepend="," property="r6_firm">
+		r6_firm = #r6_firm#
+	</isNotNull>
+	<isNotNull prepend="," property="switch_type">
+		switch_type = #switch_type#
+	</isNotNull>
+	<isNotNull prepend="," property="rf_type">
+		rf_type = #rf_type#
+	</isNotNull>
+	<isNotNull prepend="," property="remark">
+		remark = #remark#
+	</isNotNull>
+
+	</dynamic>
+	where conf_id = #conf_id#
+	</update>
+	
+	<select id="queryQamDec" parameterClass="map" resultClass="dto">
+		select conf_id ,firm_name,rtsp_port,device_firm,device_type,hardware_version,software_version,status,port_step,service_step,pid_rule,r6_firm,switch_type,rf_type,remark
+		from urm_ipqam_firm_conf 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="device_firm">
+			device_firm = #device_firm#
+			 </isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="queryQamDecCount" parameterClass="map" resultClass="java.lang.Integer">
+		select count(*) from urm_ipqam_firm_conf 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="device_firm">
+			device_firm = #device_firm#
+			 </isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

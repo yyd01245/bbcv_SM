@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- QAM手工映射SQL语句 -->
+<sqlMap namespace="Navigate">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	<!-- 查询QAM信息 -->
+	<select id="getNavigateListForPage" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM ucs_navigate where 0 =0
+			<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="navigate_category">
+				navigate_category like '%$navigate_category$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="navigate_url">
+				navigate_url like '%$navigate_url$%'
+			</isNotEmpty>
+		</dynamic>
+		order by id
+	</select>
+	<select id="getNavigateLists" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM ucs_navigate a   where 0=0
+	<dynamic prepend="and">
+		<isNotEmpty prepend="and" property="navigate_category">
+				navigate_category like '%$navigate_category$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="navigate_url">
+				navigate_url like '%$navigate_url$%'
+			</isNotEmpty>
+		
+		</dynamic>
+		order by id
+	</select>
+		<select id="getNavigateListsCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM ucs_navigate a where 0=0
+			<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="navigate_category">
+				navigate_category like '%$navigate_category$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="navigate_url">
+				navigate_url like '%$navigate_url$%'
+			</isNotEmpty>
+		</dynamic>
+		order by id
+	</select> 
+
+	<!-- 查询是否有全量同步事件 -->
+	<select id="queryCountSynEvent" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT COUNT(*) from  urm_event_update where oper_status=#oper_status#
+	</select>
+	<select id="queryResourceByNavigate" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqam_id FROM urm_ipqam_info where network_code=#network_code#
+	</select>
+	<select id="queryResourceByNavigateCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info where network_code=#network_code#
+	</select>
+	<select id="queryRfResourceByNavigate" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT rf_code FROM urm_ipqam_frequency where network_code=#network_code# and status=1
+	</select>
+	<select id="queryRfResourceByNavigateCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_frequency where network_code=#network_code# and status=1
+	</select>
+	
+	<select id="getNavigateList" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM urm_network_area 
+	</select>
+	<select id="queryIDByNavigate" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqam_id FROM urm_ipqam_info where network_code=#network_code#
+	</select>
+	<select id="queryRfIDByNavigate" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM urm_ipqam_frequency where network_code=#network_code#
+	</select>
+	<select id="getNavigateListByKey" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_network_area 
+<!--		where sg_id='$sg_id$' and status!=-1 and area_id=#area_id# -->
+	</select>
+	<!-- 添加重名校验 -->
+	<select id="getNameByKey" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_network_area 
+<!--		where status!=-1 and network_name='$network_name$' -->
+	</select>
+	<select id="getNavigateListByUpdate" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_network_area where sg_id='$sg_id$' and status!=-1 and area_id=#area_id# and network_code!=#network_code#
+	</select>
+	<!-- 修改重名校验 -->
+	<select id="getNameByUpdate" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_network_area where status!=-1 and network_name='$network_name$' and network_code!=#network_code#
+	</select>
+	<!-- 获取QAM总数 -->
+	<select id="getNavigateListForPageCount" parameterClass="map"
+		resultClass="java.lang.Integer">
+		SELECT count(*) FROM ucs_navigate where 0=0
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="id">
+				id like '%$id$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="navigate_category">
+				navigate_category like '%$navigate_category$%'
+			</isNotEmpty>
+		</dynamic>
+		order by id
+	</select>
+	<!-- 获取所有网络区域的area_id和region_id组合 -->
+	<select id="getAreaRegion" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT area_id,sg_id FROM urm_network_area  where status=1 order by area_id
+	</select>
+	
+	<!-- 获取网络区域的信息 -->
+	<select id="getAreaRegionByCode" parameterClass = "map" resultClass = "dto" >
+		SELECT area_id,sg_id FROM urm_network_area  where status=1 and network_code=#network_code#
+	</select>
+	
+	<!-- 获取全量信息 -->
+	<select id="queryyNavigate" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM urm_network_area where network_code=#network_code# 
+	</select>
+	<!-- 插入QAM表一条记录 -->
+	<insert id="saveNavigate" parameterClass="dto">
+		INSERT INTO ucs_navigate (navigate_category,navigate_url,resolution,remark,state) 		   
+		VALUES (#navigate_category#,#navigate_url#,#resolution#,#remark#,#state#)
+	</insert> 
+	<!-- 插入到历史表 -->  
+	<insert id="saveNavigateHis" parameterClass="dto">
+		INSERT INTO urm_network_area_his (network_code,sg_id,network_name,th_per,area_id,status,remark,delete_time,busi_id) 		   
+		VALUES (#network_code#,#sg_id#,#network_name#,#th_per#,#area_id#,-1,#remark#,SYSDATE(),#busi_id#)
+	</insert>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+	
+	<!-- 删除一条云应用表记录  -->
+	<delete id="deleteNavigate" parameterClass="map" >
+		delete from ucs_navigate WHERE id = #id#
+	</delete>
+	
+	<!-- 根据主键更新用户 -->
+	<update id="updateNavigate" parameterClass="dto">
+         UPDATE ucs_navigate
+      
+		<dynamic prepend="SET">
+			<isNotNull prepend="," property="navigate_category">
+	         navigate_category = #navigate_category#
+			</isNotNull>
+			<isNotNull prepend="," property="navigate_url">
+	         navigate_url = #navigate_url#
+			</isNotNull>
+			<isNotNull prepend="," property="resolution">
+			resolution = #resolution#
+			</isNotNull>
+			<isNotNull prepend="," property="remark">
+	         remark = #remark#
+			</isNotNull>
+			
+		</dynamic> 
+	        WHERE id = #id# 
+	</update>
+</sqlMap>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 运维监控告警首页显示sql语句 -->
+<sqlMap namespace = "dgwmonitor">
+
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+
+	<procedure id="queryErrorThreshold" parameterClass="map">
+		{call queryErrorSumByTime(#timer#)}
+	</procedure>
+	<select id="getError" parameterClass="map" resultClass="dto" >
+		select * from errorTempTab
+	</select>
+	
+	<select id="queryHostCount" parameterClass="map" resultClass="dto">
+		select host_name,host_ip from dgw_host_info where cpu_info > host_cpu_value or  mem_info > host_mem_value 
+		or disk_info > host_disk_value or host_status=-1 or app_status = -1
+	</select>
+	
+	<select id="queryReRes" parameterClass="map" resultClass="java.lang.Integer">
+		select count(*) from dgw_urm_repeat_use_info
+	</select>
+	
+	<select id="queryExpRes" parameterClass="map" resultClass="java.lang.Integer">
+		select count(*) from dgw_resource_error_info
+	</select>
+
+</sqlMap>

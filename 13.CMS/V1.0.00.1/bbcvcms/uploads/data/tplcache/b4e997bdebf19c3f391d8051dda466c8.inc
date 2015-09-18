@@ -1,0 +1,15 @@
+{
+	        id:"[field:id/]",
+			name:"[field:title/]",
+			movieintro:"{dede:field.intro /}",
+			videosrc:"{dede:field.path /}",
+			director:"{dede:field.director /}",
+			actor:"{dede:field.actor /}",
+			type:"{dede:field.type /}",
+			ondata:"{dede:field.years /}",
+			rstp:"{dede:field.rtsp_url /}",
+			poster:"{dede:field.tv_poster_path1 /}",
+			sliderposter:"{dede:field.tv_poster_path2 /}",
+			area:"{dede:field.area /}",
+			star:"{dede:field.grade /}"
+		},

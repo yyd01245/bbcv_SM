@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html charset=utf-8">
+<link rel="stylesheet" style="text/css" href="{dede:global.cfg_filebase/}/ad/css/style.css">
+<script src="{dede:global.cfg_filebase/}/ad/js/jquery-1.11.0.min.js" language="javascript" type="text/javascript"></script>
+</head>
+<body>
+	<div class="main">
+		<div class="movie_main">
+			<img data-src="{dede:field.tv_poster_path2 /}" class="js-v-img" />
+		</div>
+		<div class="movie_introduce">
+			<h1 class="title_main">{dede:field.title /}</h1>
+			<span class="time">{dede:field.years function="MyDate('Y-m-d',@me)" /}</span>
+			<ul class="actor">
+				<li>主演：{dede:field.actor /}</li>
+				<li>导演：{dede:field.director /}</li>
+				<li>国家：{dede:field.area /}</li>
+			</ul>
+		<p class="boldp">剧情：</p>
+		<div class="plot">{dede:field.intro /}</div>
+		<div class="go_maintext">
+			<div id="scroll" style="width:100%;margin-left:200px;">用户<span id="username">137****0000</span>正在选择中</div>
+		</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+/*
+	var web="js/movie.js"
+	$.getJSON(web).then(function(json){
+	 insert(json);
+	},
+	function(){
+	console.log(arguments)
+	});	
+	function insert(json){
+		$(json).each(function(index){
+				$("h1").html(json[0].name);
+				$(".movie_main").find("img").attr("src",json[0].poster)
+				$(".time").html("("+(json[0].ondata).substr(0,4)+")");
+				$(".actor li:first").html("主演:  "+json[0].actor);
+				$(".actor li:eq(1)").html("导演:  "+json[0].director);
+				$(".actor li:eq(2)").html("国家:  "+json[0].area);
+				$(".plot").html((json[0].movieintro).substr(0,82)+"...");
+			})
+	}*/
+	var tmpDelay=10000,$tmTip=$("#scroll");
+	$(function(){
+		marquee();
+		setInterval(marquee,tmpDelay)
+	})
+	function marquee(){
+		$tmTip.fadeIn(function() {
+			$tmTip.animate({marginLeft: '-460'}, tmpDelay, 'linear',function() {
+				$tmTip.css("marginLeft","460px");
+			});
+		});
+	}
+$(".js-v-img").each(function(index, ele){
+	if($(ele).data("src")){
+		$(ele).attr("src", regImgSrc($(ele).data("src")));
+	}
+})
+
+function regImgSrc(src){
+	var reg_img_src = /}(.+){/g;
+	var result = reg_img_src.exec(src)
+	if(result){
+		return $.trim(result[1])
+	}
+
+	return src;
+}
+
+var stream_id = getQueryStringByName("streamid");
+var username = decodeURIComponent(getQueryStringByName("username"));
+var current_vod_id = getQueryStringByName("aid");
+var reg = /^(13[0-9]|14(5|7)|15(0|1|2|3|5|6|7|8|9)|18[0-9])\d{8}$/;
+if(reg.test(username)){// 手机用户
+	var mphone =username.substring(0,3);
+	var mphone1 =username.substring(7,11);
+	var u = mphone+"****"+mphone1;
+	$("#username").text(u);
+	//document.getElementById("userType").innerHTML = "手机用户("+u+")";
+}else{
+	$("#username").text(username);
+	//document.getElementById("userType").innerHTML = "微信用户("+username+")";
+}
+function queryStatus(){
+	$.post("http://{dede:global.cfg_nav_server/}/NS/mobile/ShowVodInfo?flag=getnow&streamid="+stream_id+"&username="+username+"&resolution=0", function(returndata) {
+		if(returndata!=""&&"error"!=returndata.trim()&&returndata.trim()!=""){
+			window.location.href=returndata;
+		}
+	});
+}
+setInterval(queryStatus,1000);
+
+var relocate = setTimeout(redirect,10000);
+function redirect(){
+	location.href = "/bbcvcms/uploads/plus/view.php?aid="+getQueryStringByName("aid")+"&assigntypeid=17&username="+username+"&streamid="+stream_id+"&resolution="+stream_id
+	//window.location.href="/bbcvcms/uploads/plus/list.php?tid=17&username="+username+"&streamid="+stream_id
+}
+function getQueryStringByName(name){
+	var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+	if(result == null || result.length < 1){
+		return "";
+	}
+	return result[1];
+}
+	</script>
+</body>
+</html>

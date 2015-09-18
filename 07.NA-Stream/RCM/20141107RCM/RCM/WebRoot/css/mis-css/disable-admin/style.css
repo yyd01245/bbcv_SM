@@ -1,0 +1,40 @@
+/*-------------------------------------
+	css for www.135edu.com
+	design by ljw Email:385322465@qq.com
+	date 2011-11-19
+----------------------------------------*/
+/* 全局CSS定义 */
+* { word-break:break-all; }
+html, body { margin:0; padding:0; font:12px 宋体, Arial, Verdana; background:url(../../apps/mis/images/body_bg.jpg); height:100%; }
+body {  min-height:700px; }
+ul, ol { margin:0px; padding:0px; list-style:none; }
+p, h1, h2, h3 { margin:0px; padding:0px; font-size:12px; }
+img { border:0px; }
+a { color:#334a33; text-decoration:none; }
+a:hover { text-decoration:none; color:#000; }
+.box { width:960px; margin:0px auto; padding:0px; }
+.clear { clear:both; margin:0px; padding:0px; }
+/* 引导页 */
+.myGuide { margin:0px auto; height: 571px; width: 930px; margin-top: -285px; margin-left: -465px; z-index:1; position: absolute; left: 50%; top: 50%; }
+.enter { position:absolute; width: 228px; margin-left:364px; bottom:6px; z-index:111; height:88px; _display:inline; _bottom:82px; }
+.enter img:hover { filter:alpha(opacity=72); -moz-opacity:0.7; opacity: 0.7; }
+.footer { text-align:center; line-height:21px; color:#fff; padding-bottom:24px; padding-top:12px; }
+.footer a { color:#fff; }
+h6{ font-size:12px; font-size:12px; margin:0px; padding:0px; line-height:30px; height:30px; padding-left:12px;}
+#btnGotoUC
+{
+	display:inline-block;
+	height:26px;
+	width:110px;
+	background:url(../../../images/usercenter.jpg) no-repeat;
+	margin-top:12px;
+	margin-right:12px;
+}
+#btnLogOff
+{
+	display:inline-block;
+	height:26px;
+	width:69px;
+	background:url(../../../images/logoff.jpg) no-repeat;
+	margin-top:12px;
+}

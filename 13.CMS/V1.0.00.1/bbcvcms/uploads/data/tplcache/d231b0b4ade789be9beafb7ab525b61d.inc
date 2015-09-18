@@ -1,0 +1,1 @@
+{dede:img text='' width='178' height='268'} /bbcvcms/uploads/uploads/jiaoyu/flx/flx.png {/dede:img}

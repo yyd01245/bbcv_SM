@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 应用组管理手工映射SQL语句 -->
+<sqlMap namespace="AppGroupManager">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	<!-- 获取应用组管理最大索引值-->
+	<select id="queryMaxIndex" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT MAX(group_id) FROM dgw_group_info
+	</select>
+	<!-- 重名校验-->
+	<select id="IsNamed" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_group_info where group_name = #group_name#
+	</select>
+	<!-- 修改时重名校验-->
+	<select id="IsUpdateNamed" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_group_info where group_name = #group_name# and group_id!=#group_id#
+	</select>
+	<!-- 查看组有没有关联-->
+	<select id="queryRelByGroupID" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_group_version_info where group_id = #group_id#
+	</select>
+	<!-- 查看组有没有承载-->
+	<select id="queryVncmByGroupID" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_vncm_info where group_id = #group_id#
+	</select>
+	<!-- 根据主键查询代码表 -->
+	<select id="getAppGroupManagerByKey" parameterClass="map" resultClass="dto">
+		SELECT group_id,group_code,group_name,group_desc,status,start_id,end_id,create_date,update_date
+		from yynm_group_info
+		 WHERE group_id = #group_id#
+	</select>
+	
+	<!-- 获取应用组管理列表-->
+	<select id="getAppGroupManagerListForPage" parameterClass="map" resultClass="dto">
+		SELECT  group_id,group_name, group_desc,status,encodeType,
+		date_format(create_time,'%Y-%m-%d') as create_time,operate_version,
+		date_format(update_time,'%Y-%m-%d') as update_time
+		    FROM dgw_group_info	ORDER BY group_id DESC
+	</select>
+	
+	<!-- 获取应用组管理列表-->
+	<select id="getAppGroupManagerValidList" parameterClass="map" resultClass="dto">
+		SELECT  group_id,group_name,encodeType,operate_version FROM dgw_group_info
+		   WHERE status = '1'
+		ORDER BY encodeType
+	</select>
+	
+	<!-- 获取应用组信息管理总数-->
+	<select id="getAppGroupManagerListForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_group_info
+	</select>
+	
+	<!-- 插入应用组信息管理表一条记录 -->
+	<insert id="saveAppGroupManagerItem" parameterClass="dto">
+		INSERT INTO dgw_group_info (
+		  group_id, group_name,encodeType,operate_version, group_desc,status,create_time,update_time) 
+		VALUES (#group_id#,#group_name#,#encodeType#,#operate_version#,#group_desc#,#status#,#create_time#,#update_time#)
+	</insert>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+	
+	<!-- 删除一条应用组信息管理表记录  -->
+	<delete id="deleteAppGroupManagerItems" parameterClass="map" >
+		DELETE FROM dgw_group_info
+		      WHERE group_id = #group_id#
+	</delete>
+	
+	<!-- 根据主键更新用户 -->
+	<update id="updateAppGroupManagerItem" parameterClass="dto">
+         UPDATE dgw_group_info
+		<dynamic prepend="SET"> 
+			<isNotEmpty prepend="," property="group_name">
+	         group_name = #group_name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="update_date">
+	         update_time = #update_date#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="operate_version">
+				operate_version = #operate_version#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="group_desc">
+	         group_desc = #group_desc#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE group_id = #group_id# 
+	</update>
+	
+</sqlMap>

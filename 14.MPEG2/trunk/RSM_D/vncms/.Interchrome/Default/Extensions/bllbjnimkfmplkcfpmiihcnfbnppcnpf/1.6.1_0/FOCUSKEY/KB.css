@@ -1,0 +1,9 @@
+@charset "GBK";
+/* CSS Document */
+
+#KB_td{background-image:url(KB_bg.png);width:450px;height:280px;background-repeat:no-repeat;vertical-align:top; text-align:left;}
+#KB_input{position:absolute; width:400px;height:54px;left:20px;top:0px;text-align:left;font-size:24px;line-height:44px;padding-top:10px;color:#000;}
+#KB_keyboard_div{position:absolute;width:420px;height:210px;left:14px;top:15px;z-index:15;}
+#KB_keyboard{text-align:center;font-size:24px;line-height:42px;color:#000;}
+#KB_focus{position:absolute;background-image:url(KB_focus.png);background-repeat:no-repeat;height:42px;width:42px;z-index:5;}
+.KB_center{text-align:center;}

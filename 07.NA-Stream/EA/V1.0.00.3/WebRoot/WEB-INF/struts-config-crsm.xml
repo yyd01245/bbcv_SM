@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+	<!-- 配置ActionFormBean -->
+	<form-beans>
+		<!-- 公共Form -->
+		<form-bean name="commonActionForm" type="org.eredlab.g4.rif.web.CommonActionForm" />
+	</form-beans>
+
+	<!-- Action映射 -->
+	<action-mappings type="org.apache.struts.action.ActionMapping">
+		<!-- 服务器监控导入-->
+		<action name="commonActionForm" path="/crsmServerMonitor" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.crsm.web.CrsmServerMonitorAction">
+			<forward name="toAim" path="/AimShutdown.jsp" />
+			<forward name="toMoreServer" path="/serverMoreManage.jsp" />
+			<forward name="toChrome" path="/updateChrome.jsp" />
+			<forward name="toManage" path="/manageUrl.jsp" />
+		</action>
+	</action-mappings>
+</struts-config>

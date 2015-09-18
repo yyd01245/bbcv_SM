@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	 <!-- 启动Mina监听 -->
+	<bean id="propertyPlaceholderConfigurer" class="prod.nebula.mcs.util.PropertyPlaceholderConfigurer">
+		<constructor-arg index="0" ref="core"></constructor-arg>
+	</bean>
+	
+	<bean id="core" class="prod.nebula.mcs.core.CoreLoader"></bean>
+	<bean id="SpringApplicationContext" class="prod.nebula.mcs.util.ApplicationContextHelper"></bean>
+	<bean id="cumsMinaAcceptor" class="prod.nebula.framework.mina.socket.JsonNioSocketAcceptor"> 
+		<property name="port" value="${mcs.tcpserver.port}" /> 
+		<property name="jsonCommandHandler" >
+			<bean class="prod.nebula.mcs.module.handle.TcpPersistentHandler"></bean>
+		</property>  
+		<property name="backlog" value="${framework.mima.backlog}" /> 
+		<property name="charset" value="${framework.mima.charset}" /> 
+		<property name="keepAlive" value="${framework.mima.keepAlive}" />
+		<property name="corePoolSize" value="${framework.mima.corePoolSize}" />  
+		<property name="maxPoolSize" value="${framework.mima.maxPoolSize}" /> 
+		<property name="keepAliveSeconds" value="${framework.mima.keepAliveSeconds}" /> 
+	</bean>   
+	<bean id="redis" class="prod.nebula.mcs.core.module.ModuleLoader"/>
+	<bean id="redisImpl" class="prod.nebula.mcs.core.executor.impl.RedisImpl" />
+	<bean id="cscsredisImpl" class="prod.nebula.mcs.core.executor.impl.CscsRedisImpl" />
+</beans>

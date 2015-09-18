@@ -1,0 +1,15 @@
+{
+   "background": {
+      "scripts": [ "background.js" ]
+   },
+   "content_scripts": [ {
+      "js": [ "contentscript.js", "jquery-1.7.2.min.js", "bbcv.js" ],
+      "matches": [ "http://*/*" ]
+   } ],
+   "description": "bbcv chrome extension for internet",
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCYncZdHroJsV2LUaU411K18+qA/8Tqw6UD1VTaa6ZIv1RYkq7tpq1ehGFXTBsc+mD6ypFIT5s4Ss4jtHYchYH3KLnBgx0REpMT8BfmyWH6IxYIfhEF09EFX+kPUie+LPRjh9I2BsB1PrAL0bde0VPajalr8xHgdmCcb0N7LFaiWQIDAQAB",
+   "manifest_version": 2,
+   "name": "bbcv chrome extension for internet",
+   "permissions": [ "tabs", "webRequest", "http://*/*", "webRequestBlocking", "history" ],
+   "version": "1.6.1"
+}

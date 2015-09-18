@@ -1,0 +1,311 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<meta name="page-view-size" content="640*526"/>
+<title>vod play</title>
+<script>
+/***********************iPanel.enterMode(mode,mask)ARGUMENTS***********/
+var EPG_MASK_ACTUAL_PF			= 0x01;
+var EPG_MASK_ACTUAL_SCHEDULE 	= 0x02;
+var EPG_MASK_OTHER_PF			= 0x04;
+var EPG_MASK_OTHER_SCHEDULE		= 0x08;
+var EPG_MASK_CURRENT_TS			= 0x00;
+var EPG_MASK_ALL_TS				= 0x10;
+
+var EPG_MODE_WATCHTV 			= "watchTV";
+var EPG_MODE_EPG				= "EPG";
+var EPG_MODE_NVOD				= "NVOD";
+var EPG_MODE_SEARCHPROGRAM		= "searchProgram";
+
+function Event(code, args){
+	this.code = code;
+	this.args = args;
+}
+
+var iPanelReturnFlag = false;
+
+
+document.onsystemevent = grabEvent;
+document.onkeypress = grabEvent;
+document.onirkeypress = grabEvent;
+function grabEvent(event){
+	iPanelReturnFlag = false;
+	var keycode = event.which;
+	//alert(keycode);
+	if(keycode < 58 && keycode > 47){//数字键
+		var args = new Object();
+		args.value = keycode - 48;
+		if(iPanelReturnFlag) return 1;
+		else return 0;
+	}
+	else{
+		var code = null;
+		var args = new Object();
+		args.modifiers = 0;
+		args.value = keycode;
+		switch(keycode){
+			case 339:
+				close_widget();
+				exit_page();
+				return;
+				break;
+			case 340://后退（back）
+				close_widget();
+				exit_page();
+				return;
+				break;
+			case 5202:
+				if(socket_error){
+					}else{
+						media.AV.play();
+					}
+					return 0;
+				break;
+			case 5502:
+				media.AV.open(rtsp_url,'VOD');
+				break;
+			
+		}
+		if(iPanelReturnFlag) return 1;
+		else return 0;
+	}
+}
+
+</script>
+<script language="javascript">
+var version = "hangzhou_mp2_20130617_01";
+ipanel.debug("version = "+version);
+	
+hardware.STB.frontPanel(2,"0000",0,0,100);
+hardware.STB.statusLight(2,0,0,100);//显示数据载入指示灯
+hardware.STB.statusLight(31,0,0,100);//显示vod指示灯
+hardware.STB.statusLight(30,0,0,0);//灭掉浏览器指示灯
+iPanel.misc.enableIconLoading=0;
+iPanel.overlayFrame.close();
+
+/*****************************解析广告/点播rtsp*********************************/
+/*
+	插入位置：(start 片头  middle 片中 end 片尾 vedio 正片)
+	插入时间：600 (单位S)
+	视频时长：30  (单位S) 
+	播放地址：play-url
+*/
+//var adVodUrl = "vedio,正片,时长,rtsp://125.210.188.13:555/san01/1/m06090900030000001_z.mp4;start,0,30,rtsp://125.210.188.13:555/san01/1/f720kfctjjt_30.mp4;middle,30,30,rtsp://125.210.188.13:555/san01/1/f720kfctjjt_30.mp4";
+//var adVodUrl = "vedio,正片,时长,rtsp://125.210.188.13:1555/san01/1/2010112234291096.ts;start,0,30,rtsp://125.210.188.13:1555/san01/1/f720kfc01.ts;middle,60,30,rtsp://125.210.188.13:1555/san01/1/f720kfc01.ts;";
+//var adVodUrl = iPanel.getGlobalVar("ads-url");
+//rtsp://125.210.227.234:5541/mpeg2_ipqam/icms_icds_pub03/opnewsps03/Video/2013/10/07/14/20131107015340_haixiaoqijijianji_750185230_750193176.ts?Contentid=CP23010020131104101623&isHD=0&isIpqam=1&token=A309F58BB207F34E862D05BDD28117F419432618EF58CEABC8EBF359B550288F0CD7FF79912BC4C2446537D395ADB8E38D78F48D1D1340C47484F1A34249FDB44C4A2FB137D67B10052BB63D3BC35EB39C707AD81DDFB52D1164998DEFA9C4EE382B6DD98919AF4846635DCFA60E143F1DA5DA2C8F35B48C60BB4DF310C57D4C59CEEDF56FFE73A39A15DEC9819438274B1C9BDC8F40C5B9D836356879A257AC299A872491A46DDFA5FAF403A06B1B47ECCAAB3E7E6596DC61CD30E6121135CEE72BE97564D4E266A060EF494B7D581C78C1C60C51B7926589130A3A621A2D3AE25C4990608387&jishu=0&assetId=125449846&assetType=36&folderCode=213900&programId=125449846&vip=0&movieId=125450862&conVod=true
+//var tempUrl = adVodUrl.split(";");
+var startAdDuration = 0;
+var startAdUrl = "";
+var middleAdDuration = 0;
+var middleAdInsertTime = 0;
+var middleAdUrl = "";
+var vedioUrl = "rtsp://192.168.60.238:5542/yjy_ip/bjfen01.ts";
+/*for(var i=0; i<tempUrl.length; i++){
+	var item = tempUrl[i].split(",");
+	if(item[0] == "vedio"){
+		vedioUrl = item[3];
+	}else if(item[0] == "start"){
+		startAdDuration = parseInt(item[2]);
+		startAdUrl = item[3];
+	}else if(item[0] == "middle"){
+		middleAdInsertTime = parseInt(item[1]);
+		middleAdDuration = parseInt(item[2]);
+		middleAdUrl = item[3];
+	}
+}*/
+var middleAdEndSeekTime = "";
+var middleAdEndFlag = false;
+var isAdPlay = true;
+var adPlayError = false;
+var checkAdElapsedTimeFlag = -1;
+var checkVedioElapsedTimeFlag = -1;
+var adFlag = "start";
+var adDuration = 0;
+/******************************************************************************/
+
+var mute_status = (typeof(iPanel.getGlobalVar("mute_status")) != "undefined" && iPanel.getGlobalVar("mute_status")!= '') ? iPanel.getGlobalVar("mute_status") : '0'; //0表示未静音，1表示静音
+var ethernetItem = network.ethernets[0];
+var net_status = ethernetItem.LANStatus; //1：表示目前处于连接状态   0：表示没有连接上网络
+if(net_status==0||(net_status!=3&&network.ethernets[0].DHCPEnable==1)){
+	net_status="0";
+}else{
+	net_status="1";
+}
+var cable_connect_flag = iPanel.getGlobalVar("cable_connect_success");
+if(cable_connect_flag){
+	cable_connect_flag="1";
+}
+var vod_mode;
+var wasu_url=iPanel.getGlobalVar("url_parm");
+var rtsp_url = "";
+
+var link_tips=true;
+var can_volume=true;
+var can_ward=true;
+var can_info=true;
+var currOriginVolume = media.sound.value;
+var currVolume = currOriginVolume;
+var has_set_sound=false;
+
+var ward_visible=false;
+var ward_timeout=-1;
+var volumeBarVisible=false;
+var volumeBarTimeout = -1;
+//var exit_tips_visible=false;
+var pause_tips_visible=false;
+var network_tips_visible=false;
+var network_timeout=-1;
+var f3_visible=false;
+var f3_timeout=-1;
+var info_visible=false;
+var info_timeout=-1;
+var information_visible = false;
+var information_timeout = -1;
+var exit_remind_visible = false;
+
+var first_play=true;
+var connect_failed=false;
+var has_stop=false;
+
+var butPosition = 1;
+var duration = 0;
+var elapsed_time=0;
+var is_now_seek=false;
+var seek_flag=false;//判断是不是处于调出进度条并按下确定键后到缓冲提示弹出之前的状态之中
+var continuePlayFlag = true;	//是否继续播放。默认暂停
+var time_position=0;
+var time_array=new Array();
+var show_front_time_timeout=-1;
+
+var NETWORK_CONNECT=0;
+var NETWORK_DISCONNECT=0;
+var load_page_timeout = -1;
+var socket_error = false;//当拔网线超时后会发送一个5225消息，p2为2106，收到此消息后应用关闭vod并重新建立连接，这个变量用来记录此状态
+var socket_error_seek_time = "";
+var check_net_status_timeout = -1;
+var loadAdRequest;//回传广告请求
+
+//used
+function init(){
+	//alert("ready play");
+	DVB.stopAV();
+	iPanel.misc.startOtherApp("VOD");
+	
+	//----------是否优先使用全局变量---------------
+	var isGlobalFlag="";
+	var locationUrl = iPanel.mainFrame.location.href;
+	if(locationUrl.indexOf("&conVod=")!= -1){
+		isGlobalFlag = locationUrl.split("&conVod=")[1].split("&")[0];
+	}
+	iPanel.debug("isGlobalFlag=="+isGlobalFlag);
+	if(isGlobalFlag == "true"){
+			vedioUrl = locationUrl.split("rtspUrl=")[1];
+	}
+	if(startAdUrl){
+		isAdPlay = true;
+		rtsp_url=startAdUrl;
+		if(typeof(rtsp_url)!="undefined"){
+			media.AV.open(rtsp_url,'VOD');
+			adFlag = "start";
+			adDuration = startAdDuration;
+			//setTimeout("checkAdElapsedTime();",2000);
+		}
+	}else{
+		isAdPlay = false;
+		rtsp_url = vedioUrl;
+		if(typeof rtsp_url != "undefined"){
+			//alert("playURL: " + rtsp_url);
+			media.AV.open(rtsp_url,'VOD');
+			if(middleAdUrl){
+				iPanel.debug("init()");
+				//setTimeout("checkVedioElapsedTime();",2000);
+			}
+		}
+	}
+  media.video.fullScreen();
+  if(rtsp_url.indexOf(".ts")!=-1){
+		iPanel.eventFrame.server_mode = "DVB";
+	}else{
+		iPanel.eventFrame.server_mode = "IP";
+	}
+  vod_mode= iPanel.eventFrame.server_mode;
+
+//	if(cable_connect_flag == "0"&&vod_mode=="DVB"){
+//		//network_tips_visible=true;
+//		//var remindText = "没有信号,插上cable线继续播放,按“确认”键结束播放";
+//		//show_exit(remindText);
+//		return;	    
+//	}	
+//	if(link_tips) {
+//		//$("load_tips").style.visibility="visible";
+//		//load_page_timeout = setTimeout("show_page_load_timeout()", 12000);
+//	}
+//	var ethernetItem = network.ethernets[0];
+//	var net_status = ethernetItem.LANStatus; //1：表示目前处于连接状态   0：表示没有连接上网络
+//	if (net_status==0||(net_status!=3&&network.ethernets[0].DHCPEnable==1)){
+//		//$("net_tips").style.visibility="visible";
+//	}
+//	if (mute_status != "0"){
+//		iPanel.misc.showWindow("ui://muteIcon.gif",558,43,44,49);//以防万一，显示一下吧
+//	}
+	//write_elapsed_time(elapsed_time);
+}
+
+function exit_page(){
+	media.AV.close();
+	if(ward_visible){
+		hide_ward();
+	}
+	hide_load_tips();
+	hide_exit();
+	
+	iPanel.misc.enableIconLoading=1;
+	iPanel.setGlobalVar("url_parm","");//这里要清除一下url_parm，避免上次未正常打开华数眼时，下次普通全屏点播是url_parm有残留
+	
+	/**从高清点播退出来，置为回第三方VOD**/
+	if(vod_mode=="DVB"){	
+  	VOD.changeServer("sihua_3rd","dvb");
+	}
+	if(mute_status == "1"){
+		iPanel.misc.showWindow("ui://muteIcon.gif",558,43,44,49);
+	}
+	iPanel.overlayFrame.close();
+	var ethernet_item = network.ethernets[0];
+	if(ethernet_item.LANStatus==0 ||(ethernet_item.LANStatus!=3&&network.ethernets[0].DHCPEnable==1)){
+		iPanel.setGlobalVar("netlink_status", "0");
+		iPanel.eventFrame.flag = 1;
+		hardware.STB.frontPanel(2,"0000",0,0,0);
+		setTimeout('window.location.href = "ui://index.htm"', 50);
+	}else{
+		iPanel.setGlobalVar("netlink_status", "1");
+		iPanel.eventFrame.flag = 2;
+		history.go(-3);
+		hardware.STB.frontPanel(2,"IE::",0,0,100);
+		setTimeout("go_index()",7000);
+	}
+}
+
+
+function close_widget(){
+	if (typeof(wasu_url)!="undefined"&&wasu_url!=""){
+		var my_wasu_widget  = iPanel.pageWidgets.getByName("wasu_widget");
+		my_wasu_widget.iconize();
+		my_wasu_widget.location.href = "ui://blank.htm";
+		iPanel.setGlobalVar("url_parm","");
+	}
+}
+</script>
+</head>
+
+<body leftmargin="0" text="#FFFFFF" topmargin="0" bgcolor="transparent" onLoad="init()" onunLoad="close_widget()">
+<!--loading-->
+<!--<div id="load_tips" style="position:absolute; width:496px; height: 311px; background-image:url(loading_bg.gif); left: 72px; top: 107px; visibility:hidden; z-index:1;">
+	<div style="position:absolute; width:462px; height:183px; background-image:url(ad_pause.gif); left: 18px; top:17px;"></div>
+	<div style="position:absolute; width:119px; height:46px; background-image:url(loading.gif); left: 26px; top: 233px;"></div>
+	<div id="load_tips_text" style="position:absolute; width:327px; height:39px; left:153px; top:242px; color: #250B36; font-size: 24px;">正在连接，敬请稍候...</div>
+</div>-->
+
+</body>
+</html>
+ 

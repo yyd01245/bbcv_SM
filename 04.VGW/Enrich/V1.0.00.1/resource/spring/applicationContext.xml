@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	<bean id="core" class="prod.nebula.vrc.core.CoreLoader"></bean>
+	<bean id="SpringApplicationContext" class="prod.nebula.vrc.util.ApplicationContextHelper"></bean>
+<!--	<bean id="http" class="prod.nebula.vrc.module.http.HttpModuleLoader"></bean>-->
+
+	 <bean id="propertyConfigurer" class="prod.nebula.vrc.util.PropertyPlaceholderConfigurer">
+		<constructor-arg index="0" ref="core"></constructor-arg>
+	</bean>
+	
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer"> 
+		<property name="customEditors"> 
+			<map> 
+				<entry key="java.net.SocketAddress"> 
+					<bean class="org.apache.mina.integration.beans.InetSocketAddressEditor" /> 
+				</entry> 
+			</map> 
+		</property> 
+	</bean> 
+	<bean id="wasubusigwMinaHandler" class="prod.nebula.vrc.handler.ServerHander"/> 
+	<bean id="wasubusigwThreadPool" class="org.apache.mina.integration.spring.ThreadPoolExecutorFactoryBean">
+		<property name="corePoolSize" value="1"/>
+		<property name="maxPoolSize" value="2000"/>
+		<property name="keepAliveSeconds" value="60"/>
+	</bean>
+	<bean id="wasubusigwExecutorFilter" class="org.apache.mina.filter.executor.ExecutorFilter" >
+		<constructor-arg ref="wasubusigwThreadPool"/>
+	</bean> 
+	<bean id="wasubusigwMdcInjectionFilter" class="org.apache.mina.filter.logging.MdcInjectionFilter"> 
+		<constructor-arg value="remoteAddress" /> 
+	</bean> 
+	<bean id="wasubusigwCodecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter"> 
+		<constructor-arg> 
+			<bean class="prod.nebula.vrc.util.MinaTextLineCodecFactory">
+				<constructor-arg index="0" value="UTF-8" />
+				<constructor-arg index="1" value="XXEE" />
+				<constructor-arg index="2" value="XXEE" />
+				<constructor-arg index="3" value="1048576" />
+				<constructor-arg index="4" value="1048576" />
+			</bean> 
+		</constructor-arg> 
+	</bean> 
+	<!-- The non-SSL filter chain. --> 
+	<bean id="wasubusigwFilterChainBuilder" class="org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder"> 
+		<property name="filters"> 
+			<map> 
+				<entry key="executor" value-ref="wasubusigwExecutorFilter" /> 
+				<entry key="mdcInjectionFilter" value-ref="wasubusigwMdcInjectionFilter" /> 
+				<entry key="codecFilter" value-ref="wasubusigwCodecFilter" /> 
+			</map> 
+		</property> 
+	</bean> 
+	<bean id="wasubusigwMinaAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor" init-method="bind" destroy-method="unbind"> 
+		<property name="defaultLocalAddress" value=":${vgw.port}" /> 
+		<property name="handler" ref="wasubusigwMinaHandler" /> 
+		<property name="reuseAddress" value="true" /> 
+		<property name="filterChainBuilder" ref="wasubusigwFilterChainBuilder" />
+	</bean>
+	
+</beans>

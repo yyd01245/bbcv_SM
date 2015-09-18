@@ -1,0 +1,141 @@
+table.seacherTbl {
+	font-size: 10pt;
+	margin-top: 2;
+	margin-bottom: 1;
+	border: 0px solid #808080;
+}
+
+table.seacherTbl tr {
+	
+}
+
+table.seacherTbl td {
+	text-align: left;
+}
+
+table.itemList {
+	background-color: #BFC7CA;
+	border: solid 0px #BFC7CA;
+	border-collapse: collapse;
+	font-size: 10pt;
+	margin-top: 1;
+	margin-bottom: 0;
+	margin-left: 0;
+}
+
+table.itemList caption.head {
+	font-size: 12px;
+	text-align: center;
+	background: url(../images/1_tab_tit.jpg) right;
+	height: 26px;
+	color: #000000;
+	padding-left: 5px
+}
+
+table.itemList caption.foot {
+	font-size: 12px;
+	text-align: right;
+}
+
+table.itemList th {
+	height: 22px;
+	font-size: 12px;
+	background: url(../images/1_tab_tit.jpg) right;
+	color: #000;
+	padding-left: 5px
+}
+
+table.itemList thead tr {
+	background-color: #DCDCDC;
+}
+
+/*Ã÷Ï¸±êÌâ*/
+table.itemList td.title {
+	font-size: 12px;
+	height: 23px;
+	color: #000;
+	padding-left: 5px;
+	background-image: url(../images/1_tab_tit.jpg);
+	background-repeat: repeat;
+	text-align: center;
+}
+
+table.itemList tbody tr.even {
+	background-color: expression((   this .   sectionRowIndex %   2 ==   0)
+		? 
+		 "FFFFFF" :   "F7F7F7" );
+	text-align: left;
+	height: 22px;
+}
+
+table.itemList tbody tr.over1 {
+	color: #284DA4;
+	height: 22px;
+	background: url(../images/1_tab_over.gif) repeat;
+}
+
+table.itemList tbody tr.over2 {
+	background-color: #F7F7F7;
+	color: #000;
+	height: 22px;
+}
+
+table.itemList tbody tr.over {
+	background: url(../img/right/tab_over.gif) repeat;
+	height: 20px;
+	padding-left: 6px;
+}
+
+table.itemList tbody tr.out {
+	border-bottom: 1px solid #DAD6D7;
+	height: 22px;
+	padding-left: 6px;
+}
+
+table.itemList tbody td {
+	color: #000;
+	height: 22px;
+	padding-left: 5px
+}
+
+table.itemList tbody a {
+	TEXT-DECORATION: none;
+	COLOR: #0000CD
+}
+
+table.itemList tbody td.nowrap1 {
+	white-space: nowrap;
+}
+
+table.itemList tfoot tr {
+	background-color: #DCDCDC;
+}
+
+table.foot {
+	background-color: #708090;
+	border-collapse: collapse;
+	font-size: 12pt;
+	margin-top: 0;
+	margin-bottom: 1;
+	border: solid 1px #BFC7CA;
+	border-top: 0;
+}
+
+table.foot td.page {
+	height: 22px;
+	background-image: url(../images/tab_bottom.gif);
+	background-color: #CCCCFF;
+	padding: 0px 0px 0px 0px;
+	display: block;
+	border-top: none;
+	margin-bottom: -5px;
+	font-size: 12px;
+	text-align: right;
+	LINE-HEIGHT: 12pt;
+	FONT-FAMILY: "Arial"
+}
+
+table.foot td.page a {
+	TEXT-DECORATION: none;
+	COLOR: #0000CD
+}

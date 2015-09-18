@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+	  <artifactId>msi</artifactId>
+	  <groupId>prod.nebula.msi</groupId>
+	  <version>1.0.00.0-SNAPSHOT</version>
+	</parent>
+	<groupId>prod.nebula.msi.service</groupId>
+	<artifactId>msi-service</artifactId>
+	<version>1.0.00.0-SNAPSHOT</version>
+	
+	<dependencies>
+		<dependency>
+  			<groupId>com.bbcv.mdb</groupId>
+  			<artifactId>MDB</artifactId>
+  		</dependency>
+  		
+		<dependency>
+			<groupId>prod.nebula.msi.dao</groupId>
+			<artifactId>msi-dao</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>prod.nebula.msi.dto</groupId>
+			<artifactId>msi-dto</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>prod.nebula.msi.socket</groupId>
+			<artifactId>msi-socket</artifactId>
+		</dependency>
+	</dependencies>
+</project>

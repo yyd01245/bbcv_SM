@@ -1,0 +1,28 @@
+{
+  "name": "onewayvod",
+  "version": "1.0.0",
+  "description": "bbcvision oneway vod based on wechat",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "guanyx",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.9.2",
+    "cors": "^2.5.0",
+    "ejs": "^1.0.0",
+    "express": "^4.10.1",
+    "http-proxy": "^1.6.1",
+    "later": "^1.1.6",
+    "moment": "^2.8.3",
+    "mysql": "^2.5.3",
+    "nodemailer": "^1.3.0",
+    "nodemailer-smtp-transport": "^0.1.13",
+    "request": "^2.47.0",
+    "superagent": "^0.20.0",
+    "wechat": "^1.2.1",
+    "wechat-api": "^1.1.2",
+    "winston": "^0.8.3"
+  }
+}

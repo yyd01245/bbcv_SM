@@ -1,0 +1,382 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="page-view-size" content="1280*720"/>
+    <title>城市列表</title>
+
+    <link rel="stylesheet" href="/bbcvcms/uploads/filebase/index/style/clstyle.css"/>
+    <style>
+        #qrcode{
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        #qrcode img{
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="poetic view">
+	<div class="background"></div>
+</div>
+<div class="clcontainer">
+    <div class="clleft">
+        <div class="video">
+			<div class="dg-wrapper">
+				
+			</div>
+            <video id="video"></video>
+        </div>
+        <div class="descript">
+            <p id="cname"></p>
+			<ul class="movieinfo">
+				<li class="director">导演</li>
+				<li class="actor">主演</li>
+				<li class="datetime">上映日期</li>
+			</ul>
+            <p id="cintro"></p>
+            <p id="subtxt"></p>
+        </div>
+    </div>
+    <div class="clright" id="dg-container">
+        <div class="logo"></div>
+		<div class="information">微信/APP扫描二维码</div>
+		<div class="qcode">
+			<div id="qrcode"></div>
+		</div>
+    </div>
+    
+    <div class='example'>
+        <div class="thumb">
+            <div class="inner">
+                <img src="">
+                <div class="title"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/bbcvcms/uploads/filebase/index/js/jquery-1.11.0.min.js"></script>
+<script>
+var info = [
+{
+	        id:"29",
+			name:"测量学",
+			movieintro:"在阐述测量基本知识、基础理论和基本测量方法的基础上，结合土木工程施工测量的特点，介绍了一般土木工程施工测量的内容和方法。教材中包括了多方面的基础知识以扩展视野、拓宽知识面，并力求做到简明扼要，实用性强，有新意，反映现代测绘新技术、新仪器的应用。为满足教学需要，在每章之后附有思考题和习题",
+			videosrc:"http://192.168.100.31/bbcvcms/uploads/uploads/jiaoyu/clx/clx.mp4",
+			director:"周德易",
+			actor:"周德易",
+			type:"教育",
+			ondata:"2014-11-24",
+			rstp:"/home/x00/Penglei/ts/ts/clx_new.ts|4914",
+			poster:"/bbcvcms/uploads/uploads/jiaoyu/clx/clx_1.png",
+			sliderposter:"/bbcvcms/uploads/uploads/jiaoyu/clx/clx_2.jpg",
+			area:"同济大学",
+			star:"50"
+		},
+{
+	        id:"32",
+			name:"老鼠嫁女儿",
+			movieintro:"很久很久以前，一对年迈的老鼠夫妇住在阴湿寒冷的黑洞里，眼看着自己如花似玉的女儿一天天长大。夫妻俩许诺，要为闺女找一个最好的婆家，要让闺女摆脱这种不见天日的生活。于是，老鼠夫妇出门寻亲",
+			videosrc:"http://218.108.50.246/bbcvcms/uploads/uploads/jiaoyu/lsjne/lsjne.mp4",
+			director:"谢武彰",
+			actor:"老鼠",
+			type:"教育",
+			ondata:"2013-06-19",
+			rstp:"/home/x00/Penglei/ts/ts/lsjne.ts|360",
+			poster:"/bbcvcms/uploads/uploads/jiaoyu/lsjne/lsjne_1.png",
+			sliderposter:"/bbcvcms/uploads/uploads/jiaoyu/lsjne/lsjne_2.jpg",
+			area:"中国大陆",
+			star:"80"
+		},
+{
+	        id:"30",
+			name:"法理学",
+			movieintro:"法理学(Jurisprudence)是以整个法律现象的共同发展规律和共同性问题为研究对象的学科。它的研究范围十分广泛，主要包括法律的起源、发展和消亡、法律的本质和作用、法律和其他社会现象的关系、法律的创制和实现、法律的价值等",
+			videosrc:"http://218.108.50.246/bbcvcms/uploads/uploads/jiaoyu/flx/flx.mp4",
+			director:"宋延军",
+			actor:"宋延军",
+			type:"教育",
+			ondata:"2014-11-24",
+			rstp:"/home/x00/Penglei/ts/ts/flx_new.ts|5674",
+			poster:"/bbcvcms/uploads/uploads/jiaoyu/flx/flx_1.png",
+			sliderposter:"/bbcvcms/uploads/uploads/jiaoyu/flx/flx_2.jpg",
+			area:"吉林大学",
+			star:"50"
+		},
+
+]
+</script>
+<script type="text/javascript" src="/bbcvcms/uploads/filebase/index/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+    var $container, instance, citylist = ['fuzhou', 'longyan', 'nanping', 'ningde', 'pingtan', 'putian', 'quanzhou', 'sanming', 'xiamen', 'zhangzhou'], Otimer, textinfo = [], videoSrc = [], nameinfo = [], imgSrc = [],director=[],actor=[],ondate=[],vp=[];
+    $(document).ready(function () {
+        init();
+        //初始化3D布局
+        $container = $("#dg-container");
+		var currentIndex  = 0,flag = true;;
+		var changeIndex = function(){
+				currentIndex++;
+				if(flag){
+					moveCurrent(1);
+					if(currentIndex==2){
+						currentIndex = 0; 
+						flag = false;
+					}
+				}
+				else{
+					moveCurrent(-1);
+					if(currentIndex==2){
+						currentIndex = 0;
+						flag = true;
+					}
+				}				
+				setTimeout(changeIndex,90000);
+		}
+
+		setTimeout(changeIndex,90000);
+
+        var logo_list = {
+            "6": "/bbcvcms/uploads/filebase/index/images/remen.png",
+            "7": "/bbcvcms/uploads/filebase/index/images/jiaoyu.png",
+            "8": "/bbcvcms/uploads/filebase/index/images/jingdian.png"
+        }
+
+        $(".logo").css({
+            "backgroundImage": "url('"+logo_list[getQueryStringByName("tid")]+"')"
+        })
+        //绑定按键操作
+        document.onkeydown = grabEvent;
+        function grabEvent(event) {
+            switch (event.keyCode) {
+                case 38://up
+                    moveCurrent(-1);
+                    break;
+                case 40://down
+                    moveCurrent(1);
+                    break;
+                case 37://left
+                    break;
+                case 39://right
+                    break;
+                case 13://select
+                    // window.location.href=$('.dg-center').attr('href');
+                    break;
+                case 45: //back
+                case 46: //exit
+                    history.go(-1);
+                    break;
+            }
+        }
+    });
+
+    //根据地址栏城市初始化数据
+    function init() {
+        var name = getQueryStringByName('city'),len = info.length;
+        for (var i = 0; i < len; i++) {
+            var clone = $(".example .thumb").clone(true);
+            clone.find('img').attr('src', regImgSrc(info[i].poster));
+
+            clone.find('.title').html(info[i].name);
+            videoSrc[i] = info[i].videosrc;
+            textinfo[i] = "剧情介绍:"+info[i].movieintro;
+            nameinfo[i] = info[i].name;
+            imgSrc[i] = regImgSrc(info[i].poster);
+			
+			director[i] = info[i].director;
+			actor[i] = info[i].actor;
+			ondate[i] = info[i].ondata;
+            vp[i] = info[i].id;
+            $('.dg-wrapper').append(clone);
+        }
+
+        for (; i < 4; i++) {
+            $('.dg-wrapper').append('<div class="thumb none"></div>');
+        }
+		//$("#qrcode").qrcode({width:305,height:305,text:"http://192.168.100.11/multiscreen/BBCV_Local-release-1.0.00.92.apk"});
+		$(".thumb").eq(0).addClass("current");
+		$(".poetic.view").css("opacity",1);
+		moveCurrent(0);
+    }
+
+    var singleHeight = 79 + 8;
+    var current_vod_id;
+    function moveCurrent(flag) {
+        var $thumb = $(".dg-wrapper .thumb")
+        var thumbLen = $thumb.length;
+        var noneLen = $(".none").length;
+
+        var len = thumbLen - noneLen;
+
+        var index = $(".dg-wrapper .thumb").index($(".current"));
+
+        index += flag;
+
+
+        if (index >= 0 && index < len) {
+            clearInterval(Otimer);
+            $(".current").removeClass("current");
+            $thumb.eq(index).addClass("current");
+            showfocus(index);
+            moveWrapper();
+            /*var oldBg = parent.$('.poetic .background');
+            var newBg = $('<div class="background">').css({
+                "opacity": "1",
+                'background-image': 'url(' + $('.current img').attr('src') + ')'
+
+            }).insertAfter(oldBg);
+            oldBg.remove();*/
+            /*setTimeout(function () {
+                oldBg.css('opacity', 0).one('webkitTransitionEnd', function () {
+                    $(this).remove();
+                });
+                newBg.css('opacity', 1);
+            }, 0);*/
+
+
+        }
+
+        function moveWrapper() {
+            $(".dg-wrapper").finish();
+            var curTop = $(".current").position().top;
+            var wraTop = $(".dg-wrapper").position().top;
+            console.log(curTop + wraTop)
+            if ((curTop + wraTop) < 0) {
+                if (Math.abs(wraTop) <= 3 * singleHeight) {
+                    $(".dg-wrapper").animate({"top": '0px'}, 300, function () {
+
+                    })
+                }
+                else {
+                    $(".dg-wrapper").animate({"top": (wraTop + 3 * singleHeight) + 'px'}, 300, function () {
+
+                    })
+                }
+            }
+            else if ((curTop + wraTop) >= 3 * singleHeight) {
+                if ((thumbLen - index) > 3) {
+                    $(".dg-wrapper").animate({"top": (wraTop - 3 * singleHeight) + 'px'}, 300, function () {
+
+                    })
+                }
+                else {
+
+                    $(".dg-wrapper").animate({"top": (wraTop - (thumbLen - index) * singleHeight) + 'px'}, 300, function () {
+
+                    })
+                }
+            }
+        }
+    }
+
+
+    //获取初始化城市
+    function getindex() {
+        for (var i = 0; i < citylist.length; i++) {
+            if (citylist[i] == getQueryStringByName('city')) {
+                return i;
+            }
+        }
+        return 2;
+    }
+
+    //获取地址栏中的参数值
+    function getQueryStringByName(name) {
+
+        var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+
+        if (result == null || result.length < 1) {
+
+            return "";
+
+        }
+
+        return result[1];
+
+    }
+    /*根据焦点项目更换视频和文字*/
+    function showfocus(index) {
+        var video = $('#video:first').attr('src', videoSrc[index]).get(0);
+        video.play();
+        video.loop = true;
+        $('#cname').text(nameinfo[index]);
+        $('#subtxt').text(textinfo[index]);
+		
+		$(".movieinfo .director").text("导演:"+director[index]);
+		$(".movieinfo .actor").text("主演:"+actor[index]);
+		$(".movieinfo .datetime").text("上映日期:"+ondate[index]);
+		
+        changeText($("#subtxt"), $('#cintro').empty(), 100);
+        $.get("http://218.108.50.246/wechat/oneway/qrcode", {
+            "channel": getQueryStringByName("stream_id"),
+            "vodid": vp[index],
+            "area": getQueryStringByName("area") || "home"
+        }, function(result){
+            if(result.retcode == 0){
+                $("#qrcode").html("<img src='"+result.url+"' />")
+            }
+        }, "jsonp")
+
+        /*$("#qrcode").empty().qrcode({width:305,height:305,text:"http://192.168.100.11:8882/NS/a?id="+getQueryStringByName("stream_id")+"&vp="+vp[index]+"&r=0"});*/
+        current_vod_id = vp[index];
+    }
+
+    /*文字的打字效果*/
+    function changeText(cont1, cont2, speed) {
+        /*clearInterval(Otimer);
+        var Otext = cont1.text();
+        var Ocontent = Otext.split("");
+        var i = 0;
+
+        function show() {
+            if (i < Ocontent.length) {
+                cont2.append(Ocontent[i]);
+                i = i + 1;
+            }
+        }
+        Otimer = setInterval(show, speed);*/
+
+        cont2.text(cont1.text());
+    }
+
+    function regImgSrc(src){
+        var reg_img_src = /}(.+){/g;
+        var result = reg_img_src.exec(src)
+        if(result){
+            return $.trim(result[1])
+        }
+
+        return src;
+    }
+
+    function getQueryStringByName(name){
+        var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+        if(result == null || result.length < 1){
+            return "";
+        }
+        return result[1];
+    }
+
+function formatDate(num){
+    num = parseInt(num) * 1000;
+    var date = new Date(num);
+
+    return date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDay();
+}
+
+    var vodid;
+    var stream_id = getQueryStringByName("stream_id");
+    function queryStatus(){
+        var pageName = "remen";
+        $.post("http://192.168.100.11:8882/NS/skipServlet?resolution=0&streamid="+stream_id+"&vodid="+current_vod_id+"&pageName="+pageName,function(data) {
+            if(data!=""&&"error"!=data.trim()){
+                location.href=data;
+            }
+        });
+    }
+    setInterval(queryStatus,1000);
+
+</script>
+</body>
+</html>

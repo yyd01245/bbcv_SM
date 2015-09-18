@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- QAM手工映射SQL语句 -->
+<sqlMap namespace="QamResource">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<!-- 根据主键查询代码表 -->
+	<select id="getQamResByKey" parameterClass="map" resultClass="dto">
+		SELECT r.ipqam_res_id,r.ipqam_id,r.app_name,r.exp_port,r.data_type,r.server_id,r.res_type,r.res_status,
+		date_format(r.status_time,'%Y-%m-%d %T') as status_time,r.band_width,r.rf_code,r.pid_id,r.prod_id,r.remark FROM urm_ipqam_resource r
+		 WHERE r.ipqam_res_id = #ipqam_res_id#
+	</select>
+	
+	<select id="getReQamResById" parameterClass="map" resultClass = "dto">
+		SELECT r.ipqam_res_id,i.ipqam_ip,i.ipqam_port,r.exp_port,r.server_id,r.res_type,f.rf_id,f.order_port,n.area_id,n.sg_id 
+		FROM  urm_ipqam_resource r,urm_ipqam_info i ,urm_ipqam_frequency f , urm_network_area n 
+		where i.ipqam_id = r.ipqam_id and r.rf_code = f.rf_code and i.network_code = n.network_code and f.status !=-1 and n.status != -1
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and"  property="ipqam_res_id">
+				r.ipqam_res_id = #ipqam_res_id#
+			</isNotEmpty>
+		</dynamic> 
+	</select>
+	
+	<!-- 获取QAM资源列表通过QAMID-->
+	<select id="getListWithQamID" parameterClass="map" resultClass="dto">
+	
+	
+		SELECT ipqamResId,ipqamResPort,ipqamResPid,ipqamInfoId,state,remark
+	
+			FROM ipqam_resource  WHERE ipqamInfoId= #ipqamInfoId# 
+	</select>
+	<!-- 获取QAM资源列表通过QAMID-->
+	<select id="getResourceInfoByResID" parameterClass="map" resultClass="dto">
+		SELECT ipqamResId,ipqamResPort,ipqamResPid,ipqamInfoId,state,remark,stream_id FROM ipqam_resource  WHERE ipqamResId= #ipqamResId# 
+	</select>
+	<select id="getListByNetWork" parameterClass="map" resultClass="dto">
+		SELECT r.ipqam_res_id,r.ipqam_id,i.ipqam_ip,i.ipqam_port,r.app_name,r.exp_port,r.data_type,r.server_id,r.res_type,r.res_status,
+		date_format(r.status_time,'%Y-%m-%d %T') as status_time,r.band_width,r.rf_code,r.pid_id,r.prod_id,r.remark,f.rf_id
+			FROM urm_ipqam_info i inner join urm_network_area a on i.network_code = a.network_code and a.status!=-1 and i.status=1 LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id left join urm_ipqam_frequency f on r.rf_code=f.rf_code 
+			 WHERE r.res_status !=-2 and a.network_code = #network_code# ORDER BY r.ipqam_res_id DESC
+	</select>
+		<select id="getListByNetWorkCount" parameterClass="map" resultClass="Integer">
+		SELECT count(*) FROM urm_ipqam_info i inner join urm_network_area a on i.network_code = a.network_code and a.status!=-1 and i.status=1 LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id left join urm_ipqam_frequency f on r.rf_code=f.rf_code 
+			 WHERE r.res_status !=-2 and a.network_code = #network_code# ORDER BY r.ipqam_res_id DESC
+	</select>
+	<select id="getListWithTypec" parameterClass="map" resultClass="dto">
+		SELECT r.ipqam_res_id,r.ipqam_id,i.ipqam_ip,i.ipqam_port,r.app_name,r.exp_port,r.data_type,r.server_id,r.res_type,r.res_status,
+		date_format(r.status_time,'%Y-%m-%d %T') as status_time,r.band_width,r.rf_code,r.pid_id,r.prod_id,r.remark,f.rf_id
+		FROM urm_ipqam_info i inner join urm_network_area a on i.network_code = a.network_code and a.status !=-1 LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id left join urm_ipqam_frequency f on r.rf_code=f.rf_code 
+		WHERE  r.res_status !=-2 and a.area_id = '99999' ORDER BY r.ipqam_res_id DESC
+	</select>
+		<select id="getListWithTyped" parameterClass="map" resultClass="dto">
+		SELECT r.ipqam_res_id,r.ipqam_id,i.ipqam_ip,i.ipqam_port,r.app_name,r.exp_port,r.data_type,r.server_id,r.res_type,r.res_status,
+		date_format(r.status_time,'%Y-%m-%d %T') as status_time,r.band_width,r.rf_code,r.pid_id,r.prod_id,r.remark,f.rf_id
+		FROM urm_ipqam_info i inner join urm_network_area a on i.network_code = a.network_code and a.status !=-1 LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id left join urm_ipqam_frequency f on r.rf_code=f.rf_code 
+		WHERE  r.res_status !=-2 and area_id != '99999' and (sg_id = '' or ISNULL(sg_id)) ORDER BY r.ipqam_res_id DESC
+	</select>
+		<select id="getListWithTypeb" parameterClass="map" resultClass="dto">
+		SELECT r.ipqam_res_id,r.ipqam_id,i.ipqam_ip,i.ipqam_port,r.app_name,r.exp_port,r.data_type,r.server_id,r.res_type,r.res_status,
+		date_format(r.status_time,'%Y-%m-%d %T') as status_time,r.band_width,r.rf_code,r.pid_id,r.prod_id,r.remark,f.rf_id
+		FROM urm_ipqam_info i inner join urm_network_area a on i.network_code = a.network_code and a.status !=-1 LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id left join urm_ipqam_frequency f on r.rf_code=f.rf_code 
+		WHERE r.res_status !=-2 and area_id != '99999' and (sg_id != '' and !ISNULL(sg_id)) ORDER BY r.ipqam_res_id DESC
+	</select>
+	<select id="getListWithTypeCountc" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*)
+		FROM urm_ipqam_info i inner join urm_network_area a on i.network_code = a.network_code and a.status !=-1 LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id left join urm_ipqam_frequency f on r.rf_code=f.rf_code 
+		WHERE  r.res_status !=-2 and a.area_id = '99999' ORDER BY r.ipqam_res_id DESC
+	</select>
+		<select id="getListWithTypeCountd" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*)
+		FROM urm_ipqam_info i inner join urm_network_area a on i.network_code = a.network_code and a.status !=-1 LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id left join urm_ipqam_frequency f on r.rf_code=f.rf_code 
+		WHERE  r.res_status !=-2 and area_id != '99999' and (sg_id = '' or ISNULL(sg_id)) ORDER BY r.ipqam_res_id DESC
+	</select>
+		<select id="getListWithTypeCountb" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info i inner join urm_network_area a on i.network_code = a.network_code and a.status !=-1 LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id left join urm_ipqam_frequency f on r.rf_code=f.rf_code 
+		WHERE  r.res_status !=-2 and area_id != '99999' and (sg_id != '' and !ISNULL(sg_id)) ORDER BY r.ipqam_res_id DESC
+	</select>
+	
+	<select id="getIpqamResIdByRf" parameterClass="map" resultClass="dto">
+		SELECT r.ipqam_res_id FROM urm_ipqam_info i LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id
+	</select>
+	
+	
+	<!-- 获取QAM资源总数通过QAMID-->
+	<select id="getListWithQamIDCount" parameterClass="map" resultClass="java.lang.Integer">
+	
+	
+		SELECT count(*) FROM ipqam_resource  WHERE ipqamInfoId= #ipqamInfoId# 
+	
+	</select>
+	<select id="getCountByIPQAMkey" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_resource
+		 	WHERE res_status!=-1 and ipqam_id= #ipqam_id# and exp_port=#exp_port# and server_id=#server_id# and pid_id=#pid_id# and rf_code = #rf_code#
+	</select>
+	<!-- 修改 -->
+	<select id="getCountByIPQAMkeyChange" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_resource
+		 	WHERE res_status!=-1 and ipqam_id= #ipqam_id# and exp_port=#exp_port# and server_id=#server_id# and pid_id = #pid_id# and rf_code = #rf_code# and ipqam_res_id!=#ipqam_res_id#
+	</select>
+	<select id="getResourceByRfCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_resource
+		 	WHERE rf_code= #rf_code#
+	</select>
+	<select id="getIDForPageByKey" parameterClass="map" resultClass="dto">
+		SELECT * FROM urm_ipqam_resource WHERE  rf_code= #rf_code#
+	</select>
+	<select id="getIDByKey" parameterClass="map" resultClass="dto">
+		SELECT * FROM urm_ipqam_resource WHERE  ipqam_id= #ipqam_id#
+	</select>
+	<!-- 获取QAM资源列表-->
+	<select id="getListForPage" parameterClass="map" resultClass="dto">
+		SELECT r.ipqam_res_id,r.ipqam_id,i.ipqam_ip,i.ipqam_port,r.app_name,r.exp_port,r.data_type,r.server_id,r.res_type,r.res_status,
+		date_format(r.status_time,'%Y-%m-%d %T') as status_time,r.band_width,r.rf_code,r.pid_id,r.prod_id,r.remark
+			FROM urm_ipqam_info i LEFT OUTER JOIN  urm_ipqam_resource r ON i.ipqam_id=r.ipqam_id
+		   WHERE r.app_name LIKE '%$queryParam$%'
+		      OR r.res_type LIKE '%$queryParam$%'
+		ORDER BY r.ipqam_res_id DESC
+	</select>
+	
+	<!-- 获取QAM资源总数-->
+	<select id="getListForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM ipqam_resource
+		
+	</select>
+	
+	<!-- 插入QAM表一条记录 -->
+	<insert id="saveQamResItem" parameterClass="dto">
+		INSERT INTO ipqam_resource (
+		ipqamResPort,ipqamResPid,ipqamInfoId,state,remark) 
+		VALUES (#ipqamResPort#,#ipqamResPid#,#ipqamInfoId#,#state#,#remark#)
+	</insert>  
+	<insert id="saveQamResItemHis" parameterClass="dto">
+		INSERT INTO urm_ipqam_resource_his (
+		   ipqam_res_id,ipqam_id,app_name,exp_port,data_type,server_id,res_type,res_status,status_time,band_width,rf_code,pid_id,prod_id,remark,delete_time,busi_id) 
+		VALUES (#ipqam_res_id#,#ipqam_id#,#app_name#,#exp_port#,#data_type#,#server_id#,
+				#res_type#,-1,#status_time#,#band_width#,#rf_code#,#pid_id#,#prod_id#,#remark#,SYSDATE(),#busi_id#)
+	</insert>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+	
+	<!-- 删除一条云应用表记录  -->
+	<delete id="deleteQamResItems" parameterClass="map" >
+		delete from ipqam_resource   WHERE ipqamResId = #ipqamResId#
+	</delete>
+	<delete id="deleteQamResItemsByRfId" parameterClass="map" >
+		delete from urm_ipqam_resource  WHERE rf_code = #rf_code#
+	</delete>
+	<delete id="deleteResManagerByIPqam" parameterClass="map" >
+		delete from urm_ipqam_resource WHERE ipqam_id = #ipqam_id#
+	</delete>
+	<!-- 根据主键更新用户 -->
+	<update id="updateQamResItem" parameterClass="dto">
+         UPDATE ipqam_resource
+		<dynamic prepend="SET">
+			<isNotNull prepend="," property="ipqamResPort">
+	         ipqamResPort = #ipqamResPort#
+			</isNotNull>
+			<isNotNull prepend="," property="ipqamResPid">
+	         ipqamResPid = #ipqamResPid#
+			</isNotNull>
+			<isNotNull prepend="," property="ipqamInfoId">
+	         ipqamInfoId = #ipqamInfoId#
+			</isNotNull>
+			<isNotNull prepend="," property="state">
+	         state = #state#
+			</isNotNull>
+			<isNotNull prepend="," property="remark">
+	         remark = #remark#
+			</isNotNull>
+			
+		</dynamic> 
+	        WHERE ipqamResId = #ipqamResId# 
+	</update>
+	<!--根据ipqam_id查询所有rf_id-->
+	<select id="getRfIdByIpqamId" parameterClass="map" resultClass="dto">
+		SELECT ipqamResId as value, ipqamResPort as text
+		FROM ipqam_resource 
+	</select>
+	<select id="getRfIdByCodeId" parameterClass="map" resultClass="dto">
+		SELECT f.rf_code as value, f.rf_id as text
+		FROM urm_ipqam_frequency f where f.network_code=#network_code and#
+	</select>
+	<select id="getIPQAMForPageByKey" parameterClass="map" resultClass="dto">
+		SELECT * FROM ipqam_resource WHERE  ipqamResId= #ipqamResId#
+	</select>
+	<select id="getResList" parameterClass="map" resultClass="dto">
+		select ipqamResId from ipqam_resource where ipqamResId = #ipqamResId#
+	</select>
+	
+	<select id="getCountByIPQAMID" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT COUNT(*) FROM ipqam_resource where ipqamInfoId=#ipqamInfoId# and ipqamResPort=#ipqamResPort#
+	</select>
+	
+</sqlMap>

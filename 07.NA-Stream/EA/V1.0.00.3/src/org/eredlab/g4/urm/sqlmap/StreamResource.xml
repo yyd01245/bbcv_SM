@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- QAM手工映射SQL语句 -->
+<sqlMap namespace="StreamResource">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	<!-- 查询QAM信息 -->
+	<select id="getStreamResourceListForPage" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT a.*,b.strStreamType FROM ucs_stream_resource a left join stream_session  b ON a.istreamID=b.istreamID where 1=1
+			<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="strNav_url">
+				a.strNav_url like '%$strNav_url$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="iChannel_id">
+				a.iChannel_id like '%$iChannel_id$%'
+			</isNotEmpty>
+						
+		
+		</dynamic>
+		order by iStreamID
+	</select>
+	<select id="getStreamResourceLists" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM ucs_stream_resource a   where 0=0
+	<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="strNav_url">
+				strNav_url like '%$strNav_url$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="iChannel_id">
+				iChannel_id like '%$iChannel_id$%'
+			</isNotEmpty>
+			
+		</dynamic>
+		order by iStreamID
+	</select>
+		<select id="getStreamResourceListsCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM ucs_stream_resource a where 0=0
+			<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="strNav_url">
+				strNav_url like '%$strNav_url$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="iChannel_id">
+				iChannel_id like '%$iChannel_id$%'
+			</isNotEmpty>
+				
+		
+		</dynamic>
+		order by iStreamID
+	</select> 
+
+
+		
+		<!-- 查询QAM信息 -->
+	<select id="getQamInfo" parameterClass="map" resultClass="dto" remapResults="true">
+			SELECT ipqamInfoId as id, ipqamInfoName as text ,network_area_id ,ipqamFrequency 
+		FROM
+		ipqam_info where 0=0
+		<dynamic prepend="AND">
+		
+			<isNotEmpty prepend="," property="ipqamInfoName">
+				ipqamInfoName like '%$ipqamInfoName$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ipqamInfoId">
+				ipqamInfoId =#ipqamInfoId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 查询是否有全量同步事件 -->
+	<select id="queryCountSynEvent" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT COUNT(*) from  urm_event_update where oper_status=#oper_status#
+	</select>
+	<select id="queryResourceByStreamResource" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqam_id FROM urm_ipqam_info where network_code=#network_code#
+	</select>
+	<select id="queryResourceByStreamResourceCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info where network_code=#network_code#
+	</select>
+	<select id="queryRfResourceByStreamResource" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT rf_code FROM urm_ipqam_frequency where network_code=#network_code# and status=1
+	</select>
+	<select id="queryRfResourceByStreamResourceCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_frequency where network_code=#network_code# and status=1
+	</select>
+	
+	<select id="getStreamResourceList" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM urm_network_area 
+	</select>
+	<select id="queryIDByStreamResource" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqam_id FROM urm_ipqam_info where network_code=#network_code#
+	</select>
+	<select id="queryRfIDByStreamResource" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM urm_ipqam_frequency where network_code=#network_code#
+	</select>
+	<select id="getStreamResourceListByKey" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_network_area 
+<!--		where sg_id='$sg_id$' and status!=-1 and area_id=#area_id# -->
+	</select>
+	<!-- 添加重名校验 -->
+	<select id="getNameByKey" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_network_area 
+<!--		where status!=-1 and network_name='$network_name$' -->
+	</select>
+	<select id="getStreamResourceListByUpdate" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_network_area where sg_id='$sg_id$' and status!=-1 and area_id=#area_id# and network_code!=#network_code#
+	</select>
+	<!-- 修改重名校验 -->
+	<select id="getNameByUpdate" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_network_area where status!=-1 and network_name='$network_name$' and network_code!=#network_code#
+	</select>
+	<!-- 获取QAM总数 -->
+	<select id="getStreamResourceListForPageCount" parameterClass="map"
+		resultClass="java.lang.Integer">
+		SELECT count(*) FROM  ucs_stream_resource where 0=0
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="iStreamID">
+				iStreamID like '%$iStreamID$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="strNav_url">
+				strNav_url like '%$strNav_url$%'
+			</isNotEmpty>
+		</dynamic>
+		order by iStreamID
+	</select>
+	
+	<!-- 插入QAM表一条记录 -->
+	<insert id="saveStreamResource" parameterClass="dto">
+		INSERT INTO ucs_stream_resource (ipqamInfoId,strNetRegionNum,strNav_url,iChannel_id,strWhether_HD) 		   
+		VALUES (#ipqamInfoId#,#strNetRegionNum#,#strNav_url#,#iChannel_id#,#strWhether_HD#)
+	</insert> 
+	<!-- 根据频道号查询数据是否重复 -->
+	<select id="queryStreamResourceBychannelId" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM ucs_stream_resource where iChannel_id=#iChannel_id#
+	</select>
+	<!-- 插入到历史表 -->  
+	<insert id="saveStreamResourceHis" parameterClass="dto">
+		INSERT INTO urm_network_area_his (network_code,sg_id,network_name,th_per,area_id,status,remark,delete_time,busi_id) 		   
+		VALUES (#network_code#,#sg_id#,#network_name#,#th_per#,#area_id#,-1,#remark#,SYSDATE(),#busi_id#)
+	</insert>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+	
+	<!-- 删除一条云应用表记录  -->
+	<delete id="deleteStreamResource" parameterClass="map" >
+		delete from ucs_stream_resource WHERE iStreamID = #iStreamID#
+	</delete>
+	
+	<!-- 根据主键更新用户 -->
+	<update id="updateStreamResource" parameterClass="dto">
+         UPDATE ucs_stream_resource
+      
+		<dynamic prepend="SET">
+			
+			
+			<isNotNull prepend="," property="ipqamInfoId">
+	         ipqamInfoId = #ipqamInfoId#
+			</isNotNull>
+			<isNotNull prepend="," property="strNetRegionNum">
+	         strNetRegionNum = #strNetRegionNum#
+			</isNotNull>
+			
+				
+			<isNotNull prepend="," property="strNav_url">
+	         strNav_url = #strNav_url#
+			</isNotNull>
+		
+					
+			
+			<isNotNull prepend="," property="iChannel_id">
+	         iChannel_id = #iChannel_id#
+			</isNotNull>	
+
+			<isNotNull prepend="," property="strWhether_HD">
+	         strWhether_HD = #strWhether_HD#
+			</isNotNull>			
+										
+		</dynamic> 
+	        WHERE iStreamID = #iStreamID# 
+	</update>
+	
+	
+	<!-- 根据流ID查询当前处于什么状态 -->
+	<select id="queryStatusByID" parameterClass="map" resultClass="java.lang.String">
+			SELECT strStreamType FROM stream_session where istreamID =#iStreamID#
+	</select>
+	
+	
+		<!-- 根据流ID查询当前处于什么状态 -->
+	<select id="queryBindUserById" parameterClass="map" resultClass="java.lang.String">
+			SELECT strBind_userID FROM stream_session where istreamID =#iStreamID#
+	</select>
+	
+	<select id="queryTypeByID" parameterClass="map" resultClass="java.lang.String">
+		SELECT strWhether_HD FROM ucs_stream_resource where iStreamID = #iStreamID# 
+	</select>
+	
+	<select id="getCountByIPqamID" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM ucs_stream_resource where ipqamInfoId = #ipqamInfoId#
+	</select>
+	
+	<delete id="deleteStreamResourceByIPQAMID" parameterClass="map" >
+		delete from ucs_stream_resource WHERE ipqamInfoId = #ipqamInfoId#
+	</delete>
+</sqlMap>

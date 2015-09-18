@@ -1,0 +1,93 @@
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="msi" extends="default" namespace="/msi">
+		<global-results>
+           <result name="error">/error.html</result>
+      	</global-results>
+      	
+      <!--  	
+        <action name="user_regist_req" class="prod.nebula.msi.web.action.msi.UserRegistReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_vodplay_req" class="prod.nebula.msi.web.action.msi.UserVodPlayReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_login_req" class="prod.nebula.msi.web.action.msi.UserLoginReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_access_req" class="prod.nebula.msi.web.action.msi.UserAccessReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_sessionquery_req" class="prod.nebula.msi.web.action.msi.UserSessionQueryReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_bind_req" class="prod.nebula.msi.web.action.msi.UserBindReqAction" method="action">
+      	</action>
+      	
+      	<action name="auth_code_req" class="prod.nebula.msi.web.action.msi.AuthCodeReqAction" method="action">
+      	</action>
+      	
+      	<action name="bind_stb_req" class="prod.nebula.msi.web.action.msi.BindStbReqAction" method="action">
+      	</action>
+      	
+      	<action name="rename_stb_req" class="prod.nebula.msi.web.action.msi.RenameStbReqAction" method="action">
+      	</action>
+      	
+      	<action name="querybind_stb_req" class="prod.nebula.msi.web.action.msi.QueryBindStbReqAction" method="action">
+      	</action>
+      	<action name="command_send_req" class="prod.nebula.msi.web.action.msi.CommandSendReqAction" method="action">
+      	</action>
+      	
+      	<action name="key_send_req" class="prod.nebula.msi.web.action.msi.KeySendReqAction" method="action">
+      	</action>
+      	
+      	<action name="stb_login_req" class="prod.nebula.msi.web.action.msi.StbLoginReqAction" method="action">
+      	</action>
+      	
+      	<action name="stb_logout_req" class="prod.nebula.msi.web.action.msi.StbLogoutReqAction" method="action">
+      	</action>
+      	
+      	<action name="unbind_stb_req" class="prod.nebula.msi.web.action.msi.UnbindStbReqAction" method="action">
+      	</action>
+      	
+      	<action name="gen_region_req" class="prod.nebula.msi.web.action.msi.GenerateMsiRegionAction" method="action">
+      	</action>
+      	
+      	<action name="qr_req" class="prod.nebula.msi.web.action.msi.QrCodeReqAction" method="action"></action>
+      	
+      	<action name="qr_query_req" class="prod.nebula.msi.web.action.msi.QrCodeReqAction" method="query"></action>
+      	
+      	<action name="channel_common" class="prod.nebula.msi.web.action.msi.channel.CommonReqAction" method="action"></action>
+      	
+      	<action name="channel_notice_over" class="prod.nebula.msi.web.action.msi.channel.NoticeOverReqAction" method="action"></action>
+      	
+      	<action name="channel_screennotice" class="prod.nebula.msi.web.action.msi.channel.ScreennoticeReqAction" method="action"></action>
+		
+		<action name="region_req" class="prod.nebula.msi.web.action.msi.MsiRegionReqAction" method="action">
+      	</action>
+      	-->
+      	
+      	<action name="user_vodplay_req" class="prod.nebula.msi.web.action.msi.UserVodPlayReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_login_req" class="prod.nebula.msi.web.action.msi.UserLoginReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_sessionquery_req" class="prod.nebula.msi.web.action.msi.UserSessionQueryReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_bind_req" class="prod.nebula.msi.web.action.msi.UserBindReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_unbind_req" class="prod.nebula.msi.web.action.msi.UserUnBindReqAction" method="action">
+      	</action>
+      	
+      	<action name="key_send_req" class="prod.nebula.msi.web.action.msi.KeySendReqAction" method="action">
+      	</action>
+      	
+      	<action name="user_choosetime_req" class="prod.nebula.msi.web.action.msi.UserChoosetimeReqAction" method="action">
+      	</action>
+	</package>
+</struts>

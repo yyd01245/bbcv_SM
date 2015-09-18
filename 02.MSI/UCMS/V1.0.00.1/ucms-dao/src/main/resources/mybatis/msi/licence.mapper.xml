@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="msi.licence">
+	<cache type="prod.nebula.mdb.MybatisCache"/>
+	
+	<select id="listLicence" parameterType="map" resultType="Licence">
+		<![CDATA[
+			select id, app_name, licence
+			 from msi_licence ]]>
+		<where>
+			<if test="licence.id != null">and id=#{licence.id}</if>
+			<if test="licence.app_name != null">and app_name=#{licence.app_name}</if>
+			<if test="licence.licence != null">and licence=#{licence.licence}</if>
+		</where>
+		<if test="orderBy != null"> order by $orderBy$ </if>
+		<if test="page != null">LIMIT #{page.firstIndex},#{page.pageSize}</if>
+	</select>
+	
+	<select id="listLicenceCount" parameterType="Licence" resultType="int">
+		<![CDATA[select count(1) from msi_licence ]]>
+		<where> 
+			<if test="id != null">and id=#{id}</if>
+			<if test="app_name != null">and app_name=#{app_name}</if>
+			<if test="licence != null">and licence=#{licence}</if>
+		</where>
+	</select>
+	
+	<insert id="addLicence" parameterType="Licence" flushCache="true">
+		<![CDATA[INSERT INTO msi_licence ]]> 
+		<trim prefix="(" suffix=")values" suffixOverrides=",">
+			<if test="app_name != null">app_name,</if>
+			<if test="licence != null">licence,</if>
+		</trim>
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="app_name != null">#{app_name},</if>
+			<if test="licence != null">#{licence},</if>
+		</trim>
+	    <selectKey keyProperty="id" resultType="int">
+	    	SELECT @@IDENTITY AS id
+	    </selectKey>
+	</insert>
+	
+	<update id="updateLicenceById" parameterType="Licence" flushCache="true">
+		<![CDATA[update msi_licence ]]> 
+		<set>
+			<if test="app_name != null">app_name=#{app_name},</if>
+			<if test="licence != null">licence=#{licence},</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="deleteLicenceById" parameterType="int" flushCache="true">
+		delete from msi_licence where id = #{id}
+	</delete>
+	
+</mapper>

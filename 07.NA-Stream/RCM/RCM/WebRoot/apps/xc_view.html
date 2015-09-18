@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="../dist/dwz-ria/themes/specter/css/specter.css" />
+	<link rel="stylesheet" type="text/css" href="../dist/jquery-ui/css/ui-lightness/jquery-ui-1.8.11.custom.css"/>
+	<script type="text/javascript" src="themes/jqueryui/js/jquery-1.7.2.js"></script>
+	<script type="text/javascript" src="themes/jqueryui/js/jquery-ui-1.8.19.custom.min.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+
+  <body style="background: url(images/1_right_1.jpg) repeat-x; padding: 3px 6px 0 6px;">
+    <table id="navTbl" width="100%" cellspacing="0" cellpadding="0"
+		class="navTbl">
+		<tr>
+		    <td width="10">
+				<img src="images/1_ico1.gif" width="26" height="9">
+			</td>
+			<td class="navtd">
+				当前位置：文体事业系统&gt;&gt;残疾人运动管理&gt;&gt;运动项目细类修改
+			</td>
+			<td align="right">
+				<a href="javaScript:window.history.go(-1);"><img src="images/ico/7.gif" alt="返回" border="0"></a>
+				<a><img src="images/ico/a6.gif" alt="帮助" border="0">
+				</a>
+			</td>
+			<td width="10"></td>
+		</tr>
+	</table>
+  
+  <!-- 显示信息-->	
+	<div align="left">	
+		<font color="red"  size="2">
+		<ul>
+		
+		</ul>
+		</font>		
+	</div>
+  <br>
+   
+   <form name="ydxmForm" method="post" action="/sportsItemManager.do?method=update">
+   	 <input type="hidden" name="id" value="2">
+     <table width="70%"  cellpadding="0" cellspacing="0"
+		 style="margin:10px 0; border:1px solid #BECFD6;" align="center" >
+		 <tr>
+			<td colspan="6" class="tab01" >
+				<b>修改运动项目详细类</b>
+			</td>
+		</tr>
+		<tr>
+		   <td nowrap class="tab02" align="right">
+				运动项目总类名称：
+			<br></td>
+			<td class="tab01">
+				<select name="parentId" id="totalItems" style="width:145px;" class="select"><option value="0">---选择项目总类---</option>
+					<option value="1" selected="selected">田径</option></select>
+			<br></td>
+		</tr>
+		<tr>
+			<td nowrap class="tab02" align="right">
+				项目详细类名称：
+			<br/></td>
+			<td class="tab01" >
+				<input type="text" name="itemName" value="100米跑">
+			<br/></td>
+		</tr>
+		<tr>
+			<td nowrap class="tab02" align="right">
+				世界记录：
+			<br/></td>
+			<td class="tab01" >
+				<input type="text" name="worldRecord" value="17">
+			<br/></td>
+		</tr>
+		<tr>
+			<td nowrap class="tab02" align="right">
+				省级记录：
+			<br/></td>
+			<td class="tab01" >
+				<input type="text" name="provinceRecord" value="20">
+			<br/></td>
+		</tr>
+		<tr>
+			<td nowrap class="tab02" align="right">
+				市级记录：
+			<br/></td>
+			<td class="tab01" >
+				<input type="text" name="cityRecord" value="22">
+			<br/></td>
+		</tr>
+		<tr>
+			<td nowrap class="tab02" align="right">
+				成绩计量单位：
+			<br/></td>
+			<td class="tab01" >
+				<select name="unit" style="width:132px;"><option value="">---选择项目单位---</option>
+					<option value="米">米(m)</option>
+					<option value="秒" selected="selected">秒(s)</option>
+					<option value="公斤">公斤(kg)</option>
+					<option value="分">分</option>
+					<option value="环">环</option></select>
+				<span><font color="red">*如，米(m)、秒(s)、公斤(kg)等</font></span>
+			<br/></td>
+		</tr>
+		<tr>
+			<td nowrap class="tab02" align="right">
+				排序方法：
+			<br/></td>
+			<td class="tab01" >
+				<span style="width:135px;">
+				<input type="radio" name="recordOrdering" value="asc">升序
+				<input type="radio" name="recordOrdering" value="desc" checked="checked">降序
+				</span>
+				<span><font color="red">*成绩数据与名次成正比，则升序；否则，降序</font></span>
+			<br/></td>
+		</tr>
+		<tr>
+			<td colspan="6" nowrap align="center" >
+              <input type="submit" value="确定" onclick="return check();">&nbsp;&nbsp;&nbsp;
+              <input type="button" name="button1" value="返回" onclick="javaScript:window.history.go(-1);">
+            </td>
+		</tr>
+	</table>
+	</form>
+  </body>
+
+</html>

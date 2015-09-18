@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="步骤1：使用手机扫描频道中的二维码抢占操控权"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:padding="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="扫描前Tv画面示意："
+                android:textColor="#000000" />
+            <ImageView 
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/help_1"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="使用手机扫描二维码"
+                android:textColor="#000000" />
+            <ImageView 
+                android:layout_width="match_parent"
+                android:layout_height="530dp"
+                android:padding="5dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/help_2"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="扫描后电视画面示意："
+                android:textColor="#000000" />
+            <ImageView 
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:padding="5dp"
+                android:src="@drawable/help_3"/>
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="步骤2：点播你喜欢的电影或连续剧"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:padding="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="方式1（默认）：直接点播扫描电视画面对应的电影或连续剧"
+                android:textColor="#000000" />
+            <ImageView 
+                android:layout_width="match_parent"
+                android:layout_height="530dp"
+                android:padding="5dp"
+                android:src="@drawable/help_4"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="方式2：返回首页选择其他电影或连续剧手机首页图"
+                android:textColor="#000000" />
+            <ImageView 
+                android:layout_width="match_parent"
+                android:layout_height="530dp"
+                android:padding="5dp"
+                android:src="@drawable/help_5"/>
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="步骤3：使用手机遥控器操作"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:padding="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="手机遥控器图（含说明）"
+                android:textColor="#000000" />
+            <ImageView 
+                android:layout_width="match_parent"
+                android:layout_height="530dp"
+                android:padding="5dp"
+                android:src="@drawable/help_6"/>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

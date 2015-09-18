@@ -1,0 +1,1 @@
+{dede:img text='' width='336' height='494'} /bbcvcms/uploads/uploads/allimg/141124/1_1124124141B08.jpg {/dede:img}

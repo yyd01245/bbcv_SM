@@ -1,0 +1,19 @@
+{
+  "button": [
+    {
+      "name": "扫码",
+      "type": "scancode_waitmsg",
+      "key": "scancode"
+    },
+    {
+      "name": "遥控器",
+      "type": "click",
+      "key": "keyboard"
+    },
+    {
+      "name": "关于我们",
+      "type": "view",
+      "url": "http://www.bbcvision.com/main.html"
+    }
+  ]
+}

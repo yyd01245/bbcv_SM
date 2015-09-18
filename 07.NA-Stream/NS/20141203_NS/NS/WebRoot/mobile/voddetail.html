@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=GBK">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta content="telephone=no" name="format-detection" />
+<title>电影详情</title>
+<link href="css/layout.css" rel="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/data.js"></script>
+</head>
+
+<body class="detail">
+	<div id="header" >
+		<div class="hover">
+			<h1 class="back" id="moviename">关云长</h1>
+			<h1 class="mainpage logo"></h1>  
+		</div>
+	</div>
+    <div id="detailInfo">
+    	<img id="poster" src="images/gyc.jpg" width="120" class="img" />
+        <div>
+			<ul>
+				<li>主演：<span id="actor">詹妮弗·劳伦斯</span> </li>
+				<li>导演：<span id="director">麦兆辉 / 庄文强</span> </li>   
+				<li>类型：<span id="type">动作、喜剧</span></li>
+				<li>地区：<span id="ondate">大陆</span></li>
+			</ul>
+			<a href="#" class="play" id="playbtn">播放</a>
+		</div>
+		
+    </div>
+
+	<div id="detailBt">			
+		<span class="xqlogo logo"></span>
+		<span class="pllogo logo"></span>
+		<span class="fxlogo logo"></span>
+		<span class="sclogo logo"></span>
+	</div>    
+    <div id="detail">
+        <h3 class="title">剧情简介</h3>
+        <div id="detailintro" class="de">第七十四届饥饿游戏已经结束，凯妮丝出人意料地活了下来，她和“恋人”皮塔将会过上安定闲适的生活。然而，噩梦才刚刚开始，此时，十二个区也暗波涌动，凯妮丝竟然成了反叛的象征，情窦初开的凯特尼斯陷入爱情的纠结中不能自拔，狩猎伙伴盖尔和竞技场“恋人”皮塔让她难以取舍。第七十五届饥饿游戏“世纪极限赛”的赛制是，选手是历届获胜者，他们中只有一人能存活。凯妮丝又将重返杀戮赛场，她只有一死，才能挽救皮塔，这是对皮塔深情的最后报答，爱情与友谊，真诚与猜忌，血腥与牺牲，越来越扑朔迷离…… </div>
+    </div>
+<script>
+var moviename=getQueryStringByName("name"),currentEle,index=-1,timer,movieList=["gyc","aqgy","ypzjs"],rstp;
+$(function(){
+	changeMovie(moviename);
+	//timer=setInterval("changeMovie(checkIndex())",90000);
+})
+function checkIndex(){
+	index>1?index=0:index++;
+	return movieList[index];
+}
+function changeMovie(moviename){	
+	$.each(data[0].resource,function(i,ele){
+		if(ele.id==moviename){
+			currentEle=ele;
+			if(index == -1){
+				index = parseInt(i);
+			}
+			return;
+		}
+	})
+	if(currentEle){
+		$("#moviename").html(currentEle.name);
+		$("#director").html(currentEle.director);//导演
+		$("#actor").html(currentEle.actor);//主演：
+		$("#type").html(currentEle.type);//"类型："+
+		$("#ondate").html(currentEle.area);//"地区："+
+		$("#poster").attr("src",currentEle.poster)
+		//$("#movie").html(currentEle.name)
+		rstp = currentEle.rstp;
+		$("#playbtn").click(function(){
+			console.log(rstp);
+			kysxplay(rstp);			
+			return false;
+		}) 
+		$("#detailintro").html(currentEle.movieintro);	
+	}
+
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html charset=utf-8">
+<link rel="stylesheet" style="text/css" href="/bbcvcms/uploads/filebase/ad/css/style.css">
+<script src="/bbcvcms/uploads/filebase/ad/js/jquery-1.11.0.min.js" language="javascript" type="text/javascript"></script>
+</head>
+<body>
+	<div class="main">
+		<div class="movie_main">
+			<img data-src="{dede:img text='' width='' height=''} {dede:img text= {/dede:img}" class="js-v-img" />
+		</div>
+		<div class="movie_introduce">
+			<h1 class="title_main">心理学导论</h1>
+			<span class="time">2014-11-24</span>
+			<ul class="actor">
+				<li>主演：Paul Bloom</li>
+				<li>导演：Paul Bloom</li>
+				<li>国家：美国</li>
+			</ul>
+		<p class="boldp">剧情：</p>
+		<div class="plot">不知你是否听说过，在当今信息时代，没有学过心理学的人不能算是真正受到良好教育的人，因为我们时时都有可能与“心理学”不期而遇，需要用心理学知识来指导工作、学习和生活。作为一本导论性质的书籍，《心理学导论》清晰地介绍了心理学的基础知识，渗透了近年来心理学领域的新进展，帮助读者建构心理学知识的基本框架</div>
+		<div class="go_maintext">
+			<div id="scroll" style="width:100%;margin-left:200px;">用户<span id="username">137****0000</span>正在选择中</div>
+		</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+/*
+	var web="js/movie.js"
+	$.getJSON(web).then(function(json){
+	 insert(json);
+	},
+	function(){
+	console.log(arguments)
+	});	
+	function insert(json){
+		$(json).each(function(index){
+				$("h1").html(json[0].name);
+				$(".movie_main").find("img").attr("src",json[0].poster)
+				$(".time").html("("+(json[0].ondata).substr(0,4)+")");
+				$(".actor li:first").html("主演:  "+json[0].actor);
+				$(".actor li:eq(1)").html("导演:  "+json[0].director);
+				$(".actor li:eq(2)").html("国家:  "+json[0].area);
+				$(".plot").html((json[0].movieintro).substr(0,82)+"...");
+			})
+	}*/
+	var tmpDelay=10000,$tmTip=$("#scroll");
+	$(function(){
+		marquee();
+		setInterval(marquee,tmpDelay)
+	})
+	function marquee(){
+		$tmTip.fadeIn(function() {
+			$tmTip.animate({marginLeft: '-460'}, tmpDelay, 'linear',function() {
+				$tmTip.css("marginLeft","460px");
+			});
+		});
+	}
+$(".js-v-img").each(function(index, ele){
+	if($(ele).data("src")){
+		$(ele).attr("src", regImgSrc($(ele).data("src")));
+	}
+})
+
+function regImgSrc(src){
+	var reg_img_src = /}(.+){/g;
+	var result = reg_img_src.exec(src)
+	if(result){
+		return $.trim(result[1])
+	}
+
+	return src;
+}
+
+var stream_id = getQueryStringByName("streamid");
+var username = decodeURIComponent(getQueryStringByName("username"));
+var current_vod_id = getQueryStringByName("aid");
+var reg = /^(13[0-9]|14(5|7)|15(0|1|2|3|5|6|7|8|9)|18[0-9])\d{8}$/;
+if(reg.test(username)){// 手机用户
+	var mphone =username.substring(0,3);
+	var mphone1 =username.substring(7,11);
+	var u = mphone+"****"+mphone1;
+	$("#username").text(u);
+	//document.getElementById("userType").innerHTML = "手机用户("+u+")";
+}else{
+	$("#username").text(username);
+	//document.getElementById("userType").innerHTML = "微信用户("+username+")";
+}
+function queryStatus(){
+	$.post("http://192.168.100.11:8882/NS/mobile/ShowVodInfo?flag=getnow&streamid="+stream_id+"&username="+username+"&resolution=0", function(returndata) {
+		if(returndata!=""&&"error"!=returndata.trim()&&returndata.trim()!=""){
+			window.location.href=returndata;
+		}
+	});
+}
+setInterval(queryStatus,1000);
+
+var relocate = setTimeout(redirect,10000);
+function redirect(){
+	location.href = "/bbcvcms/uploads/plus/view.php?aid="+getQueryStringByName("aid")+"&assigntypeid=17&username="+username+"&streamid="+stream_id+"&resolution="+stream_id
+	//window.location.href="/bbcvcms/uploads/plus/list.php?tid=17&username="+username+"&streamid="+stream_id
+}
+function getQueryStringByName(name){
+	var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+	if(result == null || result.length < 1){
+		return "";
+	}
+	return result[1];
+}
+	</script>
+</body>
+</html>

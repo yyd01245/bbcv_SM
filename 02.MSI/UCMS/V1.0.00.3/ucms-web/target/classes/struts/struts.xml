@@ -1,0 +1,14 @@
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="default" extends="struts-default">	
+		<!--<global-results>
+			<result name="exceptionPage">/error/error500.do</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping result="exceptionPage" exception="java.lang.Exception"></exception-mapping>
+		</global-exception-mappings>-->
+	</package>
+	
+</struts>

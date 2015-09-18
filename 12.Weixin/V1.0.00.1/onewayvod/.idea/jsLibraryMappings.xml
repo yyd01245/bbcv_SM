@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaScriptLibraryMappings">
+    <file url="file://$PROJECT_DIR$" libraries="{onewayvod node_modules}" />
+    <file url="file://$PROJECT_DIR$/index.js" libraries="{Node.js Globals, Node.js v0.10.32 Core Modules}" />
+    <file url="file://$PROJECT_DIR$/lib/config.js" libraries="{Node.js Globals, Node.js v0.10.32 Core Modules}" />
+    <file url="file://$PROJECT_DIR$/lib/errmap.js" libraries="{Node.js Globals, Node.js v0.10.32 Core Modules}" />
+    <file url="file://$PROJECT_DIR$/lib/logger.js" libraries="{Node.js Globals, Node.js v0.10.32 Core Modules}" />
+    <file url="file://$PROJECT_DIR$/lib/route.js" libraries="{Node.js Globals, Node.js v0.10.32 Core Modules}" />
+    <file url="file://$PROJECT_DIR$/lib/updateUser.js" libraries="{Node.js Globals, Node.js v0.10.32 Core Modules}" />
+    <file url="file://$PROJECT_DIR$/lib/wapi.js" libraries="{Node.js Globals, Node.js v0.10.32 Core Modules}" />
+    <excludedPredefinedLibrary name="HTML" />
+    <excludedPredefinedLibrary name="HTML5 / EcmaScript 5" />
+  </component>
+</project>

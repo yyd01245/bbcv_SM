@@ -1,0 +1,75 @@
+wechat listened 80 port
+wechat listened 80 port
+{ ToUserName: 'gh_b3ba9695fb1c',
+  FromUserName: 'o_a3EtykbnbymY6v0nuZmj9OkQME',
+  CreateTime: '1415238518',
+  MsgType: 'event',
+  Event: 'SCAN',
+  EventKey: '1003',
+  Ticket: 'gQFh8DoAAAAAAAAAASxodHRwOi8vd2VpeGluLnFxLmNvbS9xL1VreE1rQ3ZrOFVPSVoxem55bUE1AAIEhvFZVAMEAAAAAA==' }
+{ appname: '',
+  cmd: 'user_access_req',
+  licence: '',
+  passwd: '',
+  return_code: 0,
+  sequence: '14152385184392403',
+  service_url: '192.168.100.11:18080',
+  token: 'D1WODFKVQR',
+  username: '',
+  version: '' }
+{ channel_id: '16',
+  cmd: 'user_bind_req',
+  new_token: 'D1WO44ER9F',
+  return_code: 0,
+  sequence: '14152385184896278',
+  status: '2' }
+{ errcode: 0, errmsg: 'ok' }
+ReferenceError: user is not defined
+    at playVod (/home/guanyx/onewayvod/index.js:201:35)
+    at info (/home/guanyx/onewayvod/index.js:97:5)
+    at Layer.handle [as handle_request] (/home/guanyx/onewayvod/node_modules/express/lib/router/layer.js:82:5)
+    at next (/home/guanyx/onewayvod/node_modules/express/lib/router/route.js:100:13)
+    at Route.dispatch (/home/guanyx/onewayvod/node_modules/express/lib/router/route.js:81:3)
+    at Layer.handle [as handle_request] (/home/guanyx/onewayvod/node_modules/express/lib/router/layer.js:82:5)
+    at /home/guanyx/onewayvod/node_modules/express/lib/router/index.js:234:24
+    at Function.proto.process_params (/home/guanyx/onewayvod/node_modules/express/lib/router/index.js:312:12)
+    at /home/guanyx/onewayvod/node_modules/express/lib/router/index.js:228:12
+    at Function.match_layer (/home/guanyx/onewayvod/node_modules/express/lib/router/index.js:295:3)
+Caught exception: TypeError: Cannot read property 'length' of undefined
+double callback!
+wechat listened 80 port
+{ ToUserName: 'gh_b3ba9695fb1c',
+  FromUserName: 'o_a3EtykbnbymY6v0nuZmj9OkQME',
+  CreateTime: '1415238955',
+  MsgType: 'event',
+  Event: 'SCAN',
+  EventKey: '1003',
+  Ticket: 'gQFh8DoAAAAAAAAAASxodHRwOi8vd2VpeGluLnFxLmNvbS9xL1VreE1rQ3ZrOFVPSVoxem55bUE1AAIEhvFZVAMEAAAAAA==' }
+{ appname: '',
+  cmd: 'user_access_req',
+  licence: '',
+  passwd: '',
+  return_code: 0,
+  sequence: '14152389560792952',
+  service_url: '192.168.100.11:18080',
+  token: 'D1WOI4GDJX',
+  username: '',
+  version: '' }
+{ cmd: 'user_bind_req',
+  msg: '用户绑定失败!',
+  return_code: -6,
+  sequence: '14152389561273825' }
+Caught exception: ReferenceError: err is not defined
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
+(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.

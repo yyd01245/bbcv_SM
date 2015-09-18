@@ -1,0 +1,1 @@
+{dede:img text='' width='336' height='494'} /bbcvcms/uploads/uploads/jingdian/ydm/ydm_2.jpg {/dede:img}

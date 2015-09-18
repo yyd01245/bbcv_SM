@@ -1,0 +1,264 @@
+﻿/*城市列表页面的样式*/
+*{
+	margin: 0;
+    padding: 0;
+}
+body {
+	font:20px 'Microsoft YaHei';
+	color:#fff;
+	letter-spacing:3px;
+}
+.view {
+	position: absolute;
+	width: 720px;
+	height: 576px;
+	overflow: hidden;
+	margin: 0;
+	left: 0;
+	top: 0;
+	opacity: 0;
+	z-index: 1;
+	-webkit-transition: all 1.8s;
+}
+.poetic .background {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	left: 0;
+	top: 0;
+	background-repeat: no-repeat;
+	-webkit-background-size:720px 576px;
+    -moz-background-size: 720px 576px;
+    -o-background-size:720px 576px;
+    background-size: 720px 576px;
+	-webkit-filter: blur(5px);
+	-webkit-transition: all 2s;
+	opacity: 0;
+}
+.clcontainer {
+    width: 720px;
+    height: 576px;
+	position: absolute;
+    left: 0;
+	top: 0;
+	z-index:2;
+    overflow: hidden;
+    -webkit-background-size:720px 576px;
+    -moz-background-size: 720px 576px;
+    -o-background-size:720px 576px;
+    background-size: 720px 576px;
+     background:url("../images/bgpf.png") no-repeat;
+}
+
+.clleft {
+    position: relative;
+    left: 25px;
+    top: 40px;
+    width: 425px;
+    height: 100%;  
+	float:left
+}
+
+.video {
+    width: 425px;
+    height: 305px;
+	padding-top:35px;
+    background-color: #000;
+	overflow:hidden;
+}
+.video video{
+	width: 319px;
+	height: 260px;
+	position: absolute;
+	right: 10px;
+	top: 40px;
+/* 	width:565px;
+	height:373px;
+	position:absolute;
+	right:25px;
+	top:50px; */
+	box-shadow:0 0 2px 2px #fff;
+}
+.descript {
+    position: absolute;
+	left: 15px;
+	top: 350px;
+	width: 410px;
+	height: 175px;
+	font-size: 13px;
+	letter-spacing: 0px;
+	overflow: hidden;
+	text-shadow: 2px 2px 5px hsla(0, 0%, 10%, 1);
+}
+
+.descript #cname {
+    font-family: Microsoft YaHei;
+    font-size: 20px;
+    margin: 0;
+}
+
+.descript #cintro {
+    white-space: normal;
+	font-size: 14px;
+	font-family: "黑体";
+	margin-top: 0px;
+	text-align: justify;
+	line-height: 1.4em;
+	word-break: break-all;
+	height: 97px;
+	overflow: hidden;
+}
+.descript .movieinfo{
+	height:30px;
+	margin:0;
+}
+.descript .movieinfo li{
+	display:inline-block;
+	list-style:none;
+	height:30px;
+	line-height:30px;
+	/*color:rgb(250,205,137);*/
+	color:rgb(255,244,92);
+	margin-right:10px;
+}
+.descript #cintro:after {
+    display: inline-block;
+    content: '';
+    overflow: hidden;
+    width: 100%;
+    height: 0;
+}
+
+#subtxt {
+    display: none
+}
+
+.clright {
+	position: relative;
+	width: 256px;
+	height: 576px;
+	overflow: hidden;
+	float: right;
+}
+.clright .logo {
+	margin-top:100px;
+	width:210px;
+	height:105px;
+    background: url("../images/logo.png") left center/210px 105px no-repeat;
+    -webkit-transition: all 1.8s;
+}
+.clright .information{
+	width:240px;
+	height:67px;
+	line-height:67px;
+	margin-top:8px;
+	border-top:1px dashed #fff;
+	text-align:center;
+}
+.clright .qcode{
+	width: 211px;
+	height: 225px;
+	margin-left: 12px;
+	background: url("../images/codeborder.png") left center/211px 225px no-repeat;
+}
+#qrcode{
+	padding:14px 0 0 14px;
+}
+.dg-wrapper {
+    width: 100%;
+    position: relative;
+    left: 10px;
+    top: 0;
+	width:122px;
+	display:inline-block;
+}
+
+.dg-wrapper .dg-transition {
+    width: 125px;
+    height: 90px;
+    position: absolute;
+    text-decoration: none;
+    display: block;
+    float: left;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    -ms-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.dg-wrapper .dg-transition img {
+    width: 100%;
+    vertical-align: middle;
+    display: block;
+    text-align: center;
+    border-radius: 6px;
+    height: 90px;
+}
+
+.dg-wrapper .dg-transition span {
+    width: 115px;
+    height: 40px;
+    line-height: 40px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: none;
+    position: absolute;
+    bottom: 0px;
+    padding-left: 10px;
+    font-size: 26px;
+}
+
+.dg-wrapper .dg-transition.dg-center span {
+    display: block
+}
+
+.example {
+    display: none
+}
+
+.thumb {
+    height: 65px;
+	width: 70px;
+	margin: 6px 0;
+    box-sizing: border-box;
+}
+
+.thumb.current {
+    /* border: 3px solid hsl(0, 80%, 50%) */
+	box-shadow: 0 0 8px 3px #fff;
+}
+
+.thumb .inner {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.thumb .inner img {
+    width: 100%;
+    height: 100%;
+}
+
+.thumb .inner .title {
+    height: 40px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 10px;
+    color: #fff;
+    font-size: 26px;
+    font-family: SimHei;
+    position: absolute;
+    bottom: 0px;
+    line-height: 40px;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    display: none;
+}
+
+.thumb.current .inner .title {
+    -webkit-transition: all 0.15s ease-in-out;
+    opacity: 1;
+}

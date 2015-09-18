@@ -1,0 +1,21 @@
+/*[¹«¹²common*/
+BODY {
+	background-color: #FFFFFF; scrollbar-face-color: #DEE3E7;
+	scrollbar-highlight-color: #FFFFFF;scrollbar-shadow-color: #DEE3E7;
+	scrollbar-3dlight-color: #D1D7DC;scrollbar-arrow-color:#006699;
+	scrollbar-track-color:#EFEFEF;scrollbar-darkshadow-color: #98AAB1;
+	margin:0px;
+}
+
+td,blockquote {	font-size:12px;line-height:150%;}
+div {font-size:12px;line-height:150%;}
+p {text-indent:24px;line-height:150%;}
+select {border:solid 1px #F77929;font-size:12px;background-color:transparent;color:#000000;}
+input {font-size:12px;}
+form {margin:0px;}
+li {list-style-type:square;line-height:16px;}
+
+.font-blue{color:#2D517F;}
+.font-orgen{color:#FF5901;font-weight:bold;font-size:14px;}
+.font-orgen-head{color:#FF5901;font-weight:bold;font-size:22px;}
+.line{border-bottom:1px solid #969A9D;}

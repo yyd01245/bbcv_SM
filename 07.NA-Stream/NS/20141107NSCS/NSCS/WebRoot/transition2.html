@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>骞垮憡椤甸潰</title>
+<style>
+*{	padding:0;
+	margin:0;}
+body{
+	margin:0;
+	padding:0;
+	color:#000;
+	text-shadow:0 1px #000;
+	font:900 22px "Microsoft YaHei"
+}
+.container{
+	width:1280px;
+	height:720px;
+	background:url(internal/img/newbg2.jpg);
+	overflow:hidden;
+}
+.logo{
+	position: absolute;
+	left: 10px;
+	top: 20px;
+	font-size: 26px;
+	font-weight:bold;
+	color:#fff;
+	//text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 40px #ff00de, 0 0 70px #ff00de;
+	text-shadow: 1px 1px rgba(197, 223, 248,0.8),2px 2px rgba(197, 223, 248,0.8),3px 3px rgba(197, 223, 248,0.8),4px 4px rgba(197, 223, 248,0.8),5px 5px rgba(197, 223, 248,0.8),6px 6px rgba(197, 223, 248,0.8);
+}
+.video{
+	position: absolute;
+	left: 187px;
+	top: 78px;
+	width:894px;
+	height:576px;
+}
+.video video{
+	width:894px;
+	height:530px;
+}
+.video div{
+	width: 780px;
+	margin: 0px 0 0 30px;
+	letter-spacing: 2px;
+	overflow:hidden;
+	height:38px;
+	line-height:38px;
+}
+.playbtn{
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	background: url(internal/img/playbtn.png) left center no-repeat;
+	background-size: 30px 30px;
+	margin:0px 5px;
+	vertical-align: text-top;
+}
+.video div #info{
+	height: 38px;
+	margin-left:780px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<!--<div class="logo">鍗曞悜浜掑姩</div>-->
+<div class="video">
+	<video src="video/gyc.mp4" autoplay="true" loop poster="img/newposter.jpg"></video>
+	<div><p id="info">137****8888鐢ㄦ埛鏆傚仠涓紝璇锋寜<i class="playbtn"></i>閿户缁搷浣�/p> </div>
+</div>	
+</div>
+<script src='js/jquery-latest.js'></script>
+<script>
+var tmpDelay=16000,$tmTip=$("#info");
+
+$(function(){
+	marquee();
+	setInterval(marquee,tmpDelay);
+})
+/*寰幆鎻愮ず涓嶅悓鐨勯棶棰樺湪鍐呭*/
+function marquee(){
+		$tmTip.fadeIn(function() {
+			$tmTip.animate({marginLeft: '-780'}, tmpDelay, 'linear',function() {
+				$tmTip.css("marginLeft","780px");
+			});
+		});
+}
+
+</script>
+</body>
+</html>

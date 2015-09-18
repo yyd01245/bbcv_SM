@@ -1,0 +1,61 @@
+<?xml version ="1.0" encoding = "utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- urm_test db sql语句映射语句  -->
+<sqlMap namespace = "NewQam" >
+	<typeAlias alias = "dto" type = "org.eredlab.g4.ccl.datastructure.impl.BaseDto" />
+	
+	<select id= "getQamAreaByIp" parameterClass = "map" resultClass = "dto" remapResults = "true">
+		SELECT a.area_id,a.sg_id,i.ipqam_ip,i.ipqam_port,i.status,r.ipqam_res_id,
+		 r.exp_port,r.res_status,f.rf_id ,r.server_id FROM  urm_ipqam_frequency f , urm_ipqam_info i , urm_network_area a ,urm_ipqam_resource r 
+		WHERE r.ipqam_id = i.ipqam_id AND r.rf_code = f.rf_code  AND r.res_status != -1 AND i.status =1 AND a.status = 1 AND f.status = 1
+		AND a.network_code = i.network_code
+			<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="area_id">
+				a.area_id like '$area_id$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="ipqam_ip">
+				i.ipqam_ip like '$ipqam_ip$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="sg_id">
+				a.sg_id like '$sg_id$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id = "getQamAreaByIpCount" parameterClass = "map" resultClass = "java.lang.Integer" >
+		SELECT count(*) FROM urm_ipqam_frequency f , urm_ipqam_info i , urm_network_area a ,urm_ipqam_resource r 
+		WHERE r.ipqam_id = i.ipqam_id AND r.rf_code = f.rf_code  AND r.res_status != -1 AND i.status = 1 AND a.status = 1 AND f.status = 1
+		AND a.network_code = i.network_code
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="area_id">
+				a.area_id like '$area_id$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="ipqam_ip">
+				i.ipqam_ip like '$ipqam_ip$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="sg_id">
+				a.sg_id like '$sg_id$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="getMdbData" parameterClass = "map" resultClass="dto">
+		select a.busi_id,a.busi_code,a.busi_date,oper_id,area_id,rec_id,mdb_key,mdb_oper_type,mdb_oper_time,mdb_old_value,mdb_new_value
+		from urm_busi_info a left join urm_busi_info_mdb b on a.busi_id= b.busi_id
+		<dynamic prepend="where">
+			<isNotNull property="mdb_key">
+				mdb_key like '$mdb_key$%'
+			</isNotNull>
+		</dynamic> 
+	</select>
+	
+	<select id="getMdbDataCount" parameterClass="map" resultClass="java.lang.Integer">
+		select count(*)
+		from urm_busi_info a left join urm_busi_info_mdb b on a.busi_id= b.busi_id
+		<dynamic prepend="where">
+			<isNotNull property="mdb_key">
+				mdb_key like '$mdb_key$%'
+			</isNotNull>
+		</dynamic>
+	</select>
+</sqlMap>

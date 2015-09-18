@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 应用组管理手工映射SQL语句 -->
+<sqlMap namespace="DeviceManager">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	<!-- 获取设备最大索引值-->
+	<select id="queryMaxIndex" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT MAX(dev_id) FROM dgw_dev_info
+	</select>
+	<!-- 重名校验-->
+	<select id="IsNamed" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_dev_info where dev_name = #dev_name# or dev_type=#dev_type#
+	</select>
+	<!-- 修改时重名校验-->
+	<select id="IsUpdateNamed" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_dev_info where (dev_name = '$dev_name$' or dev_type=#dev_type#) and dev_id!=#dev_id#
+	</select>
+	<!-- 查看设备有没有承载-->
+	<select id="queryVncmByDevID" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_vncm_info where dev_type = #dev_type#
+	</select>
+	<!-- 根据主键查询设备类型 -->
+	<select id="queryTypeByDevID" parameterClass="map" resultClass="dto">
+		SELECT dev_type	from dgw_dev_info WHERE dev_id = #dev_id#
+	</select>
+	
+	<!-- 获取应用组管理列表-->
+	<select id="getDevManagerListForPage" parameterClass="map" resultClass="dto">
+		SELECT  dev_id,dev_type, dev_version,dev_maker,status,dev_name,
+		date_format(create_time,'%Y-%m-%d') as create_time,
+		date_format(update_time,'%Y-%m-%d') as update_time
+		    FROM dgw_dev_info ORDER BY dev_id DESC
+	</select>
+	
+	<!-- 获取应用组管理列表-->
+	<select id="getAppGroupManagerValidList" parameterClass="map" resultClass="dto">
+		SELECT  group_id,group_name,encodeType FROM dgw_group_info
+		   WHERE status = '1'
+		ORDER BY encodeType
+	</select>
+	
+	<!-- 获取应用组信息管理总数-->
+	<select id="getDevManagerListForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM dgw_dev_info
+	</select>
+	
+	<!-- 插入应用组信息管理表一条记录 -->
+	<insert id="saveDevManagerItem" parameterClass="dto">
+		INSERT INTO dgw_dev_info (
+		  dev_id, dev_name,dev_type,dev_version,dev_maker,status,create_time,update_time) 
+		VALUES (#dev_id#,#dev_name#,#dev_type#,#dev_version#,#dev_maker#,#status#,#create_time#,#update_time#)
+	</insert>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+	
+	<!-- 删除一条应用组信息管理表记录  -->
+	<delete id="deleteDevManagerItems" parameterClass="map" >
+		DELETE FROM dgw_dev_info
+		      WHERE dev_id = #dev_id#
+	</delete>
+	
+	<!-- 根据主键更新用户 -->
+	<update id="updateDevManagerItem" parameterClass="dto">
+         UPDATE dgw_dev_info
+		<dynamic prepend="SET"> 
+			<isNotEmpty prepend="," property="dev_name">
+	         dev_name = #dev_name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="dev_type">
+	         dev_type = #dev_type#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="update_date">
+	         update_time = #update_date#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="dev_maker">
+	         dev_maker = #dev_maker#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="dev_version">
+				dev_version = #dev_version#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE dev_id = #dev_id# 
+	</update>
+	
+</sqlMap>

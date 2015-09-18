@@ -1,0 +1,116 @@
+.pager
+{
+	font-family: Arial;
+	font-size: 13px;
+	float: left;
+}
+.clearfix:after
+{
+	line-height: 0;
+}
+.clearfix
+{
+	display: block;
+}
+.pager .cur
+{
+	color: #000;
+	font-weight: bold;
+	border-top-color: #fff;
+	border-right-color: #fff;
+	border-bottom-color: #fff;
+	border-left-color: #fff;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	background-image: none;
+	background-attachment: scroll;
+	background-repeat: repeat;
+	background-position-x: 0px;
+	background-position-y: 50%;
+	background-color: transparent;
+}
+.pager .last
+{
+	line-height: 23px;
+	font-family: ËÎÌו;
+}
+.pager .next
+{
+	line-height: 23px;
+	font-family: ËÎÌו;
+}
+.pager SPAN
+{
+	width: auto;
+	height: 22px;
+	text-align: center;
+	color: #0000cd;
+	line-height: 22px;
+	overflow: hidden;
+	padding-top: 0px;
+	padding-right: 8px;
+	padding-bottom: 0px;
+	padding-left: 8px;
+	text-decoration: none;
+	margin-right: 5px;
+	border-top-color: #e7ecf0;
+	border-right-color: #e7ecf0;
+	border-bottom-color: #e7ecf0;
+	border-left-color: #e7ecf0;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	float: left;
+	background-image: none;
+	background-attachment: scroll;
+	background-repeat: repeat;
+	background-position-x: 0px;
+	background-position-y: 0px;
+	background-color: rgb(255, 255, 255);
+}
+.pager A
+{
+	width: auto;
+	height: 22px;
+	text-align: center;
+	color: #0000cd;
+	line-height: 22px;
+	overflow: hidden;
+	padding-top: 0px;
+	padding-right: 8px;
+	padding-bottom: 0px;
+	padding-left: 8px;
+	text-decoration: none;
+	margin-right: 5px;
+	border-top-color: #e7ecf0;
+	border-right-color: #e7ecf0;
+	border-bottom-color: #e7ecf0;
+	border-left-color: #e7ecf0;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	float: left;
+	background-image: none;
+	background-attachment: scroll;
+	background-repeat: repeat;
+	background-position-x: 0px;
+	background-position-y: 0px;
+	background-color: rgb(255, 255, 255);
+}
+

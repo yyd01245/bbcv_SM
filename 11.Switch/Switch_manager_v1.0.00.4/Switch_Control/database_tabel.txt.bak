@@ -1,0 +1,11 @@
+switch_info
+sessionid  switchserver_id  input_url output_url switchstatus
+
+redis设计
+switch_info:sessionid string
+switch_info:switchserver_id string
+
+
+//runstatus ==0 正常  >0异常 streamstatus==0正常 streamstatus>0异常
+switch_serverlist
+id   serverip listenport runstatus streamstatus max_number current_number

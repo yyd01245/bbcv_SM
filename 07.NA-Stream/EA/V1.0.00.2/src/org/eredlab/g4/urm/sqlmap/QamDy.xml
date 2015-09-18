@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- QAM手工映射SQL语句 -->
+<sqlMap namespace="qamDy">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+		<!--                      QAM 设备管理                                   -->
+	<insert id="saveQamDevice" parameterClass="map">
+	insert into urm_ipqam_firm_conf(conf_id,firm_name,rtsp_port,device_firm,device_type,hardware_version,software_version,status,port_step,service_step,pid_rule,r6_firm,switch_type,rf_type,remark) 
+	values(#conf_id#,#firm_name#,#rtsp_port#,#device_firm#,#device_type#,#hardware_version#,#software_version#,1,#port_step#,#service_step#,#pid_rule#,#r6_firm#,#switch_type#,#rf_type#,#remark#) 
+	</insert>	
+	<select id="queryInCount" parameterClass="map" resultClass="java.lang.Integer">
+	select count(*) from urm_ipqam_firm_conf where firm_name = '$firm_name$' or device_firm = #device_firm# 
+	</select>
+	<select id="queryUpCount" parameterClass="map" resultClass="java.lang.Integer">
+	select count(*) from urm_ipqam_firm_conf where (firm_name = '$firm_name$' or device_firm = #device_firm#) and conf_id != #conf_id#
+	</select>
+	<select id="getQamList" resultClass="dto" >
+	select device_firm,firm_name ,conf_id from urm_ipqam_firm_conf where status = 1
+	</select>
+	<update id="updateQamDevice" parameterClass="map" >
+	update urm_ipqam_firm_conf 
+	<dynamic prepend="set">
+	<isNotNull prepend="," property="firm_name">
+		firm_name = '$firm_name$'
+	</isNotNull>
+	<isNotNull prepend="," property="rtsp_port">
+		rtsp_port = #rtsp_port#
+	</isNotNull>
+	<isNotNull prepend="," property="device_type">
+		device_type = #device_type#
+	</isNotNull>
+	<isNotNull prepend="," property="hardware_version">
+		hardware_version = #hardware_version#
+	</isNotNull>
+	<isNotNull prepend="," property="software_version">
+		software_version = #software_version# 
+	</isNotNull>
+	<isNotNull prepend="," property="status">
+		status = #status#
+	</isNotNull>
+	<isNotNull prepend="," property="port_step">
+		port_step = #port_step#
+	</isNotNull>
+	<isNotNull prepend="," property="service_step">
+		service_step = #service_step#
+	</isNotNull>
+	<isNotNull prepend="," property="pid_rule">
+		pid_rule = #pid_rule#
+	</isNotNull>
+	<isNotNull prepend="," property="r6_firm">
+		r6_firm = #r6_firm#
+	</isNotNull>
+	<isNotNull prepend="," property="switch_type">
+		switch_type = #switch_type#
+	</isNotNull>
+	<isNotNull prepend="," property="rf_type">
+		rf_type = #rf_type#
+	</isNotNull>
+	<isNotNull prepend="," property="remark">
+		remark = #remark#
+	</isNotNull>
+
+	</dynamic>
+	where conf_id = #conf_id#
+	</update>
+	
+	<select id="queryQamDec" parameterClass="map" resultClass="dto">
+		select conf_id ,firm_name,rtsp_port,device_firm,device_type,hardware_version,software_version,status,port_step,service_step,pid_rule,r6_firm,switch_type,rf_type,remark
+		from urm_ipqam_firm_conf where status!=-1 
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="device_firm">
+			device_firm = #device_firm#
+			 </isNotEmpty>
+			 <isNotEmpty prepend="and" property="device_firm_id">
+			 conf_id = #device_firm_id#
+			 </isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="queryQamDecCount" parameterClass="map" resultClass="java.lang.Integer">
+		select count(*) from urm_ipqam_firm_conf where status!=-1
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="device_firm">
+			device_firm = #device_firm#
+			 </isNotEmpty>
+			  <isNotEmpty prepend="and" property="device_firm_id">
+			 conf_id = #device_firm_id#
+			 </isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<!--  QAM 动态上报功能 -->
+	<select id="getDyQam" parameterClass="map" resultClass="dto">
+	select a.ipqam_id,a.ipqam_name,a.ipqam_ip,a.ipqam_port,c.device_firm,a.rf_count,a.rf_usecount,a.status,a.band_width,a.ipqam_type,b.network_code,network_name,device_firm_id
+	from urm_ipqam_info_temp a LEFT JOIN urm_network_area b on a.network_code = b.network_code left join urm_ipqam_firm_conf c on a.device_firm_id = c.conf_id
+	<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="ipqam_ip" >
+				ipqam_ip = #ipqam_ip#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="ipqam_id" >
+				ipqam_id = #ipqam_id#
+			</isNotEmpty>
+			
+		</dynamic>
+	</select>
+	<select id="getDyQamCount" parameterClass="map" resultClass="java.lang.Integer">
+		select count(*)	from urm_ipqam_info_temp a LEFT JOIN urm_network_area b on a.network_code = b.network_code left join urm_ipqam_firm_conf c on a.device_firm_id = c.conf_id
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="ipqam_ip" >
+				ipqam_ip = #ipqam_ip#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="ipqam_id" >
+				ipqam_id = #ipqam_id#
+			</isNotEmpty>
+			
+		</dynamic>
+	</select>
+	<update id="deleteDyQam" parameterClass="map">
+		update urm_ipqam_info_temp set status=-1 ,rf_usecount=0 where ipqam_id=#ipqam_id#  
+	</update>
+	<update id="deleteDyRf" parameterClass="map">
+		update urm_ipqam_frequency_temp set status=-1 where ipqam_id=#ipqam_id#  
+	</update>
+	
+	<update id="deleteDyQam1" parameterClass="map">
+		delete from urm_ipqam_info_temp where ipqam_id=#ipqam_id#  
+	</update>
+	<update id="deleteDyRf1" parameterClass="map">
+		delete from urm_ipqam_frequency_temp where ipqam_id=#ipqam_id#  
+	</update>
+	
+	<select id="getRfList" parameterClass="map" resultClass="dto">
+		select rf_id,rf_code,status from urm_ipqam_frequency_temp where status !=1 and ipqam_id = #ipqam_id#
+	</select>
+	<select id = "getRfDetail" parameterClass="map" resultClass="dto" >
+		select rf_code,rf_id,ipqam_id, order_port,rf_bandwidth,a.status,biz_ip,b.rf_type,b.switch_type,b.device_firm, conf_id device_firm_id,admin_ip
+		 from urm_ipqam_frequency_temp a left join urm_ipqam_firm_conf b on b.conf_id=#device_firm_id# where a.status !=1 
+		<dynamic >
+			<isNotEmpty prepend="and" property="rf_code">
+			rf_code =#rf_code# 
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="ipqam_id">
+			ipqam_id =#ipqam_id# 
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<delete id="deleteBizip" parameterClass="map">
+		delete from urm_ipqam_busiport_info where ipqam_id = #ipqam_id#
+	</delete>
+	<select id="getBizList" resultClass="dto" parameterClass="map">
+	select rec_id biz_id,biz_ip,admin_ip from urm_ipqam_busiport_info 
+	<dynamic prepend="where" >
+		<isNotEmpty prepend="and" property="ipqam_id">
+		ipqam_id = #ipqam_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="biz_ip">
+		biz_ip = #biz_ip#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="biz_id">
+		rec_id = #biz_id#
+		</isNotEmpty>
+	</dynamic>
+	</select>
+	<update id="updateRfStatus" parameterClass="map" >
+		update urm_ipqam_frequency_temp set status = #status# where rf_code=#rf_code#
+	</update>
+	<select id="getMidQamCount" parameterClass="map" resultClass="dto" >
+		select count(ipqam_id) count,ipqam_id from urm_ipqam_info_middle where base_ipqam_id = #ipqam_id# and network_code = #network_code#
+	</select>
+	
+	<update id= "updateQamTemp" parameterClass="map" >
+		update urm_ipqam_info_temp 
+		<dynamic prepend="set" >
+		<isNotEmpty prepend="," property="value">
+			rf_usecount = rf_usecount+#value#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="ipqam_name">
+			ipqam_name = #ipqam_name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="ipqam_port">
+			ipqam_port = #ipqam_port#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="device_firm_id">
+			device_firm_id = #device_firm_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="band_width">
+			band_width = #band_width#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="network_code">
+			network_code = #network_code#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="ipqam_type">
+			ipqam_type = #ipqam_type#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="qstatus">
+			status = #qstatus#
+		</isNotEmpty>
+		</dynamic>
+		 where ipqam_id = #ipqam_id#
+	</update>
+		<update id= "updateQamTemp1" parameterClass="map" >
+		update urm_ipqam_info_temp 
+		<dynamic prepend="set" >
+		<isNotEmpty prepend="," property="value">
+			rf_usecount = rf_usecount+#value#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="qstatus">
+			status = #qstatus#
+		</isNotEmpty>
+		</dynamic>
+		 where ipqam_id = #ipqam_id# and rf_usecount>0
+	</update>
+	<update id="updateQamMid" parameterClass="map">
+		update urm_ipqam_info_middle 
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="ipqam_name">
+				ipqam_name = #ipqam_name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ipqam_port">
+				ipqam_port = #ipqam_port#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ipqam_type">
+				ipqam_type = #ipqam_type#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="band_width">
+				band_width = #band_width#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="network_code">
+				network_code = #network_code#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="device_firm_id">
+				device_firm_id = #device_firm_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+				status = #status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="normal_ipqam_id">
+				normal_ipqam_id = #normal_ipqam_id#
+			</isNotEmpty>
+		</dynamic>
+		where ipqam_id = #ipqam_id#
+	</update>
+
+	<select id="getMidCount" parameterClass="map" resultClass="java.lang.Integer">
+		select count(rf_code) count from urm_ipqam_frequency_middle where rf_code = #rf_code#
+	</select>
+	
+	<insert id="insertQamMid" parameterClass="map" >
+	insert into urm_ipqam_info_middle(ipqam_id,ipqam_name,ipqam_ip,ipqam_port,device_firm_id,status,band_width,ipqam_type,base_ipqam_id) 
+	values(#ipqam_id#,#ipqam_name#,#ipqam_ip#,#ipqam_port#,#device_firm_id#,#status#,#band_width#,#ipqam_type#,#base_ipqam_id#)
+	</insert>
+	<insert id="insertRfMid" parameterClass="map">
+	insert into urm_ipqam_frequency_middle(rf_code,rf_id,ipqam_id,base_ipqam_id,order_port,rf_bandwidth,status,biz_ip,rf_type,switch_type,app_name,r6_firm,base_rf_code,network_code) 
+	values(#rf_code#,#rf_id#,#ipqam_id#,#base_ipqam_id#,#order_port#,3750000,1,#biz_ip#,#rf_type#,#switch_type#,#app_name#,#r6_firm#,#base_rf_code#,#network_code#)
+	</insert>
+	<select id="selectReview" parameterClass="map" resultClass="dto">
+		select * from urm_ipqam_frequency_middle
+	</select>
+	<update id="updateMidRf" parameterClass="map" >
+		update urm_ipqam_frequency_middle
+		<dynamic prepend="set">
+		<isNotNull prepend="," property="ipqam_id">
+			ipqam_id = #ipqam_id#
+		</isNotNull>
+		<isNotNull prepend="," property="normal_rf_code">
+			normal_rf_code = #normal_rf_code#
+		</isNotNull>
+		<isNotNull prepend="," property="normal_ipqam_id">
+			normal_ipqam_id = #normal_ipqam_id#
+		</isNotNull>
+		<isNotNull prepend="," property="order_port">
+			order_port = #order_port#
+		</isNotNull>
+		<isNotNull prepend="," property="network_code">
+			network_code = #network_code#
+		</isNotNull>
+		<isNotNull prepend="," property="r6_firm">
+			r6_firm = #r6_firm#
+		</isNotNull>
+		<isNotNull prepend="," property="rf_type">
+			rf_type = #rf_type#
+		</isNotNull>
+		<isNotNull prepend="," property="biz_ip">
+			biz_ip = #biz_ip#
+		</isNotNull>
+		<isNotNull prepend="," property="switch_type">
+			switch_type = #switch_type#
+		</isNotNull>
+		<isNotNull prepend="," property="app_name">
+			app_name = #app_name#
+		</isNotNull>
+		</dynamic>
+		where rf_code = #rf_code#
+	</update>
+	
+	<select id="getMidRf" parameterClass="map" resultClass="dto">
+		select rf_code,rf_id,ipqam_id,base_ipqam_id,order_port,rf_bandwidth,status,biz_ip,rf_type,switch_type,app_name,network_code,r6_firm,base_rf_code  from urm_ipqam_frequency_middle
+		where rf_code = #rf_code# 
+	</select>
+
+	<select id="getMidQam" parameterClass="map" resultClass="dto" >
+		select ipqam_id, ipqam_name,ipqam_port,ipqam_type,device_firm_id,network_code,band_width,ipqam_ip,base_ipqam_id,normal_ipqam_id from urm_ipqam_info_middle where ipqam_id = #ipqam_id#
+	</select>
+	<insert id="saveDyRf" parameterClass="map">
+		insert into urm_ipqam_frequency(rf_code,rf_id,order_port,rf_bandwidth,status,biz_ip,rf_type,switch_type,app_name,r6_firm,admin_ip,network_code) 
+		values(#rf_code#,#rf_id#,#order_port#,#rf_bandwidth#,1,#biz_ip#,#rf_type#,#switch_type#,#app_name#,#r6_firm#,#admin_ip#,#network_code#)
+	</insert>
+	<insert id="saveDyQam" parameterClass="map">	
+		insert into urm_ipqam_info(ipqam_id,ipqam_ip, ipqam_level,ipqam_name,ipqam_port,ipqam_type,device_firm,network_code,band_width,status)
+		values(#ipqam_id#,#ipqam_ip#, #ipqam_level#,#ipqam_name#,#ipqam_port#,#ipqam_type#,#device_firm#,#network_code#,#band_width#,1) 
+	</insert> 
+	<select id="getSumRf" parameterClass="map" resultClass="dto">
+		select a.rf_code,a.rf_id,a.rf_id,a.app_name,a.network_code,network_name,a.biz_ip,a.switch_type ,a.rf_type,b.conf_id device_firm_id,b.device_firm,b.pid_rule,b.port_step,b.service_step from urm_ipqam_frequency_middle a LEFT JOIN urm_network_area c on a.network_code=c.network_code,urm_ipqam_firm_conf b where a.rf_code = #rf_code# and b.conf_id = #device_firm_id#
+	</select>
+	<select id="getStaticRf" parameterClass="map" resultClass="dto">
+		select a.rf_code,MIN(server_id) start_service,MIN(exp_port) start_port, MIN(server_id) start_pid,MAX(server_id) end_service,MAX(server_id) end_pid,MAX(exp_port) end_port ,count(*) count from urm_ipqam_frequency_middle a,urm_ipqam_resource_statictemp b where a.rf_code =#rf_code# and a.base_rf_code = b.rf_code  
+	</select>
+	<select id="getDyRf" parameterClass="map" resultClass="dto">
+		select a.rf_code,b.start_serviceid,b.start_port, b.start_serviceid start_pid, (res_count-1)*service_step+start_serviceid end_service,(res_count-1)*service_step+start_serviceid end_pid,res_count*port_step+start_port end_port ,b.res_count
+		from urm_ipqam_frequency_middle a,urm_ipqam_resource_dytemp b,urm_ipqam_firm_conf c where a.rf_code = #rf_code# and a.base_rf_code = b.rf_code and c.conf_id = #device_firm_id# 
+	</select>
+	
+	<select id="selectHisRf" parameterClass="map" resultClass="dto">
+	select base_ipqam_id ipqam_id,base_rf_code rf_code from urm_ipqam_frequency a, urm_ipqam_frequency_middle b  where a.rf_code = b.normal_rf_code and a.rf_code = #rf_code#
+	</select>
+	<update id="deleteTepRf" parameterClass="map">
+	update urm_ipqam_frequency_temp set status = -1 where rf_code = #rf_code# and status>=0
+	</update>
+	
+	<select id="getHisQam" parameterClass="map" resultClass="dto">
+		select base_ipqam_id ipqam_id,base_rf_code rf_code from urm_ipqam_info a,urm_ipqam_frequency_middle b where a.ipqam_id = #ipqam_id# and a.ipqam_id = b.normal_ipqam_id
+	</select>
+	
+	<select id="getNetList" resultClass="dto">
+		select network_name,network_code from urm_network_area where status = 1 
+	</select>
+	<select id="queryRfCount" parameterClass="map" resultClass="dto">
+		select  count(*) count,rf_code from urm_ipqam_frequency_middle where base_rf_code = #rf_code#  
+	</select>
+	<update id="updateStaticRes" parameterClass="map">
+	update urm_ipqam_resource_statictemp set res_status=#res_status# where rf_code = #rf_code#
+	</update>
+	<update id="updateDyRes" parameterClass="map">
+	update urm_ipqam_resource_dytemp set res_status=#res_status# where rf_code = #rf_code#
+	</update>
+
+	<insert id="svaeResMid" parameterClass="map" >
+		insert into urm_ipqam_resource_middle(ipqam_res_id ,ipqam_id,app_name,exp_port,data_type,server_id,res_type,res_status,band_width,rf_code,pid_id) 
+		value(#ipqam_res_id#,#ipqam_id#,#app_name#,#exp_port#,#data_type#,#server_id#,#res_type#,1,#band_width#,#rf_code#,#pid_id#)
+		
+	</insert>
+	<insert id="svaeResMid1" parameterClass="map" >
+		insert into urm_ipqam_resource_middle(ipqam_res_id ,ipqam_id,app_name,exp_port,data_type,server_id,res_type,res_status,band_width,rf_code,pid_id) 
+		select b.ipqam_res_id,a.normal_ipqam_id,a.app_name,b.exp_port,b.data_type,b.server_id,res_type,1,b.band_width,a.normal_rf_code rf_code,$pid_rule$ pid_id from urm_ipqam_frequency_middle a,urm_ipqam_resource_statictemp b
+		where a.base_rf_code= #rf_code# and a.base_rf_code = b.rf_code and b.res_status!=1
+	</insert>
+	<select id="getDyRes" parameterClass="map" resultClass="dto">
+		select a.normal_rf_code rf_code,a.app_name,b.data_type,a.normal_ipqam_id ipqam_id,b.start_port,b.start_serviceid,b.ipqam_res_id,b.res_count,b.res_type from urm_ipqam_frequency_middle a,urm_ipqam_resource_dytemp b
+		where a.base_rf_code = #rf_code#  and a.base_rf_code = b.rf_code and b.res_status!=1
+	</select>
+	
+	<select id="getMidHis" parameterClass="map" resultClass="dto">
+		select ipqam_res_id ,ipqam_id,app_name,exp_port,data_type,server_id,res_type,res_status,band_width,rf_code,pid_id from urm_ipqam_resource_middle where rf_code=#rf_code# and ipqam_id=#ipqam_id#
+	</select>
+	<insert id="svaeResNor" parameterClass="map">
+		insert into urm_ipqam_resource(ipqam_res_id ,ipqam_id,app_name,exp_port,data_type,server_id,res_type,res_status,band_width,rf_code,pid_id) 
+		values(#ipqam_res_id# ,#ipqam_id#,#app_name#,#exp_port#,#data_type#,#server_id#,#res_type#,1,#band_width#,#rf_code#,#pid_id#)
+	</insert>
+	
+	<select id="mathPid" parameterClass="map" resultClass="dto">
+		select $pid_id$ pid_id
+	</select>
+	<select id="getMidId" parameterClass="map" resultClass="dto">
+		select ipqam_id from urm_ipqam_info_middle where base_ipqam_id=#ipqam_id#
+	</select>
+	<select id="getQamCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT COUNT(*) count from urm_ipqam_info where ipqam_id = #normal_ipqam_id# and network_code=#network_code#
+	</select>
+		
+	<select id="selectD6R6Pro" parameterClass="map" resultClass="dto">
+	select prompt_id,`status`,d6r6_type,res_type,oper_type,ipqam_ip,rf_id, res_port,biz_ip,last_prompt_time,remark
+	from urm_ipqam_d6r6_prompt 
+	<dynamic prepend="where">
+		<isNotEmpty prepend="and" property="status">
+		status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ipqam_ip">
+		ipqam_ip '%$ipqam_ip$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="res_type">
+		res_type=#res_type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="rf_id">
+		rf_id like '%$rf_id$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="oper_type">
+		oper_type like '$oper_type$'
+		</isNotEmpty>
+	</dynamic>
+	ORDER BY last_prompt_time DESC
+	</select>
+	<select id="selectD6R6ProCount" parameterClass="map" resultClass="java.lang.Integer">
+	select count(*)	from urm_ipqam_d6r6_prompt 
+	<dynamic prepend="where">
+		<isNotEmpty prepend="and" property="status">
+		status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ipqam_ip">
+		ipqam_ip '%$ipqam_ip$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="res_type">
+		res_type=#res_type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="rf_id">
+		rf_id like '%$rf_id$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="oper_type">
+		oper_type like '%$oper_type$%'
+		</isNotEmpty>
+	</dynamic>
+	</select>
+	
+	<update id="batchData" parameterClass="map">
+	update urm_ipqam_d6r6_prompt set status = 1 where prompt_id=#prompt_id#
+	</update>
+	<update id="handlerPrompt" parameterClass="map">
+	update urm_ipqam_d6r6_prompt set status=1 where oper_type like '%$oper_type$%' 
+	<dynamic>
+		<isNotEmpty prepend="and" property="ipqam_id"> 
+		base_ipqam_id = #ipqam_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="rf_code">
+		base_rf_code = #rf_code#
+		</isNotEmpty>
+	</dynamic> 
+	</update>
+	
+	<select id="rfCount" parameterClass="map" resultClass="dto">
+	select rf_code ,count(*) count from urm_ipqam_frequency where rf_id=#rf_id# and network_code=#network_code#
+	</select>
+	
+	<select id="rfSuccess" parameterClass="map" resultClass="java.lang.Integer">
+	select count(*) from urm_ipqam_frequency_middle a,urm_ipqam_frequency_temp b where a.base_rf_code = b.rf_code and b.`status`=1 and a.normal_rf_code=#rf_code#  
+	</select>
+	<delete id="deleteStaticRes" parameterClass="map">
+	update urm_ipqam_resource_statictemp set res_status=-1 where ipqam_res_id=#ipqam_res_id#
+	</delete>
+	<delete id="delteDyRes" parameterClass="map">
+	update urm_ipqam_resource_dytemp set res_status=-1 where ipqam_res_id=#ipqam_res_id#
+	</delete>
+	
+	<select id="getMinPort" parameterClass="map" resultClass="java.lang.Integer">
+	select MIN(exp_port) min from urm_ipqam_resource_statictemp where ipqam_id=#ipqam_id#
+	</select>
+	<select id="getMinPort1" parameterClass="map" resultClass="java.lang.Integer">
+	select MIN(start_port) min from urm_ipqam_resource_dytemp where ipqam_id=#ipqam_id# 
+	</select>
+	
+	<update id="updateData" parameterClass="map">
+	update urm_ipqam_resource_middle b,urm_ipqam_frequency_middle a  set res_type=#res_type# 
+	where b.exp_port = #min_port# and a.base_rf_code= #rf_code# and a.normal_rf_code = b.rf_code  
+	</update>
+	
+	<insert id="saveMidRes" parameterClass="map">
+	insert into urm_ipqam_resource_middle(ipqam_res_id ,ipqam_id,app_name,exp_port,data_type,server_id,res_type,res_status,band_width,rf_code,pid_id) 
+	select #ipqam_res_id#,#ipqam_id#,#app_name#,#exp_port#,#data_type#,#server_id#,#res_type#,1,#band_width#,#rf_code#,#pid_id#
+	 from DUAL where NOT EXISTS (select * from urm_ipqam_resource_middle where (server_id=#server_id# or exp_port=#exp_port#)
+	and ipqam_id=#ipqam_id# and rf_code = #rf_code#) 
+	</insert>
+
+	</sqlMap>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="item_login">
+        <attr name="desc" format="string" />
+        <attr name="input" format="string" />
+        <attr name="pwd" format="string" />
+    </declare-styleable>
+</resources>

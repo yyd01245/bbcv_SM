@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 外部应用接入手工映射SQL语句 -->
+<sqlMap namespace="AppAccess">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<!-- 根据主键查询代码表 -->
+	<select id="getAppAccessByKey" parameterClass="map" resultClass="dto">
+		SELECT * FROM urm_app_login  WHERE login_id = #login_id#
+	</select>
+	<select id="getAppNames" parameterClass="map" resultClass="dto">
+		SELECT app_name FROM urm_app_login 
+	</select>
+	
+	<!-- 获取外部应用列表-->
+	<select id="getAppAccessListForPage" parameterClass="map" resultClass="dto">
+		SELECT login_id, app_id,app_name,app_servurl,license,auth_code,urm_version,urm_servurl FROM urm_app_login 
+		   WHERE app_name LIKE '%$app_name$%'
+		ORDER BY app_id DESC
+	</select>
+	
+	<!-- 获取外部应用总数-->
+	<select id="getAppAccessListForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_app_login 
+		 WHERE app_name LIKE '%$app_name$%'
+	</select>
+	<select id="getCountByKey" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_app_login 
+		 WHERE app_name = '$app_name$' and login_id != '$login_id$'
+	</select>
+	
+	<!-- 插入外部应用表一条记录 -->
+	<insert id="saveAppAccessItem" parameterClass="dto">
+		INSERT INTO urm_app_login  (
+		   login_id,app_id,app_name,app_servurl,license,auth_code,urm_version,urm_servurl) 
+		VALUES (#login_id#,#app_id#,#app_name#,#app_servurl#,#license#,#auth_code#,#urm_version#,#urm_servurl#)
+	</insert>    
+
+	<insert id="saveAppAccessItemHis" parameterClass="dto">
+		INSERT INTO urm_app_login_his  (
+		   login_id,app_id,app_name,app_servurl,license,auth_code,urm_version,urm_servurl,delete_time,busi_id) 
+		VALUES (#login_id#,#app_id#,#app_name#,#app_servurl#,#license#,#auth_code#,#urm_version#,#urm_servurl#,SYSDATE(),#busi_id#)
+	</insert>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+	
+	<!-- 删除一条外部应用表记录  -->
+	<delete id="deleteAppAccessItems" parameterClass="map" >
+		DELETE FROM urm_app_login 
+		      WHERE login_id = #login_id#
+	</delete>
+	
+	<!-- 根据主键更新外部应用 -->
+	<update id="updateAppAccessItem" parameterClass="dto">
+         UPDATE urm_app_login 
+		<dynamic prepend="SET"> 
+			<isNotNull prepend="," property="app_id">
+	         app_id = #app_id#
+			</isNotNull>
+			<isNotNull prepend="," property="app_name">
+	         app_name = #app_name#
+			</isNotNull>
+			<isNotNull prepend="," property="app_servurl">
+	         app_servurl = #app_servurl#
+			</isNotNull>
+			<isNotNull prepend="," property="license">
+	         license = #license#
+			</isNotNull>
+			<isNotNull prepend="," property="auth_code">
+	         auth_code = #auth_code#
+			</isNotNull>
+			<isNotNull prepend="," property="urm_version">
+	         urm_version = #urm_version#
+			</isNotNull>
+			<isNotNull prepend="," property="urm_servurl">
+	         urm_servurl = #urm_servurl#
+			</isNotNull>
+		</dynamic> 
+	        WHERE login_id = #login_id# 
+	</update>
+	
+</sqlMap>

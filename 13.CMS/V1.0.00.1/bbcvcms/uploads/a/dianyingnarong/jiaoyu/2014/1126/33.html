@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>合理食饮_宽云内容管理系统</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="/bbcvcms/uploads/templets/default/style/dedecms.css" rel="stylesheet" media="screen" type="text/css" />
+<script language="javascript" type="text/javascript" src="/bbcvcms/uploads/include/dedeajax2.js"></script>
+<script language="javascript" type="text/javascript">
+<!--
+function CheckLogin()
+{
+	  var taget_obj = document.getElementById('_ajax_feedback');
+	  myajax = new DedeAjax(taget_obj,false,false,'','','');
+	  myajax.SendGet2("/bbcvcms/uploads/member/ajax_feedback.php");
+	  DedeXHTTP = null;
+}
+
+function postBadGood(ftype,fid)
+{
+	var taget_obj = document.getElementById(ftype+fid);
+	var saveid = GetCookie('badgoodid');
+	if(saveid != null)
+	{
+		var saveids = saveid.split(',');
+		var hasid = false;
+		saveid = '';
+		j = 1;
+		for(i=saveids.length-1;i>=0;i--)
+		{
+			if(saveids[i]==fid && hasid) continue;
+			else {
+				if(saveids[i]==fid && !hasid) hasid = true;
+				saveid += (saveid=='' ? saveids[i] : ','+saveids[i]);
+				j++;
+				if(j==10 && hasid) break;
+				if(j==9 && !hasid) break;
+			}
+		}
+		if(hasid) { alert('您刚才已表决过了喔！'); return false;}
+		else saveid += ','+fid;
+		SetCookie('badgoodid',saveid,1);
+	}
+	else
+	{
+		SetCookie('badgoodid',fid,1);
+	}
+	myajax = new DedeAjax(taget_obj,false,false,'','','');
+	myajax.SendGet2("/bbcvcms/uploads/plus/feedback.php?aid="+fid+"&action="+ftype+"&fid="+fid);
+	DedeXHTTP = null;
+}
+function postDigg(ftype,aid)
+{
+	var taget_obj = document.getElementById('newdigg');
+	var saveid = GetCookie('diggid');
+	if(saveid != null)
+	{
+		var saveids = saveid.split(',');
+		var hasid = false;
+		saveid = '';
+		j = 1;
+		for(i=saveids.length-1;i>=0;i--)
+		{
+			if(saveids[i]==aid && hasid) continue;
+			else {
+				if(saveids[i]==aid && !hasid) hasid = true;
+				saveid += (saveid=='' ? saveids[i] : ','+saveids[i]);
+				j++;
+				if(j==20 && hasid) break;
+				if(j==19 && !hasid) break;
+			}
+		}
+		if(hasid) { alert("您已经顶过该帖，请不要重复顶帖 ！"); return; }
+		else saveid += ','+aid;
+		SetCookie('diggid',saveid,1);
+	}
+	else
+	{
+		SetCookie('diggid',aid,1);
+	}
+	myajax = new DedeAjax(taget_obj,false,false,'','','');
+	var url = "/bbcvcms/uploads/plus/digg_ajax.php?action="+ftype+"&id="+aid;
+	myajax.SendGet2(url);
+	DedeXHTTP = null;
+}
+function getDigg(aid)
+{
+	var taget_obj = document.getElementById('newdigg');
+	myajax = new DedeAjax(taget_obj,false,false,'','','');
+	myajax.SendGet2("/bbcvcms/uploads/plus/digg_ajax.php?id="+aid);
+	DedeXHTTP = null;
+}
+-->
+</script>
+</head>
+<body class="articleview">
+无法在这个位置找到： head.htm2
+<!-- /header -->
+
+<div class="channel-nav w960 center clear">
+	<div class='sonnav'>
+	
+		<span><a href='/bbcvcms/uploads/a/dianyingnarong/remen/'>热门</a></span><span><a href='/bbcvcms/uploads/a/dianyingnarong/jiaoyu/' class='thisclass'>教育</a></span>
+		<span><a href='/bbcvcms/uploads/a/dianyingnarong/jingdian/'>经典</a></span>
+	</div>
+</div><!-- /channel-nav -->
+
+<div class="w960 center clear mt1">
+	<div class="pleft">
+		<div class="place">
+			<strong>当前位置:</strong> <a href='http://218.108.50.246/bbcvcms/uploads'>主页</a> > <a href='/bbcvcms/uploads/a/dianyingnarong/'>电影内容</a> > <a href='/bbcvcms/uploads/a/dianyingnarong/jiaoyu/'>教育</a> > 
+		</div><!-- /place -->
+		<div class="viewbox">
+			<div class="title">
+				<h2>合理食饮</h2>
+			</div><!-- /title -->
+			<div class="info">
+				<small>时间:</small>2014-11-26 17:17<small>来源:</small>未知 <small>作者:</small>admin <small>点击:</small><script src="/bbcvcms/uploads/plus/count.php?view=yes&aid=33&mid=1" type='text/javascript' language="javascript"></script>次
+			</div><!-- /info -->
+
+			<div class="content">
+			　<font color='red'> 你会看到这个提示，那是因为你的系统无法识别某栏目的模型信息，或者你新建模型后，没为这个模型设计单独的模板。不同模型的文档浏览页的模板为：article_模型名字标识.htm
+如“article_article.htm”，更多的信息你可以在频道模型管理的地方查看。 </font>
+<table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>评分</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.grade /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> 60 </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>导演</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.director /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">  </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>演员</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.actor /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">  </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>发布日期</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.years /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> 1416993217 </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>时长</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.runtime /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> 0 </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>影片描述</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.intro /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">  </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>试看内容</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.path /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> http://192.168.100.31/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy.mp4 </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>类型</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.type /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">  </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>地区</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.area /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">  </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>rtsp地址</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.rtsp_url /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">  </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>电视海报1</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.tv_poster_path1 /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">   <li>
+    <a href='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_1.png' target='_blank'><img src='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_1.png'  width='607'  border='0'/></a>
+    <br />
+    <a href='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_1.png' target='_blank'></a>
+  </li> </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>电视海报2</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.tv_poster_path2 /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">   <li>
+    <a href='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_2.jpg' target='_blank'><img src='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_2.jpg'  width='336'  border='0'/></a>
+    <br />
+    <a href='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_2.jpg' target='_blank'></a>
+  </li> </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>电视海报3</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.tv_poster_path3 /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> 无图片信息！ </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>电视海报4</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.tv_poster_path4 /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> 无图片信息！ </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>手机海报1</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.mb_poster_path1 /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF">   <li>
+    <a href='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_1.png' target='_blank'><img src='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_1.png'  width='607'  border='0'/></a>
+    <br />
+    <a href='/bbcvcms/uploads/uploads/jiaoyu/hlsy/hlsy_1.png' target='_blank'></a>
+  </li> </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>手机海报2</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.mb_poster_path2 /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> 无图片信息！ </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>手机海报3</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.mb_poster_path3 /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> 无图片信息！ </td>
+</tr>
+</table><table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#BED1AB">
+<tr>
+	<td width="23%" height="24" align="center" bgcolor="#FBFEF5">
+		<b>手机海报4</b> 内容：
+		<br />
+	  模板调用标记：
+	  <br />
+	  <script language='javascript'>document.write("{"+"dede:field.mb_poster_path4 /"+"}");</script>
+	</td>
+	<td width="77%" bgcolor="#FFFFFF"> 无图片信息！ </td>
+</tr>
+</table>
+			</div><!-- /content -->
+			<div class="dede_pages">
+				<ul class="pagelist">
+                    
+				</ul>
+			</div><!-- /pages -->
+			<div class="newdigg" id="newdigg">
+				<div class="diggbox digg_good" onmousemove="this.style.backgroundPosition='left bottom';" onmouseout="this.style.backgroundPosition='left top';" onclick="javascript:postDigg('good',33)">
+					<div class="digg_act">顶一下</div>
+					<div class="digg_num">(0)</div>
+					<div class="digg_percent">
+						<div class="digg_percent_bar"><span style="width:0%"></span></div>
+						<div class="digg_percent_num">0%</div>
+					</div>
+				</div>
+				<div class="diggbox digg_bad" onmousemove="this.style.backgroundPosition='right bottom';" onmouseout="this.style.backgroundPosition='right top';" onclick="javascript:postDigg('bad',33)">
+					<div class="digg_act">踩一下</div>
+					<div class="digg_num">(0)</div>
+					<div class="digg_percent">
+						<div class="digg_percent_bar"><span style="width:0%"></span></div>
+						<div class="digg_percent_num">0%</div>
+					</div>
+				</div>
+			</div>
+			 <script language="javascript" type="text/javascript">getDigg(33);</script>
+			<div class="boxoff">
+				<strong>------分隔线----------------------------</strong>
+			</div>
+			<div class="handle">
+				<div id='diggCt' class='digg'>
+					<div class="digg_num" title="积分：0 好评：0 差评：0">0</div>
+					<div class="digg_act">
+						<a href="javascript:postDigg('good',33)">顶</a>
+						<a href="javascript:postDigg('bad',33)">踩</a>
+					</div>
+				</div><!-- /digg -->
+				<div class="context">
+					<ul>
+						<li>上一篇：<a href='/bbcvcms/uploads/a/dianyingnarong/jiaoyu/2014/1126/32.html'>老鼠嫁女儿</a> </li>
+						<li>下一篇：没有了 </li>
+					</ul>
+				</div><!-- /context -->
+				<div class="actbox">
+					<ul>
+						<li id="act-fav"><a href="/bbcvcms/uploads/plus/stow.php?aid=33" target="_blank">收藏</a></li>
+						<li id="act-err"><a href="/bbcvcms/uploads/plus/erraddsave.php?aid=33&title=合理食饮" target="_blank">挑错</a></li>
+						<li id="act-pus"><a href="/bbcvcms/uploads/plus/recommend.php?aid=33" target="_blank">推荐</a></li>
+						<li id="act-pnt"><a href="#" onClick="window.print();">打印</a></li>
+					</ul>
+				</div><!-- /actbox -->
+			</div><!-- /handle -->
+		</div><!-- /viewbox -->
+
+<!-- //AJAX评论区 -->
+没安装畅言模块
+
+		
+	</div><!-- /pleft -->
+
+	<div class="pright">
+        	<div class="infos_userinfo">
+ 			
+   	 	</div>
+
+		<div class="commend mt1">
+			<dl class="tbox">
+				<dt><strong>推荐内容</strong></dt>
+				<dd>
+					<ul class="d4">
+           
+					</ul>
+				</dd>
+			</dl>
+		</div><!-- /commend -->
+        <div id="contentRtPicAD" style="margin:10px auto"><script type="text/javascript" src="http://ad.dedecms.com/adsview/?action=single&key=contentrtpicad&charset=gbk"></script></div>
+		<div class="hot mt1">
+			<dl class="tbox">
+				<dt><strong>热点内容</strong></dt>
+				<dd>
+					<ul class="c1 ico2">
+                    <li><a href="/bbcvcms/uploads/a/dianyingnarong/jiaoyu/2014/1124/30.html">法理学</a></li>
+<li><a href="/bbcvcms/uploads/a/dianyingnarong/jiaoyu/2014/1126/32.html">老鼠嫁女儿</a></li>
+<li><a href="/bbcvcms/uploads/a/dianyingnarong/jiaoyu/2014/1126/33.html">合理食饮</a></li>
+<li><a href="/bbcvcms/uploads/a/dianyingnarong/jiaoyu/2014/1124/29.html">测量学</a></li>
+
+					</ul>
+				</dd>
+			</dl>
+		</div>
+		<div id="contentRtPicAD2" style="margin:10px auto"><script type="text/javascript" src="http://ad.dedecms.com/adsview/?action=single&key=contentrtpicad2&charset=gbk"></script></div>
+	</div><!-- /pright -->
+	
+</div>
+<div id="innerfooterAD2" style="margin:10px auto; width:726px"><script type="text/javascript" src="http://ad.dedecms.com/adsview/?action=single&key=innerfooterad2&charset=gbk"></script></div>
+
+<!-- //底部模板 -->
+<div class="footer w960 center mt1 clear">
+	<!-- 
+		为了支持织梦团队的发展,请您保留织梦内容管理系统的链接信息.
+		我们对支持织梦团队发展的朋友表示真心的感谢!织梦因您更精彩!
+	-->
+    <div class="footer_left"></div>
+    <div class="footer_body">
+	<p class="powered">    
+		Powered by <a href="http://www.dedecms.com" title="织梦内容管理系统(DedeCms)--国内最专业的PHP网站管理系统，轻松建站的首选利器。" target="_blank"><strong>DedeCMS_V57_UTF8_SP1</strong></a> &copy; 2004-2011 <a href="http://www.desdev.cn/" target="_blank">DesDev</a> Inc.<br /><div class="copyright">宽云视讯内容管理系统 <a href=http://www.dedecms.com target='_blank'>Power by DedeCms</a>&nbsp;&nbsp;</div></p>        
+<!-- /powered -->
+   </div>
+   <div class="footer_right"></div>
+</div>
+<!-- /footer -->
+
+</body>
+</html>

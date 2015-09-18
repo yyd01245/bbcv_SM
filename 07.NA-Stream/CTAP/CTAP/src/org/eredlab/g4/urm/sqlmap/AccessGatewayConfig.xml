@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 服务监控管理手工映射SQL语句 -->
+<sqlMap namespace="AccessGatewayConfig">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+		<!-- 网关配置信息列表(field1为ip,field2为port) -->
+	<select id="getGatewayConfigList" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT field1 ,field2 ,field3  FROM access_gateway_config 
+	</select>
+	
+	
+	
+	<!-- 查询单个网关配置信息 -->
+	<select id="queryGatewayConfig" parameterClass="map" resultClass="dto">
+		SELECT * from access_gateway_config   where field1=#field1# and field2=#field2#
+	</select>
+	
+	
+	
+	<!-- 插入一条记录 -->
+	<insert id="saveAccessGatewayConfig" parameterClass="dto">
+		INSERT INTO access_gateway_config (field1,field2,field3,field4,field5,field6,field7,field8,field9,field10) 		   
+		VALUES (#field1#,#field2#,#field3#,#field4#,#field5#,#field6#,#field7#,#field8#,#field9#,#field10#)
+	</insert> 
+	
+	
+
+	<!-- 根据更新配置-->
+	
+	<update id="updateAccessGatewayConfigById" parameterClass="dto">
+         UPDATE access_gateway_config
+      
+		<dynamic prepend="SET">
+			<isNotNull prepend="," property="field1">
+	         field1 = #field1#
+			</isNotNull>
+			<isNotNull prepend="," property="field2">
+	         field2 = #field2#
+			</isNotNull>
+		    <isNotNull prepend="," property="field3">
+	         field3 = #field3#
+			</isNotNull>
+			<isNotNull prepend="," property="field4">
+	         field4 = #field4#
+			</isNotNull>
+			<isNotNull prepend="," property="field5">
+	         field5 = #field5#
+			</isNotNull>
+		    <isNotNull prepend="," property="field6">
+	         field6 = #field6#
+			</isNotNull>
+			<isNotNull prepend="," property="field7">
+	         field7 = #field7#
+			</isNotNull>
+			<isNotNull prepend="," property="field8">
+	         field8 = #field8#
+			</isNotNull>
+			<isNotNull prepend="," property="field9">
+	         field9 = #field9#
+			</isNotNull>
+		    <isNotNull prepend="," property="field10">
+	         field10 = #field10#
+			</isNotNull>
+		</dynamic> 
+	        WHERE id = #id# 
+	</update>
+	
+	
+	
+		<!-- 认证配置-->
+	
+	<update id="authAccessGatewayConfigById" parameterClass="dto">
+         UPDATE access_gateway_config set field3 = 1
+      
+	
+	        WHERE field1 = #field1#  and  field2 = #field2#  
+	</update>
+	
+	
+	
+	
+	
+	
+		<select id="getAdsListForPage" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT * FROM ucs_adv_info where id between 27 and 30
+			<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="advname">
+				advname like '%$advname$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="advip">
+				advip like '%$advip$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="advport">
+				advport like '%$advport$%'
+			</isNotEmpty>
+		
+		</dynamic>
+		order by id
+	</select>
+			<select id="getAdsListsCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM ucs_adv_info a where id between 27 and 30
+			<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="advname">
+				advname like '%$advname$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="advip">
+				advip like '%$advip$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="advport">
+				advport like '%$advport$%'
+			</isNotEmpty>
+		
+		</dynamic>
+		order by id
+	</select> 
+	<!-- 根据承载标识更新承载信息-->
+	<update id="updateServerItemById" parameterClass="dto">
+         UPDATE encode_term_info
+		<dynamic prepend="SET">
+		<isNotNull prepend="," property="max_line">
+	         max_num = #max_line#
+			</isNotNull>
+		</dynamic> 
+	        WHERE server_ip =#server_ip#
+	</update>
+	<!-- 获取机柜绑定信息 -->
+	<select id="querycabinetList" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT cabinet_address from encode_cabinet_info where isbanding = 0
+	</select>
+	<!-- 获取机柜编号信息 -->
+	<select id="querycardList" parameterClass="map" resultClass="dto">
+		SELECT cabinet_id,cabinet_card from encode_cabinet_info where isbanding=0 and  cabinet_address=#cabinet_address#
+	</select>
+	<!-- 判断机柜地址是否已存在 -->
+	<select id="queryCabinetAddress" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(cabinet_address) from encode_cabinet_info where cabinet_address=#cabinet_address#
+	</select>
+	
+	<!-- 插入机柜信息记录 -->
+	<insert id="saveCabinet" parameterClass="dto">
+		INSERT INTO encode_cabinet_info (
+		   cabinet_address, cabinet_card, cabinet_ratePower,isbanding) 
+		VALUES (#cabinet_address#, #cabinet_card#, #cabinet_ratePower#,0 )
+	</insert>
+	
+	<!-- 根据承载标识更新承载机柜信息-->
+	<update id="updateServerInfo" parameterClass="dto">
+         UPDATE encode_term_info
+		<dynamic prepend="SET">
+		<isNotNull prepend="," property="cabinet_id">
+	         cabinet_id = #cabinet_id#
+			</isNotNull>
+		</dynamic> 
+	        WHERE server_ip =#server_ip# and server_port = #server_port#
+	</update>
+	
+	<!-- 根据机柜标识更新机柜信息-->
+	<update id="updateCabinetInfo" parameterClass="dto">
+         UPDATE encode_cabinet_info set isbanding=1 WHERE cabinet_id = #cabinet_id#
+	</update>
+	
+	<!-- 根据机柜标识更新机柜信息-->
+	<update id="updateCabinetByID" parameterClass="dto">
+         UPDATE encode_cabinet_info set isbanding=0 WHERE cabinet_id = #cabinet_id#
+	</update>
+	
+	<!-- 根据IP更新服务器信息-->
+	<update id="updateServerByIp" parameterClass="dto">
+         UPDATE encode_term_info set cabinet_id = null WHERE server_ip = #server_ip#
+	</update>
+	
+	<!-- 将所有承载状态置为下线状态-->
+	<update id="updateServer" parameterClass="dto">
+         UPDATE encode_term_info set vstatus = 'unused',online_num=0,liuhua_num=0
+	</update>
+	
+	<!-- 获取机柜全部信息 -->
+	<select id="querycabinetAllList" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT cabinet_address,cabinet_ratePower from encode_cabinet_info order by cabinet_address
+	</select>
+	
+	<!-- 根据机柜查询上面服务器信息 -->
+	<select id="queryServerListByCabinetAddress" parameterClass="map" resultClass="dto">
+		select a.cabinet_id,a.cabinet_card,b.server_ip,b.server_port,b.vtype,b.vstatus from encode_cabinet_info a LEFT JOIN encode_term_info b on a.cabinet_id=b.cabinet_id where a.cabinet_address=#cabinet_address#
+	</select>
+	
+	<!-- 根据机柜地址删除机柜信息 -->
+	<delete id="deleteCabinetItems" parameterClass="map">
+		delete from encode_cabinet_info where cabinet_address = #cabinet_address#
+	</delete>
+	
+	<!-- 根据状态查询服务器列表-->
+	<select id="queryServerByStatus" parameterClass="map" resultClass="dto">
+		SELECT server_ip,server_port,vtype,cpu_info,mem_info,max_num,online_num,liuhua_num,sys_version,vlc_version,chrome_version,chromePlush_version FROM encode_term_info where vstatus=#status#
+	</select>
+	<!-- 根据状态查询服务器列表-->
+	<select id="queryServerListNoStatus" parameterClass="map" resultClass="dto">
+		SELECT DISTINCT server_ip,server_port FROM encode_term_info 
+	</select>
+	
+	<!-- 查询承载服务器是否已在数据库-->
+	<select id="queryServerCountByID" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM encode_term_info where server_ip=#server_ip# and server_port=#server_port#
+	</select>
+	<!-- 保存服务器信息 -->
+	<insert id="saveServer" parameterClass="dto">
+		INSERT INTO encode_term_info (
+		   server_ip,server_port,vtype,vstatus,max_num,online_num,liuhua_num,vendor,rate,security,vability) 
+		VALUES (#server_ip#,#server_port#,#vtype#,#vstatus#,#max_num#,#online_num#,#liuhua_num#,#vendor#,#rate#,#security#,#vability#)
+	</insert>
+	<!-- 根据标识标识更新服务器信息-->
+	<update id="updateServerMoreInfo" parameterClass="dto">
+         UPDATE encode_term_info 
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="vtype">
+		         vtype = #vtype#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="vstatus">
+		         vstatus = #vstatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="max_num">
+		         max_num = #max_num#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="online_num">
+		         online_num = #online_num#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="liuhua_num">
+		         liuhua_num = #liuhua_num#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="vendor">
+		         vendor = #vendor#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="rate">
+		         rate = #rate#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="security">
+		         security = #security#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="cpu">
+		         cpu_info = #cpu#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="mem">
+		         mem_info = #mem#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="sys">
+		         sys_version = #sys#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="vlc">
+		         vlc_version = #vlc#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="chrome">
+		         chrome_version = #chrome#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="plugin">
+		         chromePlush_version = #plugin#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="pulseaudio">
+		         pulseaudio_version = #pulseaudio#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="xencoder">
+		         xencoder_version = #xencoder#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="dm816x">
+		         dm816x_version = #dm816x#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="server_port">
+		         server_port = #server_port#
+			</isNotEmpty>
+		</dynamic> 
+	        WHERE server_ip =#server_ip# and server_port=#server_port#
+	</update>
+	
+	<!-- 插入操作事件 -->
+	<insert id="insertEvent" parameterClass="dto">
+		INSERT INTO encode_operate_info (server_id,operate_type,operate_res,operater,operate_time) 
+		VALUES(#server_id#,#operate_type#,#operate_res#,#operater#,#operate_time#)
+	</insert>
+</sqlMap>

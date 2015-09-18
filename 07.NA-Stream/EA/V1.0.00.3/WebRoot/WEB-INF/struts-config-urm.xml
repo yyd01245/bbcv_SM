@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+	<!-- 配置ActionFormBean -->
+	<form-beans>
+		<!-- 公共Form -->
+		<form-bean name="commonActionForm" type="org.eredlab.g4.rif.web.CommonActionForm" />
+	</form-beans>
+
+	<!-- Action映射 -->
+	<action-mappings type="org.apache.struts.action.ActionMapping">
+		<!-- QAM管理-->
+		
+<!--IPqam信息表维护		-->		
+		<action name="commonActionForm" path="/qamManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.QamAction">
+			<forward name="initView" path="/qamInfo.jsp" />
+			<forward name="initPage1" path="/thresholdUrl.jsp" />
+		</action>
+			
+		
+<!--IPqam资源表维护		-->			
+		<action name="commonActionForm" path="/qamResourceManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.QamResourceAction">
+			<forward name="initView" path="/qamResourceManager.jsp" />
+		</action>
+		
+		
+<!--网络地区		-->
+		<action name="commonActionForm" path="/networkManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.NetworkAction">
+			<forward name="initView" path="/network.jsp" />
+		</action>
+		
+		
+<!--广告配置		-->		
+		<action name="commonActionForm" path="/adsManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.AdsAction">
+			<forward name="initView" path="/ads.jsp" />
+		</action>	
+		
+<!--导航配置		-->			
+		<action name="commonActionForm" path="/navigateManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.NavigateAction">
+			<forward name="initView" path="/navigate.jsp" />
+		</action>		
+
+
+<!--流配置		-->			
+		<action name="commonActionForm" path="/streamResourceManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.StreamResourceAction">
+			<forward name="initView" path="/streamResource.jsp" />
+		</action>	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+			
+		<action name="commonActionForm" path="/appAccessManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.AppAccessManagerAction">
+			<forward name="initView" path="/appAccessManager.jsp" />
+			<forward name="control" path="/MemcacheRelest.jsp" />
+		</action>
+		<action name="commonActionForm" path="/rfManager" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.RfAction">
+			<forward name="initView" path="/rfUrl.jsp" />
+		</action>
+
+		
+		
+		<action name="commonActionForm" path="/cacheData" scope="request"
+			validate="false" parameter="reqCode"
+			type="org.eredlab.g4.urm.web.CacheData">
+			<forward name="initView" path="/cacheDataUrl.jsp" />  
+		<!-- 	<forward name="initView" path="/cacheData1.jsp" />  -->
+		</action>
+		<action name = "commonActionForm" path = "/queryQam" scope = "request"
+			validate = "false" parameter="reqCode"
+			type = "org.eredlab.g4.urm.web.NewQamAction" >
+			<forward name = "initView" path = "/queryQam.jsp" />
+			<forward name = "initView1" path = "/queryKeyHandler.jsp" />	
+		</action>
+		<action name = "commonActionForm" path = "/ngodInfoAction" scope = "request"
+			validate = "false" parameter="reqCode"
+			type = "org.eredlab.g4.urm.web.NgodInfoAction" >
+			<forward name = "ngodPageInit" path = "/NgodUrl.jsp" />	
+			<forward name = "ngodRFPageInit" path = "/qamReview.jsp" />	
+			<forward name = "D6R6PageInit" path="/NgodD6R6.jsp"></forward>
+			<forward name = "QAMPageInit" path="/qamDevice.jsp" ></forward>
+		</action>
+		<action name = "commonActionForm" path = "/qamDyAction" scope = "request"
+			validate = "false" parameter="reqCode"
+			type = "org.eredlab.g4.urm.web.DynamicQamAction" >
+			<forward name = "QAMPageInit" path="/qamDevice.jsp" ></forward>
+			<forward name = "QamDyPageInit" path = "/qamReview.jsp" />	
+			<forward name ="d6r6PageInit" path="/qamPrompt.jsp" ></forward>
+		</action>
+		
+		<action name ="commonActionForm" path="/resAction" scope="request" validate="false" parameter="reqCode" 
+		type="org.eredlab.g4.urm.web.ResQueryAction">
+			<forward name="resQuery" path="/resQuery.jsp"></forward>
+		</action>
+		
+	</action-mappings>
+</struts-config>

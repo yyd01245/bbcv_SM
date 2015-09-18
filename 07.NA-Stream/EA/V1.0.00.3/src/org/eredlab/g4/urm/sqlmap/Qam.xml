@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- QAM手工映射SQL语句 -->
+<sqlMap namespace="Qam">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<!-- 根据主键查询代码表 -->
+	<select id="getQamByKey" parameterClass="map" resultClass="dto">
+		SELECT ipqam_id,ipqam_name,ipqam_ip,ipqam_port,ipqam_type,band_width,status,date_format(status_time,'%Y-%m-%d %T') as status_time,device_type,device_firm,network_code,ipqam_level,use_res_num,use_res_per,remark FROM urm_ipqam_info 
+		 WHERE ipqam_id = #ipqam_id#
+	</select>
+	
+
+	
+		<!-- 查询QAM信息 -->
+	<select id="getQamInfoByName" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqamInfoName as app_name FROM ipqam_info q where 0 = 0
+		<dynamic prepend="AND">
+		
+			<isNotEmpty prepend="," property="ipqamInfoName">
+				ipqamInfoName like '%$ipqamInfoName$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<!-- 查询QAM信息 -->
+	<select id="getQamListForPage" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqam_id,ipqam_name,ipqam_ip,ipqam_port,ipqam_type,band_width,status,date_format(status_time,'%Y-%m-%d %T') as status_time,device_type,device_firm,network_code,ipqam_level,use_res_num,use_res_per,remark FROM urm_ipqam_info q where q.status != -1
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="," property="ipqam_ip">
+				q.ipqam_ip like '%$ipqam_ip$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ipqam_name">
+				q.ipqam_name like '%$ipqam_name$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="getQamListByKey" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqamInfoId,ipqamInfoName,ipqamIp,ipqamPort,ipqamFrequency,network_area_id,state,remark FROM ipqam_info where network_area_id=#network_area_id#
+	</select>
+	
+	<select id="getQamLevelByID" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqam_level FROM urm_ipqam_info where ipqam_id = '$ipqam_id$'
+	</select>
+
+	<select id="queryIPQAMListBykey" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqamInfoId,ipqamInfoName,ipqamIp,ipqamPort,ipqamFrequency,network_area_id,state,remark FROM ipqam_info where 0=0 and network_area_id=#network_area_id#
+	</select>
+	<select id="queryIPQAMListBykeyCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM ipqam_info where network_area_id=#network_area_id#
+	</select>
+	
+	<select id="getResourceUsedCountByID" parameterClass="map" resultClass="java.lang.Integer">
+		select COUNT(*) from ipqam_resource where state=1 and ipqamInfoId=#ipqaminfoid#
+	</select>
+	
+	
+		<select id="queryIPQAMResListBykey" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT ipqamResId,ipqamResPort,ipqamResPid,ipqam_info_id,state,remark FROM ipqam_resource where 0 =0 and ipqamResId=#ipqamResId#
+	</select>
+	<select id="queryIPQAMListResBykeyCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM ipqam_resource where status =0 and ipqamResId=#ipqamResId#
+	</select>
+	
+	
+	
+	<select id="queryCountByQAMIP" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info where status != -1 and ipqam_ip= '$ipqam_ip$' and network_code = '$network_code$'
+	</select>
+	<!-- 重名校验 -->
+	<select id="queryNameByQAMIP" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info where status != -1 and ipqam_name= '$ipqam_name$'
+	</select>
+	<select id="queryCountByQAMIPUpdate" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info where status != -1 and ipqam_ip= '$ipqam_ip$' and network_code = '$network_code$' and ipqam_id!=#ipqam_id#
+	</select>
+	<!-- 重名校验 -->
+	<select id="queryNameByQAMIPUpdate" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info where status != -1 and ipqam_name= '$ipqam_name$' and ipqam_id!=#ipqam_id#
+	</select>
+	<!-- 获取QAM总数 -->
+	<select id="getQamListForPageCount" parameterClass="map"
+		resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_ipqam_info q where status != -1
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="," property="ipqam_ip">
+				q.ipqam_ip like '%$ipqam_ip$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ipqam_name">
+				q.ipqam_name like '%$ipqam_name$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="getQamListByKeyCount" parameterClass="map"
+		resultClass="java.lang.Integer">
+		SELECT count(*) FROM ipqam_info q where q.network_area_id=#network_area_id# and 0=0
+	</select>
+
+	<!-- 插入QAM表一条记录 -->
+	<insert id="saveQamItem" parameterClass="dto">
+		INSERT INTO ipqam_info (
+		   ipqamInfoId,ipqamInfoName,ipqamIp,ipqamPort,ipqamFrequency,network_area_id,state,remark) 
+		VALUES (#ipqamInfoId#,#ipqamInfoName#,#ipqamIp#,#ipqamPort#, #ipqamFrequency#,#network_area_id#,#state#,#remark#)
+	</insert> 
+	<insert id="saveQamItemHis" parameterClass="dto">
+		INSERT INTO urm_ipqam_info_his (
+		   ipqam_id,ipqam_ip,ipqam_name,ipqam_port,ipqam_type,status,band_width,device_type,device_firm,ipqam_level,network_code,remark,delete_time,busi_id) 
+		VALUES (#ipqam_id#,#ipqam_ip#,#ipqam_name#,#ipqam_port#, #ipqam_type#,-1,#band_width#,#device_type#,#device_firm#,#ipqam_level#,#network_code#,#remark#,SYSDATE(),#busi_id#)
+	</insert> 
+	<insert id="saveQamItem1" parameterClass="dto">
+		INSERT INTO urm_ipqam_info (
+		   ipqam_id,ipqam_ip,ipqam_name,ipqam_port,ipqam_type,status,band_width,remark,device_type,device_firm,ipqam_level) 
+		VALUES (#ipqam_id#,#ipqam_ip#,#ipqam_name#,#ipqam_port#, #ipqam_type#,#status#,#band_width#, #remark#,#device_type#,#device_firm#,#ipqam_level#)
+	</insert>  
+	<insert id="saveQamItem2" parameterClass="dto">
+		INSERT INTO urm_ipqam_info (
+		   ipqam_id,ipqam_ip,ipqam_name,ipqam_port,ipqam_type,status,band_width,remark,device_type,device_firm,ipqam_level) 
+		VALUES (#ipqam_id#,#ipqam_ip#,#ipqam_name#,#ipqam_port#, #ipqam_type#,#status#,#band_width#, #remark#,#device_type#,#device_firm#,#ipqam_level#)
+	</insert>  
+	<insert id="saveQamItem3" parameterClass="dto">
+		INSERT INTO urm_ipqam_info (
+		   ipqam_id,ipqam_ip,ipqam_name,ipqam_port,ipqam_type,status,band_width,remark,device_type,device_firm,ipqam_level) 
+		VALUES (#ipqam_id#,#ipqam_ip#,#ipqam_name#,#ipqam_port#, #ipqam_type#,#status#,#band_width#, #remark#,#device_type#,#device_firm#,#ipqam_level#)
+	</insert>   
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+ 
+	<!-- 删除一条云应用表记录  -->
+	<delete id="deleteQamItems" parameterClass="map" >
+		delete from ipqam_info  WHERE ipqamInfoId = #ipqamInfoId#
+	</delete>
+
+	<delete id="deleteItemsByCode" parameterClass="map" >
+		delete from ipqam_info WHERE network_area_id = #network_code#
+	</delete>
+	
+	<delete id="deleteResouceItemsByQamID" parameterClass="map" >
+		delete from ipqam_resource  WHERE ipqamInfoId = #ipqamInfoId#
+	</delete>
+	<!-- 下架/欲下架修改状态 -->
+	<update id="updateQamItemsById" parameterClass="dto">
+		update urm_ipqam_info set status =0 where ipqam_id=#ipqam_id#
+	</update>
+	<!-- 上架修改状态 -->
+	<update id="updateQamItemById" parameterClass="dto">
+		update urm_ipqam_info set status =1 where ipqam_id=#ipqam_id#
+	</update>
+	<!-- 信息修改 -->
+	<update id="updateQamItem" parameterClass="dto">
+         UPDATE ipqam_info
+		<dynamic prepend="SET"> 
+			<isNotNull prepend="," property="ipqamInfoName">
+	         ipqamInfoName = #ipqamInfoName#
+			</isNotNull>
+			<isNotNull prepend="," property="ipqamIp">
+	         ipqamIp = #ipqamIp#
+			</isNotNull>
+			<isNotNull prepend="," property="ipqamPort">
+	         ipqamPort = #ipqamPort#
+			</isNotNull>
+			<isNotNull prepend="," property="ipqamFrequency">
+	         ipqamFrequency = #ipqamFrequency#
+			</isNotNull>
+			<isNotNull prepend="," property="network_area_id">
+	         network_area_id = #network_area_id#
+			</isNotNull>
+			<isNotNull prepend="," property="state">
+	         state = #state#
+			</isNotNull>
+			<isNotNull prepend="," property="remark">
+	         remark = #remark#
+			</isNotNull>
+		
+		</dynamic> 
+	        WHERE ipqamInfoId = #ipqamInfoId# 
+	</update>
+	<!-- 插入urm_event_update表一条记录 -->
+	<insert id="dynamicLoadMDB" parameterClass="dto">
+		INSERT INTO urm_event_update (
+		   id,ipqam_event_id,oper_status,status,create_date,type) 
+		VALUES (#id#,#ipqam_event_id#,#oper_status#,#status#,#create_date#,#type#)
+	</insert>  
+	<insert id="saveOperLog" parameterClass="dto">
+		insert into urm_busi_info(busi_id,busi_code,busi_date,oper_id,area_id,remark)
+		values(#busi_id#,#busi_code#,SYSDATE(),#oper_id#,#area_id#,#remark#)
+	</insert> 
+	<!-- 新增urm缓存同步控制方式 --> 
+	<insert id="saveCacheContor" parameterClass="dto">
+		INSERT INTO urm_event_update (
+		   id,ipqam_event_id,oper_status,status,create_date,type) 
+		VALUES (#id#,121,1,1,#create_date#,#type#)
+	</insert> 
+	<!-- 查询urm缓存同步控制方式 -->
+	<select id="queryCacheContor" parameterClass="map" resultClass="dto" remapResults="true">
+		SELECT id,type as status FROM urm_event_update where type=99 || type=100
+	</select>
+	<select id="queryCacheContorForPageCount" parameterClass="map" resultClass="java.lang.Integer">
+		SELECT count(*) FROM urm_event_update where type=99 || type=100
+	</select>
+	
+	<!-- 根据network_code查询网络区域信息 -->
+	<select id="getNerworkById" parameterClass="map" resultClass="dto">
+		SELECT * FROM urm_network_area WHERE status!=-1 and network_code=#network_code#
+	</select>
+	
+	<select id="getIPQAMIdByIP" parameterClass="map" resultClass="dto">
+		SELECT ipqam_id FROM urm_ipqam_info WHERE status >0 and ipqam_ip= #ipqam_ip#  and ipqam_port = #ipqam_port#
+	</select>
+	
+	<select id = "getIPQAMIpById" parameterClass="map" resultClass="dto">
+		SELECT ipqam_ip,ipqam_port FROM urm_ipqam_info WHERE status >0 and ipqam_id= #ipqam_id# 
+	</select>
+</sqlMap>

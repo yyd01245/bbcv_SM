@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	<bean id="core" class="com.bbcvision.msiAgent.core.CoreLoader"></bean>
+	<bean id="SpringApplicationContext" class="com.bbcvision.msiAgent.util.ApplicationContextHelper"></bean>
+<!--	<bean id="http" class="prod.nebula.vrc.module.http.HttpModuleLoader"></bean>-->
+
+	 <bean id="propertyConfigurer" class="com.bbcvision.msiAgent.util.PropertyPlaceholderConfigurer">
+		<constructor-arg index="0" ref="core"></constructor-arg>
+	</bean>
+	
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer"> 
+		<property name="customEditors"> 
+			<map> 
+				<entry key="java.net.SocketAddress"> 
+					<bean class="org.apache.mina.integration.beans.InetSocketAddressEditor" /> 
+				</entry> 
+			</map> 
+		</property> 
+	</bean> 
+	
+</beans>

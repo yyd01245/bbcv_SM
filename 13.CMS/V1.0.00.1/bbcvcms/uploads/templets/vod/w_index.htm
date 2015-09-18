@@ -1,0 +1,113 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width,initial-scale=1.0, maximum-scale=1.0,user-scalable=0" name="viewport" />
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta content="telephone=no" name="format-detection" />
+<title>点播首页</title>
+<link href="{dede:global.cfg_filebase/}/vod/css/layout.css" rel="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="{dede:global.cfg_filebase/}/vod/js/jquery-1.9.0.min.js"></script>
+<script type="text/javascript" src="{dede:global.cfg_filebase/}/vod/js/main.js"></script>
+<script type="text/javascript" src="{dede:global.cfg_filebase/}/vod/js/data.js"></script>
+</head>
+
+<body>
+<div id="header" >
+		<h1 class="menu logo">目录</h1>
+		<h1 class="usr logo">首页</h1>        
+</div>
+<!--slider-begin-->
+<div class="flexslider">
+	<ul class="slides">
+        {dede:arclist addfields='intro,path,director,actor,type,years,rtsp_url,mb_poster_path1,mb_poster_path2,area,grade' row='3' titlelen='24' orderby='pubdate' typeid='10' idlist='' channelid='17'}
+        <li class=""><a class="links" data-id="[field:id/]" href="[field:arcurl/]"><img alt=""  class="js-v-img" data-src="[field:mb_poster_path2/]"/></a></li>
+        {/dede:arclist}
+	</ul>
+</div>
+<!--slider-over-->
+
+ <section class="homesection">
+	 <div class="sectionheader">
+			<h3>教育</h3>
+			<a class="more" href="#"></a>
+	 </div>
+	 <ul class="gallery">
+         {dede:arclist addfields='intro,path,director,actor,type,years,rtsp_url,mb_poster_path1,mb_poster_path2,area,grade' row='3' titlelen='24' orderby='pubdate' typeid='11' idlist='' channelid='17'}
+         <li><a class="links" data-id="[field:id/]" href="[field:arcurl/]"><img data-src="[field:mb_poster_path1/]" class="js-v-img"><h3>[field:title/]</h3></a></li>
+         {/dede:arclist}
+	 </ul>
+ </section>
+
+<section class="homesection">
+    <div class="sectionheader">
+        <h3>经典</h3>
+        <a class="more" href="#"></a>
+    </div>
+    <ul class="gallery">
+        {dede:arclist addfields='intro,path,director,actor,type,years,rtsp_url,mb_poster_path1,mb_poster_path2,area,grade' row='3' titlelen='24' orderby='pubdate' typeid='12' idlist='' channelid='17'}
+        <li><a class="links" data-id="[field:id/]" href="[field:arcurl/]"><img data-src="[field:mb_poster_path1/]" class="js-v-img"><h3>[field:title/]</h3></a></li>
+        {/dede:arclist}
+    </ul>
+</section>
+
+ <script src="{dede:global.cfg_filebase/}/vod/js/jquery.flexslider-min.js"></script>
+ <script>
+     var poneOrWeiXin;
+     var username = poneOrWeiXin = getQueryStringByName("username")
+     var resolution = getQueryStringByName("resolution")
+	$(document).ready(function() {
+        $.get("http://218.108.50.246/wechat/oneway/openidmapstream",{
+            "openid": username
+        }, function(ajax_info){
+            if(ajax_info.retcode == "0"){
+                $(".links").click(function(e){
+                    e.preventDefault();
+                    var href = $(this).attr("href");
+                    href += "&username="+username;
+                    href += "&streamid="+ajax_info.info.channel;
+                    href += "&resolution="+resolution
+
+                    location.href = href;
+                    //location.href = 'http://{dede:global.cfg_nav_server/}/NS/mobile/ShowVodInfo?flag=set&resolution='+resolution+'&username='+username+'&streamid='+stream_id+'&name='+$(this).data("id")+'&vodid='+$(this).data("id")
+                })
+            }
+            else {
+                $(".links").click(function(e){
+                    e.preventDefault();
+                    //location.href = 'http://{dede:global.cfg_nav_server/}/NS/mobile/ShowVodInfo?flag=set&resolution='+resolution+'&username='+username+'&streamid='+stream_id+'&name='+$(this).data("id")+'&vodid='+$(this).data("id")
+                })
+            }
+        }, "jsonp")
+
+		/*添加跑马灯效果*/	
+		$('.flexslider').flexslider({		
+			animation: "slide",              //String: Select your animation type, "fade" or "slide"
+			selector: ".slides > li",       //{NEW} Selector: Must match a simple pattern. '{container} > {slide}' -- Ignore pattern at your own peril
+			startAt: 0,                     //Integer: The slide that the slider should start 
+			slideshowSpeed: 5000,           //Integer: Set the speed of the slideshow cycling, in milliseconds
+			animationSpeed: 800             //Integer: Set the speed of animations, in milliseconds
+		});
+
+
+
+        $(".js-v-img").each(function(index, ele){
+            if($(ele).data("src")){
+                $(ele).attr("src", regImgSrc($(ele).data("src")));
+            }
+        })
+
+        function regImgSrc(src){
+            var reg_img_src = /}(.+){/g;
+            var result = reg_img_src.exec(src)
+            if(result){
+                return $.trim(result[1])
+            }
+
+            return src;
+        }
+	})
+ </script>
+</body>
+</html>

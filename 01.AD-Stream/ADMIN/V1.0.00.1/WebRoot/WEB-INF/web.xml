@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<display-name>WebRoot</display-name>
+	<description>宽云视讯云应用开放平台后台管理系统</description>
+	
+	<!-- 字符编码过滤器 -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.eredlab.g4.rif.util.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>enabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.ered</url-pattern>
+	</filter-mapping>
+	
+	<!-- 请求拦截过滤器 -->
+	<filter>
+		<filter-name>requestFilter</filter-name>
+		<filter-class>org.eredlab.g4.rif.util.RequestFilter</filter-class>
+		<init-param>
+			<param-name>enabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>requestFilter</filter-name>
+		<url-pattern>*.ered</url-pattern>
+	</filter-mapping>
+	
+	<!-- 系统启动监听器 -->
+	<listener>
+		<listener-class>org.eredlab.g4.rif.util.SystemInitListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+	</listener>
+	<!-- 会话监听器 -->
+	<listener>    
+		<listener-class>org.eredlab.g4.rif.util.SessionListener</listener-class>    
+	</listener>
+<!-- 	
+	<servlet>
+	  <servlet-name>ServerServlet</servlet-name>
+      <servlet-class>org.eredlab.g4.rpm.web.servlet.InitServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+    </servlet>
+-->
+	<!-- 配置ActionServlet,加载Struts配置文件 -->
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>org.eredlab.g4.rif.web.BaseActionServlet</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>/WEB-INF/struts-config.xml</param-value>
+		</init-param>	
+		<init-param>
+			<param-name>config/crsm</param-name>
+			<param-value>/WEB-INF/struts-config-crsm.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>config/cabs</param-name>
+			<param-value>/WEB-INF/struts-config-cabs.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>2</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.ered</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 设置Session时长:以分钟为单位;如果是零或负数,那么会话就永远不会超时。 -->
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
+	
+	<!-- 缺省首页 -->
+	<welcome-file-list>
+		<welcome-file>login.htm</welcome-file>
+	</welcome-file-list>  
+	
+	<!-- 404错误响应页面 
+		<error-page>
+			<error-code>404</error-code>
+			<location>/common/error/404.jsp</location>
+		</error-page>
+		-->
+	
+	<!-- 500错误响应页面，如果想在客户端获取原始的异常堆栈信息则不要统一拦截500错误
+		<error-page>
+			<error-code>500</error-code>
+			<location>/common/error/500.jsp</location>
+		</error-page>
+		 -->
+	<!-- URM缓存数据查询 -->
+	<servlet>
+	    <servlet-name>CacheData</servlet-name>
+	    <servlet-class>org.eredlab.g4.rif.util.CacheData</servlet-class>
+	</servlet>
+	  <servlet-mapping>
+	    <servlet-name>CacheData</servlet-name>
+	    <url-pattern>/CacheData</url-pattern>
+	  </servlet-mapping>
+</web-app>

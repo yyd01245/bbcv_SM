@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+	<script type="text/javascript">
+	// var ip = "http://127.0.0.1:8888/"; 
+	 var ip = "127.0.0.1";
+	 var port = 8888;
+	 var callback = "?callback=handlerXXEE";
+	 var url;
+	 var script;
+	 var time = 150; //定时刷新时间 单位：毫秒
+	 var success = 0; //请求成功返回值
+	 var vncport = 0;
+	 var vncip="";
+	 var timeout = 2000;
+	 var currenttime = new Date();
+	 
+	 function addScript(){
+	 	script = document.createElement('script') ;
+	 	script.setAttribute("type","text/javascript") ;
+		script.src = url ;
+		//console.log(url);
+	 	document.body.appendChild(script);
+		currenttime = new Date();
+		
+		script.onerror = function(){
+			//url不可访问或者其它原因
+			setTimeout(reset,time);
+		}
+	 }
+	 /**回调函数*/
+	 /**返回值格式 handler({"returncode":"0","vncport":"1234","url":"www.baidu.com"})**/
+	 function handler(data){
+	 //	localStorage.url = null;
+	 	currenttime = new Date() ;
+	    if(success <= data.returncode && vncport == data.vncport){
+	        window.location.href = data.url ;//如果url是完整地址  请去掉 http://
+	//		localStorage.url = data.url;	
+		}
+		else {
+			//不是想要的报文，重新获取
+			setTimeout(reset,time);
+		}
+	 }
+		 
+	 
+	 /**定时刷新*/
+	 function reset(){
+	    console.log("server was stopped!");
+		document.body.removeChild(script) ;
+		addScript();
+	 }
+	 /**获取vncport**/
+	 function getVncport(name){
+		 var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
+		 if(result == null || result.length < 1){
+			 return "";
+		 }
+		 return result[1];
+	}
+
+	 window.onload = function(){
+	 	 vncport = getVncport("vncport");
+		 vncip = getVncport("vncip");
+		 if(vncip=="")
+			vncip = ip ;
+		 url = "http://" +vncip +":8888/"+ vncport + callback ; //url拼接
+	 	 addScript();
+	 	 setTimeout(reload,timeout);
+	   /*    var o = {"url":"file:///opt/index.html?sessionid=01000C02222730000019682222&termId=01000C02222730000019682222&aimIp=192.168.70.106&aimPort=13848&userInfo=1$01$03&expandinfo=10900$057100$&msg=eyJBVVRIVE9LRU4iOiIiLCJLRVkiOiIzNTQzNDMiLCJSRVRVUk5VUkwiOiJodHRwOi8vMTI1LjIxMC4xMzIuMjIzOjgwODAvQlNBVGVzdC9qc3AvYWN0aXZlLmpzcD9ibmNBdHRyaWJ1dGU9dHpib3NzJTI0NDAwMSUyNCUyMyUyMyUyNGh0dHAlM0ElMkYlMkZoZC1ob21lLndhc3UuY24lMkZhYWElMkZ3YXN1SW50ZXJhY3Rpb24uZG8iLCJTRVFVRU5DRSI6IjEwMDAwMDAwMDAxIiwiVVNFUkFHRU5UIjoiV2FzdS8xLjAoQkJDVikiLCJYUkVHSU9OSUQiOiIxNTQwIiwiWFJFU0VSVkUiOiIiLCJYVEVSTUlEIjoiMDEwMDBDMDIyMjI3MzAwMDAwMTk2ODIyMjIiLCJYVEVSTUlOQUxNT0RFTCI6IlVUQyBBY3RpdmUgIiwiWFVTRVJJRCI6IjAwMDA0NzEwODMiLCJYVVNFUlBST0ZJTEUiOiIwMyMxMDAwMDMyMzAjNDUwMDYxOCMjIyQ0MDAxJHR6Ym9zcyJ9&homePage=http://218.108.172.130:7080/bbcv/csp_v4/bbcvision.html&KYSXURL=http://218.108.172.130:7080/bbcv/csp_v4/bbcvision.html","iport":"50198","serialno":"c2d02ac393a34f3e89541c04e5d9464c"};
+			var str = JSON.stringify(o);
+	 	   postURL("log.jsp",str);
+	 	   
+	 		postURL("index.jsp",str,"skip") ;
+	 	 
+	 	  window.location.href = "index.html" ;
+	 	  localStorage.url = str;	
+	 	  */
+	 }
+	 
+	 function reload(){
+	 	if(new Date().getTime() - currenttime.getTime() > 2000)
+	 		window.location.reload() ;	
+	 	else
+	 		setTimeout(reload,timeout);
+	 }
+	   
+	 function postURL(url,param,call){
+	 	var xhr = new XMLHttpRequest() ;
+	 	xhr.open('POST',url,false);
+	 	xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	 	
+	 	if(call!=null){
+		 	xhr.onreadystatechange= function(){
+		 		if(xhr.readyState==4 && xhr.status==200){
+		 				skip(param);
+		 		}else{
+		 			postURL("index.jsp",str,"skip") ;
+		 		}
+		 	};
+		 }
+	 	xhr.send("url="+encodeURIComponent(param)) ;
+	}
+	
+	</script>
+</head>
+<body 
+<form id="myform" method="post" action="index.jsp">
+	<input type="hidden" id="url" name="url"/> 
+</form>
+
+</body>
+</html>

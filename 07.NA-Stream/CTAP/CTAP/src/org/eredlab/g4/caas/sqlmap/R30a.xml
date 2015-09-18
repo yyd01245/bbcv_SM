@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<sqlMap namespace="R30a">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<!-- 插入一条参数表记录 -->
+	<insert id="saveR30aItem" parameterClass="dto">
+		INSERT INTO ea_s99k (
+		   id, api_ip, api_port,api_version,pc_info) 
+		VALUES (#id#, #api_ip#, #api_port#,#api_version#,#pc_info#)
+	</insert>
+</sqlMap>

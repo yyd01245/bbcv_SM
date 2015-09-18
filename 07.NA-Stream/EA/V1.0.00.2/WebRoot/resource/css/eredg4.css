@@ -1,0 +1,369 @@
+@CHARSET "UTF-8";
+
+BODY { /*
+	SCROLLBAR-FACE-COLOR: #FFFFFF;
+	SCROLLBAR-HIGHLIGHT-COLOR: #61BFF8;
+	SCROLLBAR-SHADOW-COLOR: #61BFF8;
+	SCROLLBAR-3DLIGHT-COLOR: #FFFFFF;
+	SCROLLBAR-ARROW-COLOR: #61BFF8;
+	SCROLLBAR-TRACK-COLOR: #FFFFFF;
+	SCROLLBAR-DARKSHADOW-COLOR: #FFFFFF;
+	SCROLLBAR-BASE-COLOR: #FFFFFF
+	*/
+	font-family: "宋体";
+	font-size: 13px;
+}
+
+/* 解决IE下PNG图片透明Bug */
+.IEPNG {
+	behavior: url(./resource/htc/iepngfix.htc);
+}
+
+/* 管理首页Frame样式 */
+.mainFrame {
+	width: 100%;
+	height: 100%;
+	border-style: none;
+}
+
+/** 如下为解决Ext表单元素禁用状态字体模糊的办法
+  *  IE下还是解决不了
+  */
+.x-custom-field-disabled {
+	color: black !important;
+	color: black;
+	background: #F0F8FF;
+}
+
+/* 树节点被选中后的状态 */
+.node_checked .x-tree-node-anchor span {
+	text-decoration: line-through;
+	color: #777;
+}
+
+.font12{
+	font-family: "宋体";
+	font-size: 12px
+}
+
+.user {
+	background: url(../image/ext/user.gif) no-repeat 2px 2px;
+}
+
+.key {
+	background: url(../image/ext/key.gif) no-repeat 2px 2px;
+}
+
+.key,.user {
+	background-color: #FFFFFF;
+	padding-left: 20px;
+	font-size: 12px;
+}
+
+span.commoncss{
+	font-weight:normal;
+}
+
+.mustinput{
+	color:blue;
+}
+
+
+
+
+.serverBox,
+.serverBox2 {
+	float:left;
+	margin:1px;
+	display:inline;
+	color:#6F6F6F;
+	text-decoration:none;
+	padding-bottom:2px;
+	height:114px;
+	width:110px;
+	overflow:hidden;
+}
+.serverBox2 {
+	margin:0 10px;
+}
+.serverBox .img,
+.serverBox2 .img {
+	border:1px solid #F5F5F5;
+	background-color:#fff;
+	display:block;
+	width:70px;
+	height:48px;
+	text-align:center;
+	padding:11px 0;
+	margin:0 auto;
+}
+.serverBox .name,
+.serverBox2 .name {
+	display:block;
+	text-align:center;
+	height:42px;
+	line-height:22px;
+}
+.serverBox .img img,
+.serverBox2 .img img {
+	display:block;
+	margin:0 auto;
+	width:44px;
+	height:48px;
+}
+.serverBox:hover .img,
+.serverBox2:hover .img {
+	border:1px solid #E3E3E3;
+	background-color:#F5F5F5;
+}
+
+/*
+.appMonitor ,
+.appMonitor2 {
+	height:100%;
+	background:#BAD2E3 url(../image/ext/line.gif) repeat-x;
+}
+.appMonitor .border {
+	border-top:1px solid #fff;
+	border-bottom:2px solid #fff;
+	background-color:#D1E1ED;
+	padding:5px;
+}*/
+.appMonitor .border {
+	padding:10px;
+}
+.appMonitor .box {
+	float:left;
+	width:150px;
+	height:300px;
+	margin:5px;
+	background:#BBD6E6;
+	border:1px solid #D8E8F2;
+	border-radius:15px;
+	box-shadow:0 0 7px #94B8D1 inset;
+	padding:15px;
+	
+}
+.appMonitor a{
+	color: #34608A;
+    text-decoration: none;
+}
+.appMonitor .box .img {
+	width:80px;
+	height:66px;
+	padding:6px 0;
+	text-align:center;
+	border:1px solid #94B8D1;
+	background:#fff;
+	display:block;
+	margin:0 auto;
+	box-shadow:0 5px 5px #AAC9DD;
+}
+.appMonitor .box .name {
+	text-align:center;
+	font-weight:bold;
+	margin:15px 0 10px 0;
+	font-size:12px;
+}
+.appMonitor .box .each {
+	font-size:12px;
+	padding:2px 0;
+	
+}
+.appMonitor .first{
+	text-align:center:
+}
+.appMonitor .box .each img {float:left; margin-right:10px;}
+.appMonitor .box .each a {
+	text-decoration:none;
+	color:#34608a;
+}
+
+
+.hostMonitor .border {
+	padding:10px;
+}
+.hostMonitor .box {
+	float:left;
+	width:140px;
+	height:240px;
+	margin:5px;
+	background:#BBD6E6;
+	border:1px solid #D8E8F2;
+	border-radius:15px;
+	box-shadow:0 0 7px #94B8D1 inset;
+	padding:15px;
+	
+}
+.hostMonitor a{
+	color: #34608A;
+    text-decoration: none;
+}
+.hostMonitor .box .img {
+	width:80px;
+	height:66px;
+	padding:6px 0;
+	text-align:center;
+	border:1px solid #94B8D1;
+	background:#fff;
+	display:block;
+	margin:0 auto;
+	box-shadow:0 5px 5px #AAC9DD;
+}
+.hostMonitor .box .name {
+	text-align:center;
+	font-weight:bold;
+	margin:15px 0 10px 0;
+	font-size:14px;
+}
+.hostMonitor .box .each {
+	font-size:12px;
+	padding:2px 0;
+	
+}
+.hostMonitor .first{
+	text-align:center:
+}
+.hostMonitor .box .each img {float:left; margin-right:10px;}
+.hostMonitor .box .each a {
+	text-decoration:none;
+	color:#34608a;
+}
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden;}.clearfix{display:inline-block;}* html .clearfix{height:1%;}.clearfix{display:block;}
+.show {
+	font-size:14px;	
+	line-height:24px;
+	padding:10px;
+}
+.show .red {color:red;}
+.show .strong{font-weight:bold;}
+.red{font-weight:bold;font-size:14px;}
+.padding20px {
+	padding:20px;
+	line-height:18px;
+}
+.padding20px1 {
+	padding:20px;
+	line-height:18px;
+	color:#ff0000;
+}
+.submitBt {
+	width:80px;
+	display:inline-block;
+	height:20px;
+	text-align:center;
+	line-height:20px;
+	color:#000;
+	text-decoration:none;
+	border:1px solid #C9C9C9;
+	border-radius:5px;
+}
+.appMonitor2 .padding {
+	padding:50px 0;
+}
+.appMonitor2 .box2{
+	float:left;
+	width:80%;
+	padding:0 20px 20px;
+	margin:0 auto;
+	background:#BBD6E6;
+	border:1px solid #D8E8F2;
+	border-radius:15px;
+	box-shadow:0 0 7px #94B8D1 inset;
+}
+.appMonitor2 .box2 .table{
+	line-height:22px;
+	font-size:12px; 
+	text-align:center;
+}
+.appMonitor2 .box2 .table th{	
+	text-align:center;
+	font-weight: bold;
+	padding:10px 5px;
+}
+.appMonitor2 .box2 .table tr{	
+	text-align:center;
+	padding:10px 5px;
+}
+.appMonitor2 .box2 .title {
+	height:46px;
+	line-height:46px;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#34608a;
+	font-size:14px;
+	background:url(../image/ext/dot.gif) no-repeat 22px center;
+	padding-left:56px;
+}
+.appMonitor2 .box2 .detail {
+	border-radius:4px;
+	background-color:#F0F6F9;
+	border:1px solid #9DBBD2;
+	width:80%;
+	margin:0 auto;
+	padding:0 15px 10px;
+}
+.appMonitor2 .box2 .each {
+	border-bottom:1px solid #A6C6E0;
+	height:31px;
+	line-height:31px;
+	padding:8px 10px;
+	overflow:hidden;
+}
+.appMonitor2 .box2 .center {
+	margin:20px 0 0;
+}
+.appMonitor2 .box2 .each .name {
+	color:#3D6890;
+	font-weight:bold;
+	width:210px;
+	overflow:hidden;
+	float:left;
+}
+.appMonitor2 .box2 .red ,
+.appMonitor2 .box2 .red .name {
+	color:red;
+}
+/*
+.appMonitor2 .box2 .each .info {
+	float:left;
+	width:210px;
+	overflow:hidden;
+}*/
+
+.appMonitor2 .box2 .table .each .info {
+	width:210px;
+	overflow:hidden;
+}
+.appMonitor2 .box2 .bt1 ,
+.appMonitor2 .box2 .bt2 ,
+.appMonitor2 .box2 .bt3 {
+	background:url(../image/ext/btBg1.gif) no-repeat;
+	width:75px;
+	height:31px;
+	line-height:29px;
+	text-align:center;
+	color:#fff;
+	text-decoration:none;
+	display:inline-block;
+}
+.appMonitor2 .box2 .bt2 {
+	background:url(../image/ext/btBg2.gif) no-repeat;
+	width:80px;
+}
+.appMonitor2 .box2 .bt3 {
+	background:url(../image/ext/btBg3.gif) no-repeat;
+	width:119px;
+}
+.appMonitor2 .box2 .detail .link, a.link {
+    border:1px solid #0081BD;
+    border-radius:10px;
+    box-shadow: 0 0.08em 0 rgba(255, 255, 255, 0.4) inset, 0 0 0.1em rgba(255, 255, 255, 0.9) inset;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: inline-block;
+	padding:5px 10px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+	background-color:#00A2ED;
+}

@@ -1,0 +1,459 @@
+{
+   "backup": {
+      "_signature": "FYmB3/c5gh0jj8y5z7pyUSLFwMcHsCjADCETvGCn8dk=",
+      "_version": 4,
+      "browser": {
+         "show_home_button": true
+      },
+      "extensions": {
+         "ids": [ "ahfgeienlihckogmohjhadlkjgocpleb", "apdfllckaahabafndbhieahigkjlhalf", "bllbjnimkfmplkcfpmiihcnfbnppcnpf", "blpcfgokakmgnkcojhhkbfbldkacnbeo", "coipanjoiohkaaaikhgfcopmnfiikfpl", "coobgpohoikkiipiblmjeljniedjpjpf", "pjkljhegncpnkpknbcohdijeoejaedia" ]
+      },
+      "homepage": "",
+      "homepage_is_newtabpage": true,
+      "session": {
+         "restore_on_startup": 4,
+         "urls_to_restore_on_startup": [ "http://www.baidu.com/" ]
+      }
+   },
+   "browser": {
+      "clear_data": {
+         "time_period": 4
+      },
+      "clear_lso_data_enabled": true,
+      "last_known_google_url": "http://www.google.com.hk/",
+      "last_prompted_google_url": "http://www.google.com.hk/",
+      "pepper_flash_settings_enabled": true,
+      "show_home_button": true,
+      "window_placement": {
+         "bottom": 720,
+         "left": 0,
+         "maximized": false,
+         "right": 1280,
+         "top": 0,
+         "work_area_bottom": 720,
+         "work_area_left": 0,
+         "work_area_right": 1280,
+         "work_area_top": 0
+      },
+      "window_placement_DevToolsApp": {
+         "always_on_top": false,
+         "bottom": 665,
+         "left": 0,
+         "maximized": false,
+         "right": 640,
+         "top": 25,
+         "work_area_bottom": 743,
+         "work_area_left": 0,
+         "work_area_right": 1024,
+         "work_area_top": 25
+      }
+   },
+   "cloud_print": {
+      "email": ""
+   },
+   "countryid_at_install": 21843,
+   "default_apps_install_state": 3,
+   "default_search_provider": {
+      "enabled": true,
+      "encodings": "UTF-8",
+      "icon_url": "http://www.google.com/favicon.ico",
+      "id": "2",
+      "instant_url": "{google:baseURL}webhp?sourceid=chrome-instant&{google:RLZ}{google:instantEnabledParameter}ie={inputEncoding}",
+      "keyword": "google.com.hk",
+      "name": "Google",
+      "prepopulate_id": "1",
+      "search_url": "{google:baseURL}search?q={searchTerms}&{google:RLZ}{google:acceptedSuggestion}{google:originalQueryForSuggestion}{google:assistedQueryStats}{google:searchFieldtrialParameter}sourceid=chrome&ie={inputEncoding}",
+      "suggest_url": "{google:baseSuggestURL}search?{google:searchFieldtrialParameter}client=chrome&hl={language}&q={searchTerms}&sugkey={google:suggestAPIKeyParameter}"
+   },
+   "devtools": {
+      "split_location": 266
+   },
+   "dns_prefetching": {
+      "host_referral_list": [ 2, [ "http://www.baidu.com/", [ "http://s1.bdstatic.com/", 3.4144081114998395, "http://web.pinyin.sogou.com/", 2.87228336212188, "http://www.baidu.com/", 2.33015861274392 ] ] ],
+      "startup_list": [ 1, "http://s1.bdstatic.com/", "http://suggestion.baidu.com/", "http://web.pinyin.sogou.com/", "http://www.baidu.com/" ]
+   },
+   "download": {
+      "directory_upgrade": true,
+      "extensions_to_open": ""
+   },
+   "extensions": {
+      "autoupdate": {
+         "last_check": "12998329825133470",
+         "next_check": "12999778723885865"
+      },
+      "blacklistupdate": {
+         "lastpingday": "12998304000459485"
+      },
+      "chrome_url_overrides": {
+         "bookmarks": [ "chrome-extension://eemcgdkfndhakfknompkggombfjjjeno/main.html" ]
+      },
+      "settings": {
+         "ahfgeienlihckogmohjhadlkjgocpleb": {
+            "active_permissions": {
+               "api": [ "appNotifications", "management", "webstorePrivate" ]
+            },
+            "app_launcher_ordinal": "n",
+            "page_ordinal": "n"
+         },
+         "apdfllckaahabafndbhieahigkjlhalf": {
+            "ack_external": true,
+            "active_permissions": {
+               "api": [ "background", "clipboardRead", "clipboardWrite", "notifications", "unlimitedStorage" ]
+            },
+            "app_launcher_ordinal": "w",
+            "from_bookmark": false,
+            "from_webstore": true,
+            "granted_permissions": {
+               "api": [ "background", "clipboardRead", "clipboardWrite", "notifications", "unlimitedStorage" ]
+            },
+            "install_time": "12998121832155169",
+            "lastpingday": "12998304000633571",
+            "location": 1,
+            "manifest": {
+               "app": {
+                  "launch": {
+                     "web_url": "https://drive.google.com/"
+                  },
+                  "urls": [ "http://docs.google.com/", "http://drive.google.com/", "https://docs.google.com/", "https://drive.google.com/" ]
+               },
+               "background": {
+                  "allow_js_access": false
+               },
+               "current_locale": "en_US",
+               "default_locale": "en_US",
+               "description": "Google Drive: create, share and keep all your stuff in one place.",
+               "icons": {
+                  "128": "128.png"
+               },
+               "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDIl5KlKwL2TSkntkpY3naLLz5jsN0YwjhZyObcTOK6Nda4Ie21KRqZau9lx5SHcLh7pE2/S9OiArb+na2dn7YK5EvH+aRXS1ec3uxVlBhqLdnleVgwgwlg5fH95I52IeHcoeK6pR4hW/Nv39GNlI/Uqk6O6GBCCsAxYrdxww9BiQIDAQAB",
+               "manifest_version": 2,
+               "name": "Google Drive",
+               "offline_enabled": true,
+               "options_page": "https://drive.google.com/settings",
+               "permissions": [ "background", "clipboardRead", "clipboardWrite", "notifications", "unlimitedStorage" ],
+               "update_url": "http://clients2.google.com/service/update2/crx",
+               "version": "6.2"
+            },
+            "page_ordinal": "n",
+            "path": "apdfllckaahabafndbhieahigkjlhalf/6.2_0",
+            "state": 1,
+            "was_installed_by_default": true
+         },
+         "bllbjnimkfmplkcfpmiihcnfbnppcnpf": {
+            "active_permissions": {
+               "api": [ "history", "tabs", "webRequest", "webRequestBlocking", "webRequestInternal" ],
+               "explicit_host": [ "http://*/*" ],
+               "scriptable_host": [ "http://*/*" ]
+            },
+            "from_bookmark": false,
+            "from_webstore": false,
+            "granted_permissions": {
+               "api": [ "history", "tabs", "webRequest", "webRequestBlocking", "webRequestInternal" ],
+               "explicit_host": [ "http://*/*" ],
+               "scriptable_host": [ "http://*/*" ]
+            },
+            "incognito": true,
+            "install_time": "12998372370020899",
+            "location": 1,
+            "manifest": {
+               "background": {
+                  "scripts": [ "background.js" ]
+               },
+               "content_scripts": [ {
+                  "js": [ "contentscript.js", "jquery-1.7.2.min.js", "bbcv.js" ],
+                  "matches": [ "http://*/*" ]
+               } ],
+               "description": "bbcv chrome extension for internet",
+               "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCYncZdHroJsV2LUaU411K18+qA/8Tqw6UD1VTaa6ZIv1RYkq7tpq1ehGFXTBsc+mD6ypFIT5s4Ss4jtHYchYH3KLnBgx0REpMT8BfmyWH6IxYIfhEF09EFX+kPUie+LPRjh9I2BsB1PrAL0bde0VPajalr8xHgdmCcb0N7LFaiWQIDAQAB",
+               "manifest_version": 2,
+               "name": "bbcv chrome extension for internet",
+               "permissions": [ "tabs", "webRequest", "http://*/*", "webRequestBlocking", "history" ],
+               "version": "1.6.1"
+            },
+            "path": "bllbjnimkfmplkcfpmiihcnfbnppcnpf/1.6.1_0",
+            "state": 1,
+            "was_installed_by_default": false
+         },
+         "blpcfgokakmgnkcojhhkbfbldkacnbeo": {
+            "ack_external": true,
+            "active_permissions": {
+               "api": [ "appNotifications" ]
+            },
+            "app_launcher_ordinal": "t",
+            "from_bookmark": true,
+            "from_webstore": true,
+            "granted_permissions": {
+               "api": [ "appNotifications" ]
+            },
+            "install_time": "12998121832130735",
+            "lastpingday": "12998304000633571",
+            "location": 1,
+            "manifest": {
+               "app": {
+                  "launch": {
+                     "container": "tab",
+                     "web_url": "http://www.youtube.com/"
+                  },
+                  "web_content": {
+                     "enabled": true,
+                     "origin": "http://www.youtube.com"
+                  }
+               },
+               "current_locale": "en_US",
+               "default_locale": "en",
+               "description": "The world's most popular online video community.",
+               "icons": {
+                  "128": "128.png"
+               },
+               "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDC/HotmFlyuz5FaHaIbVBhhL4BwbcUtsfWwzgUMpZt5ZsLB2nW/Y5xwNkkPANYGdVsJkT2GPpRRIKBO5QiJ7jPMa3EZtcZHpkygBlQLSjMhdrAKevpKgIl6YTkwzNvExY6rzVDzeE9zqnIs33eppY4S5QcoALMxuSWlMKqgFQjHQIDAQAB",
+               "name": "YouTube",
+               "permissions": [ "appNotifications" ],
+               "update_url": "http://clients2.google.com/service/update2/crx",
+               "version": "4.2.5"
+            },
+            "page_ordinal": "n",
+            "path": "blpcfgokakmgnkcojhhkbfbldkacnbeo/4.2.5_0",
+            "state": 1,
+            "was_installed_by_default": true
+         },
+         "coipanjoiohkaaaikhgfcopmnfiikfpl": {
+            "active_permissions": {
+               "scriptable_host": [ "http://*/*" ]
+            },
+            "from_bookmark": false,
+            "from_webstore": false,
+            "granted_permissions": {
+               "scriptable_host": [ "http://*/*" ]
+            },
+            "incognito": true,
+            "install_time": "12998372361239818",
+            "location": 1,
+            "manifest": {
+               "content_scripts": [ {
+                  "js": [ "target.js" ],
+                  "matches": [ "http://*/*" ]
+               } ],
+               "description": "Open all link in self window",
+               "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7bCKtCMXWNygdMoBxHsFiRUHlt6ebi4XrzVxw5hBVzy4q+L/U2qR9mWXkW4uVW470KzBIXja//C2xt910IOCCFyl2+NQ9WDW+Y5ybIikVfCeAzRxS7fdOALXs1vYIveKf/D5twqkyNb7rzXOo3QX8m0d4XE8HQgFiqMATYnu4eQIDAQAB",
+               "name": "Links target=_self",
+               "update_url": "http://clients2.google.com/service/update2/crx",
+               "version": "0.0.2"
+            },
+            "path": "coipanjoiohkaaaikhgfcopmnfiikfpl/0.0.2_0",
+            "state": 1,
+            "was_installed_by_default": false
+         },
+         "coobgpohoikkiipiblmjeljniedjpjpf": {
+            "ack_external": true,
+            "app_launcher_ordinal": "x",
+            "from_bookmark": true,
+            "from_webstore": true,
+            "install_time": "12998121832173980",
+            "lastpingday": "12998304000633571",
+            "location": 1,
+            "manifest": {
+               "app": {
+                  "launch": {
+                     "web_url": "http://www.google.com/webhp?source=search_app"
+                  },
+                  "urls": [ "*://www.google.com/search", "*://www.google.com/webhp", "*://www.google.com/imgres" ]
+               },
+               "current_locale": "en_US",
+               "default_locale": "en",
+               "description": "The fastest way to search the web.",
+               "icons": {
+                  "128": "128.png",
+                  "16": "16.png",
+                  "32": "32.png",
+                  "48": "48.png"
+               },
+               "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDIiso3Loy5VJHL40shGhUl6it5ZG55XB9q/2EX6aa88jAxwPutbCgy5d9bm1YmBzLfSgpX4xcpgTU08ydWbd7b50fbkLsqWl1mRhxoqnN01kuNfv9Hbz9dWWYd+O4ZfD3L2XZs0wQqo0y6k64n+qeLkUMd1MIhf6MR8Xz1SOA8pwIDAQAB",
+               "name": "Google Search",
+               "update_url": "http://clients2.google.com/service/update2/crx",
+               "version": "0.0.0.19"
+            },
+            "page_ordinal": "n",
+            "path": "coobgpohoikkiipiblmjeljniedjpjpf/0.0.0.19_0",
+            "state": 1,
+            "was_installed_by_default": true
+         },
+         "pjkljhegncpnkpknbcohdijeoejaedia": {
+            "ack_external": true,
+            "active_permissions": {
+               "api": [ "notifications" ]
+            },
+            "app_launcher_ordinal": "y",
+            "from_bookmark": false,
+            "from_webstore": true,
+            "granted_permissions": {
+               "api": [ "notifications" ]
+            },
+            "install_time": "12998121832191302",
+            "lastpingday": "12998304000633571",
+            "location": 1,
+            "manifest": {
+               "app": {
+                  "launch": {
+                     "container": "tab",
+                     "web_url": "https://mail.google.com/mail/ca"
+                  },
+                  "urls": [ "*://mail.google.com/mail/ca" ]
+               },
+               "current_locale": "en_US",
+               "default_locale": "en",
+               "description": "Fast, searchable email with less spam.",
+               "icons": {
+                  "128": "128.png"
+               },
+               "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCuGglK43iAz3J9BEYK/Mz6ZhloIMMDqQSAaf3vJt4eHbTbSDsu4WdQ9dQDRcKlg8nwQdePBt0C3PSUBtiSNSS37Z3qEGfS7LCju3h6pI1Yr9MQtxw+jUa7kXXIS09VV73pEFUT/F7c6Qe8L5ZxgAcBvXBh1Fie63qb02I9XQ/CQIDAQAB",
+               "name": "Gmail",
+               "options_page": "https://mail.google.com/mail/ca/#settings",
+               "permissions": [ "notifications" ],
+               "update_url": "http://clients2.google.com/service/update2/crx",
+               "version": "7"
+            },
+            "page_ordinal": "n",
+            "path": "pjkljhegncpnkpknbcohdijeoejaedia/7_0",
+            "state": 1,
+            "was_installed_by_default": true
+         }
+      },
+      "ui": {
+         "developer_mode": true
+      }
+   },
+   "homepage": "",
+   "homepage_is_newtabpage": true,
+   "instant": {
+      "confirm_dialog_shown": true,
+      "enabled": false
+   },
+   "net": {
+      "http_server_properties": {
+         "servers": {
+            "www.google.com:443": {
+               "settings": {
+                  "4": 100,
+                  "5": 16
+               },
+               "supports_spdy": true
+            }
+         },
+         "version": 1
+      }
+   },
+   "ntp": {
+      "app_page_names": [ "Apps" ],
+      "promo_resource_cache_update": "1355304290.861523"
+   },
+   "plugins": {
+      "enabled_internal_pdf3": true,
+      "enabled_nacl": true,
+      "last_internal_directory": "/opt/google/chrome",
+      "plugins_list": [ {
+         "enabled": true,
+         "name": "Shockwave Flash",
+         "path": "/opt/google/chrome/PepperFlash/libpepflashplayer.so",
+         "version": "11.5.31.2"
+      }, {
+         "enabled": true,
+         "name": "Chrome Remote Desktop Viewer",
+         "path": "internal-remoting-viewer",
+         "version": ""
+      }, {
+         "enabled": true,
+         "name": "Native Client",
+         "path": "/opt/google/chrome/libppGoogleNaClPluginChrome.so",
+         "version": ""
+      }, {
+         "enabled": true,
+         "name": "Chrome PDF Viewer",
+         "path": "/opt/google/chrome/libpdf.so",
+         "version": ""
+      }, {
+         "enabled": true,
+         "name": "VLC Multimedia Plugin (compatible Totem 2.28.6)",
+         "path": "/usr/lib64/mozilla/plugins/libtotem-cone-plugin.so",
+         "version": ""
+      }, {
+         "enabled": true,
+         "name": "Windows Media Player Plug-in 10 (compatible; Totem)",
+         "path": "/usr/lib64/mozilla/plugins/libtotem-gmp-plugin.so",
+         "version": ""
+      }, {
+         "enabled": true,
+         "name": "DivX\u00AE Web Player",
+         "path": "/usr/lib64/mozilla/plugins/libtotem-mully-plugin.so",
+         "version": ""
+      }, {
+         "enabled": true,
+         "name": "QuickTime Plug-in 7.2.0",
+         "path": "/usr/lib64/mozilla/plugins/libtotem-narrowspace-plugin.so",
+         "version": ""
+      }, {
+         "enabled": true,
+         "name": "iTunes Application Detector",
+         "path": "/usr/lib64/mozilla/plugins/librhythmbox-itms-detection-plugin.so",
+         "version": ""
+      }, {
+         "enabled": true,
+         "name": "Adobe Flash Player"
+      }, {
+         "enabled": true,
+         "name": "Chrome PDF Viewer"
+      }, {
+         "enabled": true,
+         "name": "Chrome Remote Desktop Viewer"
+      }, {
+         "enabled": true,
+         "name": "DivX\u00AE Web Player"
+      }, {
+         "enabled": true,
+         "name": "Native Client"
+      }, {
+         "enabled": true,
+         "name": "QuickTime Plug-in 7.2.0"
+      }, {
+         "enabled": true,
+         "name": "VLC Multimedia Plugin (compatible Totem 2.28.6)"
+      }, {
+         "enabled": true,
+         "name": "Windows Media Player Plug-in 10 (compatible; Totem)"
+      }, {
+         "enabled": true,
+         "name": "iTunes Application Detector"
+      } ]
+   },
+   "profile": {
+      "avatar_index": 0,
+      "content_settings": {
+         "clear_on_exit_migrated": true,
+         "pref_version": 1
+      },
+      "created_by_version": "23.0.1271.64",
+      "exited_cleanly": true,
+      "local_profile_id": 10354236,
+      "name": "First user"
+   },
+   "session": {
+      "restore_on_startup": 4,
+      "restore_on_startup_migrated": true,
+      "urls_to_restore_on_startup": [ "http://www.baidu.com/" ]
+   },
+   "sync": {
+      "suppress_start": true
+   },
+   "sync_promo": {
+      "startup_count": 2,
+      "view_count": 3
+   },
+   "translate": {
+      "enabled": false
+   },
+   "translate_accepted_count": {
+      "zh-CN": 0
+   },
+   "translate_denied_count": {
+      "zh-CN": 3
+   }
+}

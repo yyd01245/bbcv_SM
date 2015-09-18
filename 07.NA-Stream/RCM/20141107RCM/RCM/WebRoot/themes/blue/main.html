@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>残疾人综合业务系统---欢迎使用</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+		<link href="../../css/blue-style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="../../dist/jquery/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript">
+		function changeSystem(sysName){
+			if(sysName!=""){
+				sysName = "../../apps/" + sysName + "/";
+			}
+			var leftUrl = sysName + "left.html";
+			var rightUrl = sysName + "right.html";
+			
+			$("#leftFrame")[0].src = leftUrl;
+			$("#rightFrame")[0].src = rightUrl;
+		}
+		
+		function changezjcfkweb(){
+			document.location.href="../../apps/zcfgkweb/zcfgkweb.html";
+		}
+		
+		
+		function logout(){
+			var f = confirm("你确定要注销吗？");
+			if(f){
+				document.location.href = "login.html";
+			}
+		}
+		$(function(){
+			//头部导航菜单效果
+			var spanNode = $(".top_right_bottom span");
+			spanNode.addClass("top_menu_bg1");
+			spanNode.click(function(){
+				$(this).addClass("top_menu_bg2").siblings("span").removeClass("top_menu_bg2");
+			});
+		})
+		
+		//id is the iframe's id, s is top height.
+		function resetHeight(id,s){ 
+			//alert(window.screen.availHeight);
+    		var win = document.getElementById(id);
+    		
+    		var mh = 0;
+    		if (window.innerHeight)
+    			mh = window.innerHeight;
+    		else if ((document.body) && (document.body.clientHeight))
+    			mh = document.body.clientHeight;
+    		if (document.documentElement && document.documentElement.clientHeight && document.documentElement.clientWidth) {
+    			mh = document.documentElement.clientHeight;
+    		}
+    		
+    		win.height = mh - s;
+    	};
+
+		</script>
+	</head>
+
+	<body>
+	<!-- top -->
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" background="../../images/top_bg2.gif">
+			<tr>
+				<td class="top_logo" onclick="javascript:self.location.href='main.html'">
+					&nbsp;
+				</td>
+				<td valign="top" class="top_bg">  
+					<div class="top_right_top">
+						地区：<span class="top_font_orange">市残疾人联合会</span>
+						人员：<span class="top_font_orange">系统管理员！</span>
+						<a href="javascript:logout();">
+							<img src="../../images/an_zhuce.gif" width="47" height="20" border="0" style="vertical-align:middle;"/>
+						</a>&nbsp;
+						<a href="#">
+							<img src="../../images/an_xgmm.gif" width="65" height="20" border="0"  style="vertical-align:middle;">
+						</a>
+					</div>
+					<div class="top_right_bottom">
+						<span onclick="javascript:changeSystem('');" class="top_menu_bg2">首页</span>
+						<span onclick="javascript:changeSystem('dangan');">发证管理子系统</span>
+						<!-- <span onclick="javascript:changeSystem('bzj');">保障金征缴系统</span>-->
+						<span onclick="javascript:changeSystem('reports');">自定义报表系统</span>
+						<span onclick="javascript:changeSystem('sjjh');">数据交换服务系统</span>
+						<span onclick="javascript:changeSystem('survey');">需求调查管理系统</span>
+						<!--<span onclick="javascript:changeSystem('dss');">决策支持系统</span>
+						<span onclick="javascript:changeSystem('mis');">残疾儿童监测</span>
+						<span onclick="javascript:changeSystem('ecms');">信息报送系统</span>
+						<span onclick="javascript:changeSystem('system');">系统配置管理</span>-->
+						<span onclick="javascript:changeSystem('zcfgk');">政策法规管理系统</span>
+						<span onclick="javascript:changezjcfkweb();">政策法规平台</span>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<!-- menu -->
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" background="../../images/position_bg.gif">
+			<tr><td>&nbsp;</td></tr>
+		</table>
+		<!-- content -->
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" background="../../images/bg00.gif">
+			<tr>
+				<td width="220" align="center" valign="top">
+					<table width="200" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td class="content_left_top">
+							</td>
+						</tr>
+						<tr>
+							<td align="center" valign="top" bgcolor="#D7F0FF">
+								<iframe name="leftFrame" id="leftFrame" src="left.html" align="middle" scrolling="no" width="200" height="450" frameborder="0" ></iframe>
+							</td>
+						</tr>
+						<tr>
+							<td class="content_left_bottom">
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td align="center" valign="top" bgcolor="#FFFFFF">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td class="content_right_top"></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td align="left">
+								<iframe name="rightFrame" id="rightFrame" src="right.html" align="middle" scrolling="auto" width="100%" height="462" frameborder="0"></iframe>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<!-- bottom -->
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="center" class="bottom_line">
+					版权所有&nbsp;&copy;&nbsp;XXX残疾人联合会
+				</td>
+			</tr>
+		</table>
+	<script type="text/javascript">
+	resetHeight("leftFrame",147);
+	resetHeight("rightFrame",132);
+	</script>
+	</body>
+</html>

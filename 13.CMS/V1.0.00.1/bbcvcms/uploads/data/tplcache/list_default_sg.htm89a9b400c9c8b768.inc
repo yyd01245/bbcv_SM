@@ -1,0 +1,43 @@
+<?php
+$z[0]=Array("global","",236,264);
+$z[0][4]['name']="cfg_soft_lang";
+$z[1]=Array("field","",277,296);
+$z[1][4]['name']="title";
+$z[2]=Array("global","",297,323);
+$z[2][4]['name']="cfg_webname";
+$z[3]=Array("field","",364,393);
+$z[3][4]['name']="keywords";
+$z[4]=Array("field","",433,491);
+$z[4][4]['name']="description";
+$z[4][4]['function']="html2text(@me)";
+$z[5]=Array("global","",509,541);
+$z[5][4]['name']="cfg_templets_skin";
+$z[6]=Array("include","",650,685);
+$z[6][4]['filename']="head.htm";
+$z[7]=Array("channel","\r\n		<span><a href='[field:typeurl/]'>[field:typename/]</a></span>",776,952);
+$z[7][4]['currentstyle']="<span><a href='~typelink~' class='thisclass'>~typename~</a></span>";
+$z[8]=Array("field","",1110,1139);
+$z[8][4]['name']="position";
+$z[9]=Array("list","\r\n            <li><a href=\"[field:arcurl/]\" class=\"title\">[field:title/]</a><span class=\"date\">[field:pubdate function=\"GetDateTimeMK(@me)\"/]</span></li>\r\n            ",1235,1439);
+$z[9][4]['pagesize']="20";
+$z[10]=Array("pagelist","",1537,1608);
+$z[10][4]['listitem']="info,index,end,pre,next,pageno";
+$z[10][4]['listsize']="5";
+$z[11]=Array("arclistsg","\r\n                        <li><span>[field:typename/]</span><a href=\"[field:arcurl/]\">[field:title/]</a></li>\r\n                    ",1860,2060);
+$z[11][4]['orderby']="id";
+$z[11][4]['titlelen']="60";
+$z[11][4]['row']="10";
+$z[12]=Array("myad","",2181,2212);
+$z[12][4]['name']="listRtPicAD";
+$z[13]=Array("arclistsg","\r\n                    	<li><span>[field:typename/]</span><a href=\"[field:arcurl/]\">[field:title/]</a></li>\r\n                    ",2384,2581);
+$z[13][4]['sort']="click";
+$z[13][4]['titlelen']="30";
+$z[13][4]['row']="10";
+$z[14]=Array("myad","",2697,2729);
+$z[14][4]['name']="listRtPicAD2";
+$z[15]=Array("myad","",2835,2868);
+$z[15][4]['name']="innerfooterAD";
+$z[16]=Array("include","",2876,2913);
+$z[16][4]['filename']="footer.htm";
+
+?>

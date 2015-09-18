@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="ucms-web">
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
+        <dependent-module archiveName="ucms-dto-1.0.00.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ucms-dto/ucms-dto">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="ucms-commons-1.0.00.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ucms-commons/ucms-commons">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="ucms-model-1.0.00.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ucms-model/ucms-model">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="ucms-exception-1.0.00.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ucms-exception/ucms-exception">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="ucms-service-1.0.00.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ucms-service/ucms-service">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="ucms-dao-1.0.00.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ucms-dao/ucms-dao">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="ucms-mdb-1.0.00.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ucms-mdb/ucms-mdb">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="ucms-socket-1.0.00.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ucms-socket/ucms-socket">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="java-output-path" value="/ucms-web/src/main/webapp/WEB-INF/classes"/>
+        <property name="context-root" value="/UCMS"/>
+    </wb-module>
+</project-modules>

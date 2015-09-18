@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  
+  
+  <servlet>
+    <description>模板管理</description>
+    <display-name>电视导航Servlet</display-name>
+    <servlet-name>TvNavigateServlet</servlet-name>
+    <servlet-class>servlet.template.TvNavigateServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>手机首页管理</description>
+    <display-name>手机首页Servlet</display-name>
+    <servlet-name>MbHomeServlet</servlet-name>
+    <servlet-class>servlet.template.MbHomeServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>手机详情页管理</description>
+    <display-name>手机详情页Servlet</display-name>
+    <servlet-name>MbDetailServlet</servlet-name>
+    <servlet-class>servlet.template.MbDetailServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>点播资源管理</description>
+    <display-name>点播资源Servlet</display-name>
+    <servlet-name>VodResourceServlet</servlet-name>
+    <servlet-class>servlet.vodRes.VodResourceServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>配置一览表管理</description>
+    <display-name>配置一览表Servlet</display-name>
+    <servlet-name>ConfigListServlet</servlet-name>
+    <servlet-class>servlet.configure.ConfigListServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>电视导航配置管理</description>
+    <display-name>电视导航配置Servlet</display-name>
+    <servlet-name>TvNavigateConfigServlet</servlet-name>
+    <servlet-class>servlet.configure.TvNavigateConfigServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>手机首页配置管理</description>
+    <display-name>手机首页配置Servlet</display-name>
+    <servlet-name>MbHomeConfigServlet</servlet-name>
+    <servlet-class>servlet.configure.MbHomeConfigServlet</servlet-class>
+  </servlet>
+  
+    <servlet>
+    <description>栏目管理</description>
+    <display-name>栏目Servlet</display-name>
+    <servlet-name>BannerServlet</servlet-name>
+    <servlet-class>servlet.column.BannerServlet</servlet-class>
+  </servlet>
+  
+  
+  
+
+  <servlet>
+    <description>栏目配置</description>
+    <display-name>栏目配置Servlet</display-name>
+    <servlet-name>BannerConfigServlet</servlet-name>
+    <servlet-class>servlet.column.BannerConfigServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>栏目资源统计</description>
+    <display-name>栏目资源统计Servlet</display-name>
+    <servlet-name>BanderCountServlet</servlet-name>
+    <servlet-class>servlet.count.BanderCountServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>栏目配置</description>
+    <display-name>栏目配置Servlet</display-name>
+    <servlet-name>Test</servlet-name>
+    <servlet-class>servlet.count.Test</servlet-class>
+  </servlet>
+  <servlet>
+    <description>vod资源上传下载</description>
+    <display-name>vod资源上传下载Servlet</display-name>
+    <servlet-name>ResUpDownLoad</servlet-name>
+    <servlet-class>servlet.vodRes.ResUpDownLoad</servlet-class>
+  </servlet>
+  <servlet>
+    <description>加载vod资源</description>
+    <display-name>加载vod资源Servlet</display-name>
+    <servlet-name>InitVodResourceServlet</servlet-name>
+    <servlet-class>servlet.vodRes.InitVodResourceServlet</servlet-class>
+  </servlet>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <servlet-mapping>   
+   <servlet-name>TvNavigateServlet</servlet-name>
+    <url-pattern>/apps/TvNavigateServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MbHomeServlet</servlet-name>
+    <url-pattern>/apps/MbHomeServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MbDetailServlet</servlet-name>
+    <url-pattern>/apps/MbDetailServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>VodResourceServlet</servlet-name>
+    <url-pattern>/apps/VodResourceServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ConfigListServlet</servlet-name>
+    <url-pattern>/apps/ConfigListServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TvNavigateConfigServlet</servlet-name>
+    <url-pattern>/apps/TvNavigateConfigServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MbHomeConfigServlet</servlet-name>
+    <url-pattern>/apps/MbHomeConfigServlet</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>BannerServlet</servlet-name>
+    <url-pattern>/apps/BannerServlet</url-pattern>
+  </servlet-mapping>
+  
+
+  <servlet-mapping>
+    <servlet-name>BannerConfigServlet</servlet-name>
+    <url-pattern>/apps/BannerConfigServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>BanderCountServlet</servlet-name>
+    <url-pattern>/apps/BanderCountServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Test</servlet-name>
+    <url-pattern>/Test</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ResUpDownLoad</servlet-name>
+    <url-pattern>/apps/ResUpDownLoad</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>InitVodResourceServlet</servlet-name>
+    <url-pattern>/apps/InitVodResourceServlet</url-pattern>
+  </servlet-mapping>
+  
+  
+  
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  
+
+  
+</web-app>

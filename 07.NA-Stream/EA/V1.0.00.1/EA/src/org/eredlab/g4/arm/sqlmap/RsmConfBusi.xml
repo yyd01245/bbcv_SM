@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 权限模型标签数据访问手工映射SQL语句 -->
+<sqlMap namespace="RsmConfBusi">
+	<typeAlias alias="dto" type="org.eredlab.g4.ccl.datastructure.impl.BaseDto"/>
+	
+	<!-- 查询RSM操作编号最大值 -->
+	<select id="queryMaxCode" parameterClass="map" resultClass="java.lang.String">
+		 SELECT max(busi_code) from ea_busi_info
+	</select>
+	<!-- 插入一条RSM配置文件更新记录 -->
+	<insert id="saveBusi" parameterClass="map">
+		INSERT INTO ea_busi_info (busi_code, operater, oper_time) 
+		VALUES (#busi_code#, #operater#, #oper_time#)
+	</insert>
+	<!-- 插入一条RSM配置文件更新详情记录 -->
+	<insert id="saveBusiDetail" parameterClass="map">
+		INSERT into ea_busi_detail_info (busi_code,busi_type,area_id,maxcount,Vncname,sd_width,sd_height,hd_width,hd_height,vncserverport,recordadd,pa_amount,uid,chrome_type,TVnet,key_ignore,listenport,proxy,keytimeoutport,keylistenport,timeoutforecast,log_file_path,log_file,log_level,process_threads_aim,RSM_AREA_ID,RSM_C_TYPE,RSM_NETNAME,RSM_AIM_LISTENTPORT,RSM_VNC_LISTENTPORT,AIM_IP,AIM_PORT,VNCW_IP,VNCW_PORT,RSM_VID_QUOTA,RSM_NUM_HD,RSM_NUM_SD,RSM_AUDIO,RSM_GOP_SIZE,RSM_VID_RATE,VNC_PORT,RSM_VNCSERVER_PORT,RSM_KEYLISTEN_PORT,RSM_PA_AMOUNT,RSM_UID,RSM_LOG_FILE_PATH,RSM_LOG_FILE,RSM_LOG_LEVEL,RSM_PROCESS_THREADS_AIM,RSM_PROCESS_THREADS_VNC)
+		VALUES (#busi_code#,#busi_type#,#area_id#,#maxcount#,#Vncname#,#sd_width#,#sd_height#,#hd_width#,#hd_height#,#vncserverport#,#recordadd#,#pa_amount#,#uid#,#chrome_type#,#TVnet#,#key_ignore#,#listenport#,#proxy#,#keytimeoutport#,#keylistenport#,#timeoutforecast#,#log_file_path#,#log_file#,#log_level#,#process_threads_aim#,#RSM_AREA_ID#,#RSM_C_TYPE#,#RSM_NETNAME#,#RSM_AIM_LISTENTPORT#,#RSM_VNC_LISTENTPORT#,#AIM_IP#,#AIM_PORT#,#VNCW_IP#,#VNCW_PORT#,#RSM_VID_QUOTA#,#RSM_NUM_HD#,#RSM_NUM_SD#,#RSM_AUDIO#,#RSM_GOP_SIZE#,#RSM_VID_RATE#,#VNC_PORT#,#RSM_VNCSERVER_PORT#,#RSM_KEYLISTEN_PORT#,#RSM_PA_AMOUNT#,#RSM_UID#,#RSM_LOG_FILE_PATH#,#RSM_LOG_FILE#,#RSM_LOG_LEVEL#,#RSM_PROCESS_THREADS_AIM#,#RSM_PROCESS_THREADS_VNC#)
+	</insert>
+		
+</sqlMap>

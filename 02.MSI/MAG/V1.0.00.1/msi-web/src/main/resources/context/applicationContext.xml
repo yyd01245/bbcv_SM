@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byType" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="mdbPool" class="com.bbcv.mdb.redis.pool.MdbPool">
+		<constructor-arg value="${redis.server.host}" />
+		<constructor-arg value="${redis.server.port}" />
+		<constructor-arg value="${redis.server.password}" />
+	</bean>
+
+	<bean id="mdbImpl" class="com.bbcv.mdb.redis.impl.MDBDataImpl">
+		<constructor-arg index="0" ref="mdbPool" />
+	</bean>
+			
+	<bean id="mdbRedis" class="prod.nebula.mdb.MdbRedis">
+		<property name="jedisPool" ref="mdbPool" />
+		<property name="mdbImpl" ref="mdbImpl" />
+	</bean>
+	
+	<!-- MsiConfig统一配置文件 -->
+	<bean id="msiConfig" class="prod.nebula.commons.config.MsiConfig">
+		<property name="dbSourceUrl" value="${db.source.url}" />
+		<property name="redisServerHost" value="${redis.server.host}" />
+		<property name="redisServerPort" value="${redis.server.port}" />
+		<property name="serviceIP" value="${ucms.service.ip}" />
+		<property name="servicePort" value="${ucms.service.port}" />
+		<property name="smServiceIP" value="${sm.service.ip}" />
+		<property name="smServicePort" value="${sm.service.port}" />
+	</bean>
+	
+	
+	<!-- ucmsConfig统一配置文件 -->
+	<!-- 
+	<bean id="ucmsConfig" class="prod.nebula.commons.config.UcmsConfig">
+		<property name="mainPage" value="${default.mobile.url}" />
+		<property name="sm_service_ip" value="${sm.service.ip}" />
+		<property name="sm_service_port" value="${sm.service.port}" />
+		<property name="sm_service_time" value="${sm.service.timeout}" />
+		<property name="local_server_port" value="${local.tcpserver.port}" />
+	</bean>
+ 	-->
+	<bean class="prod.nebula.commons.spring.ApplicationContextHelper"></bean>
+	
+	<!-- 
+	<bean id="ucms" class="prod.nebula.msi.web.handle.UCMSModuleLoader"></bean>
+	 -->
+	<bean id="socketSession" class="prod.nebula.socket.session.impl.SocketSessionTemplate">
+		<property name="ip" value="${ucms.service.ip}" />
+		<property name="port" value="${ucms.service.port}" />
+		<property name="timeout" value="4000" />
+		<property name="suffix" value="XXEE" />
+	</bean>
+	
+	<bean class="prod.nebula.socket.session.SocketSessionSupport" abstract="true">
+	</bean>
+	
+	<import resource="classpath:context/applicationContext-database.xml"/>
+	<!-- 
+	<import resource="classpath:context/applicationContext-quartz.xml"/>
+	<import resource="classpath:context/applicationContext-mina.xml"/>
+	-->
+	<context:component-scan base-package="prod.nebula" />
+</beans>

@@ -1,0 +1,16 @@
+#本地地址
+mulip = 192.168.100.56 
+#本地端口
+mulport = 21000
+#SM地址 
+smip = 192.168.100.56
+#SM端口
+smport = 20909
+#数据库地址 
+dbip = 192.168.100.11
+#数据库名字
+dbname = newmydb
+#数据库用户名
+dbuser = bbcv
+#数据库密码
+dbpass = bbcv

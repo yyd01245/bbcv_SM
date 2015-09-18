@@ -1,0 +1,70 @@
+@CHARSET "UTF-8";
+
+.pagination-specter {
+	display:inline;
+	float:right;
+	margin-right:10px;
+	padding-top:8px;
+	width:auto;
+	font-size:12px;
+	text-decoration:none;
+}
+.pagination-specter a {
+	background:url("button.png") no-repeat scroll left top transparent;
+	color:#000000;
+	display:inline;
+	float:right;
+	font-family:"Arial";
+	height:21px;
+	line-height:21px;
+	margin-left:3px;
+	padding-left:6px;
+	text-align:center;
+}
+.pagination-specter a span {
+	background:url("button.png") no-repeat scroll right top transparent;
+	display:inline-block;
+	font-family:"Arial";
+	height:21px;
+	line-height:21px;
+	padding-right:6px;
+}
+
+.pagination-specter a span.sm {
+	padding:0 4px 0 0;
+}
+.pagination-specter a.disable {
+	color:#C4C4C4;
+	cursor:auto;
+	font-family:"宋体";
+}
+.pagination-specter a.enable {
+	font-family:"宋体";
+}
+.pagination-specter a:hover, .pagination-specter a.this {
+	background:url("button.png") no-repeat scroll left bottom transparent;
+	color:#FFFFFF;
+	cursor:pointer;
+	text-decoration:none;
+}
+.pagination-specter a:hover span, .pagination-specter a.this span {
+	background:url("button.png") no-repeat scroll right bottom transparent;
+}
+.pagination-specter a.disable:hover {
+	background:url("button.png") no-repeat scroll left top transparent;
+	color:#C4C4C4;
+}
+.pagination-specter a.disable:hover span {
+	background:url("button.png") no-repeat scroll right top transparent;
+}
+.pagination-specter span.points {
+	border:0 none;
+	color:#000000;
+	display:inline;
+	float:right;
+	font-family:"Arial";
+	line-height:11px;
+	margin-left:3px;
+	padding:5px 6px;
+	text-align:center;
+}

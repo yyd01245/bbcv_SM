@@ -1,0 +1,1 @@
+<li class=""><a href="[field:arcurl/]"><img alt=""  class="js-v-img" data-src="[field:mb_poster_path2/]"/></a></li>

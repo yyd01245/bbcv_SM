@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<!--     二维码扫描Servlet  	-->
+
+	<servlet>
+		<servlet-name>appServlet</servlet-name>
+		<servlet-class>prod.nebula.service.servlet.AppServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/a</url-pattern>
+	</servlet-mapping>
+
+
+
+
+
+	<!--     首页  	-->
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+
+	<!--  页面实时查询跳转  Servlet -->
+
+	<servlet>
+		<servlet-name>skipServlet</servlet-name>
+		<servlet-class>prod.nebula.service.servlet.SkipServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>skipServlet</servlet-name>
+		<url-pattern>/skipServlet</url-pattern>
+	</servlet-mapping>
+
+
+
+	<!--  下载 Servlet    无用-->
+	<servlet>
+		<description>This is the description of my J2EE component</description>
+		<display-name>This is the display name of my J2EE component</display-name>
+		<servlet-name>FileDownLoadServlet</servlet-name>
+		<servlet-class>prod.nebula.service.FileDownLoadServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>FileDownLoadServlet</servlet-name>
+		<url-pattern>/FileDownLoadServlet</url-pattern>
+	</servlet-mapping>
+
+
+
+
+
+	<!--  绑定超时请求-->
+
+	<servlet>
+		<servlet-name>OverTimeServlet</servlet-name>
+		<servlet-class>prod.nebula.service.servlet.OverTimeServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>OverTimeServlet</servlet-name>
+		<url-pattern>/OverTimeServlet</url-pattern>
+	</servlet-mapping>
+
+
+
+	<!--  暂停超时请求-->
+	
+	<servlet>
+		<servlet-name>PauseServlet</servlet-name>
+		<servlet-class>prod.nebula.service.servlet.PauseServlet</servlet-class>
+	</servlet>
+  <servlet>
+    <description>过渡</description>
+    <display-name>过渡Servlet</display-name>
+    <servlet-name>TransitionServlet</servlet-name>
+    <servlet-class>prod.nebula.service.servlet.TransitionServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>显示vod详情</description>
+    <display-name>显示vod详情Servlet</display-name>
+    <servlet-name>ShowVodInfo</servlet-name>
+    <servlet-class>prod.nebula.service.servlet.ShowVodInfo</servlet-class>
+  </servlet>
+  <servlet>
+    <description>vod资源上传下载</description>
+    <display-name>vod资源上传下载Servlet</display-name>
+    <servlet-name>QuitServlet</servlet-name>
+    <servlet-class>prod.nebula.service.servlet.QuitServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <display-name>清除用户扫描二维码时的vodid</display-name>
+    <servlet-name>ClearVodidServlet</servlet-name>
+    <servlet-class>prod.nebula.service.servlet.ClearVodidServlet</servlet-class>
+  </servlet>
+
+
+
+
+
+	<servlet-mapping>
+		<servlet-name>PauseServlet</servlet-name>
+		<url-pattern>/PauseServlet</url-pattern>
+	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TransitionServlet</servlet-name>
+    <url-pattern>/TransitionServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ShowVodInfo</servlet-name>
+    <url-pattern>/mobile/ShowVodInfo</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>QuitServlet</servlet-name>
+    <url-pattern>/QuitServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ClearVodidServlet</servlet-name>
+    <url-pattern>/ClearVodidServlet</url-pattern>
+  </servlet-mapping>
+
+
+
+
+
+
+
+
+
+
+</web-app>
